@@ -1,4 +1,34 @@
 [bits 16]
+    jmp     _start
+
+
+gdt:
+gdt_null:
+    dd  0
+    dd  0
+gdt_code:
+    ; dword 1
+    dw  0xffff
+    dw  0
+    ; dword 2
+    db  0
+    db  10011010b
+    db  11001111b
+    db  0
+gdt_data:
+    ; dword 1
+    dw  0xffff
+    dw  0
+    ; dword 2
+    db  0
+    db  10010010b
+    db  11001111b
+    db  0
+gdt_end:
+
+gdt_desc:
+    dw  gdt_end - gdt - 1
+    dd  gdt
 
 _start:
     ;
@@ -30,34 +60,6 @@ _start_pm:
 
 _loop: 
     jmp     _loop
-
-gdt:
-gdt_null:
-    dd  0
-    dd  0
-gdt_code:
-    ; dword 1
-    dw  0xffff
-    dw  0
-    ; dword 2
-    db  0
-    db  10011010b
-    db  11001111b
-    db  0
-gdt_data:
-    ; dword 1
-    dw  0xffff
-    dw  0
-    ; dword 2
-    db  0
-    db  10010010b
-    db  11001111b
-    db  0
-gdt_end:
-
-gdt_desc:
-    dw  gdt_end - gdt - 1
-    dd  gdt
 
 
 times 510-($-$$) db 0

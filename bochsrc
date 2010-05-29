@@ -6,7 +6,7 @@ romimage: file=/usr/share/bochs/BIOS-bochs-latest, address=0xe0000
 vgaromimage: file=/usr/share/bochs/VGABIOS-lgpl-latest
 megs: 32
 
-floppya: 1_44=/home/ssword/code/orzos/boot.img, status=inserted
+floppya: 1_44=/home/ssword/code/os/orzos/boot.img, status=inserted
 boot: a
 
 log: bochsout.txt
