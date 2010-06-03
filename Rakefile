@@ -10,8 +10,8 @@ file 'boot.o' => ['boot.S'] do
   sh "nasm -f elf boot.S"
 end
 
-file 'boot.bin' => ['boot.o', 'orzos.ld'] do 
-  sh "ld boot.o -o boot.bin -e c -T orzos.ld"
+file 'boot.bin' => ['boot.o', 'img.ld'] do 
+  sh "ld boot.o -o boot.bin -e c -T img.ld"
 end
 
 #file 'boot.bin' => ['boot.elf'] do
