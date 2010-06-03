@@ -1,4 +1,10 @@
-task :default => 'boot.img'
+task :default => :bochs
+
+task :bochs => :build do
+  sh "bochs -q -f .bochsrc"
+end
+  
+task :build => 'boot.img'
 
 file 'boot.o' => ['boot.S'] do
   sh "nasm -f elf boot.S"
