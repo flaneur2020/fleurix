@@ -1,5 +1,35 @@
 [bits 16]
-    jmp     _start
+align 4
+extern  main
+
+_start:
+    ;
+    ; prepare to enter protect mode
+    ;
+    xor     ax,  ax
+    mov     ds,  ax
+
+    ; clear the intrrupt
+    cli
+    ; load gdt
+    lgdt    [gdt_desc]
+    ; switch on PE in cr0
+    mov     eax, cr0
+    or      eax, 1
+    mov     cr0, eax
+    ; jump, set seg registers as selector
+    jmp     08h:_start_pm
+
+[bits 32]
+_start_pm:
+    mov     ax,  10h
+    mov     ds,  ax
+    mov     ss,  ax
+    mov     esp, 090000h              
+    call    main
+
+_loop: 
+    jmp     _loop
 
 
 gdt:
@@ -30,37 +60,5 @@ gdt_desc:
     dw  gdt_end - gdt - 1
     dd  gdt
 
-_start:
-    ;
-    ; prepare to enter protect mode
-    ;
-    xor     ax,  ax
-    mov     ds,  ax
-
-    ; clear the intrrupt
-    cli
-    ; load gdt
-    lgdt    [gdt_desc]
-    ; switch on PE in cr0
-    mov     eax, cr0
-    or      eax, 1
-    mov     cr0, eax
-    ; jump, set seg registers as selector
-    jmp     08h:_start_pm
-
-[bits 32]
-_start_pm:
-    mov     ax,  10h
-    mov     ds,  ax
-    mov     ss,  ax
-    mov     esp, 090000h
-    ; put a char
-    mov     byte [ds:0B8000h], 'x'
-    mov     byte [ds:0B8001h], 1Bh 
-
-_loop: 
-    jmp     _loop
-
-
-times 510-($-$$) db 0
-dw 0xAA55
+;times 510-($-$$) db 0
+;dw 0xAA55

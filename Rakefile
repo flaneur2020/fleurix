@@ -10,8 +10,13 @@ file 'boot.o' => ['boot.S'] do
   sh "nasm -f elf boot.S"
 end
 
-file 'boot.bin' => ['boot.o', 'img.ld'] do 
-  sh "ld boot.o -o boot.bin -e c -T img.ld"
+file 'main.o' => ['main.c'] do 
+  sh "gcc -Wall -O -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin -c main.c"
+end
+
+file 'boot.bin' => ['boot.o', 'main.o', 'img.ld'] do 
+  sh "ld boot.o main.o -o boot.bin -e c -T img.ld"
+  sh "ruby ./sign.rb boot.bin"
 end
 
 #file 'boot.bin' => ['boot.elf'] do

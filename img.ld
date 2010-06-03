@@ -1,5 +1,5 @@
 OUTPUT_FORMAT("binary")
-ENTRY("_start")
+ENTRY("boot")
 SECTIONS {
     . = 0x7c00;
     .text : {
