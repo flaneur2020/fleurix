@@ -1,4 +1,6 @@
 [bits 16]
+[section .text]
+
 align 4
 extern  main
 
