@@ -9,7 +9,7 @@ megs: 32
 floppya: 1_44=/home/ssword/code/os/orzos/kernel.img, status=inserted
 boot: a
 
-log: bochsout.txt
+log: .bochsout
 panic: action=ask
 error: action=report
 info: action=report
