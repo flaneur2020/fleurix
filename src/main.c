@@ -1,16 +1,19 @@
+#include <sys.h>
 
 int main(){
-	char *str = "Hello, world\n", *ch;
-	unsigned short *vidmem = (unsigned short*) 0xb8000;
-	unsigned i;
+    cls();
+	char *str = "Hello, world", *ch;
+	short *vidmem = (short*) 0xb8000;
+	int i;
 	
 	for (ch = str, i = 0; *ch; ch++, i++)
-		vidmem[i] = (unsigned char) *ch | 0x0700;
+		vidmem[i] = (char) *ch | 0x0700;
 		
 	for (;;)
 		;
 }
 
-void putc(char c){
 
+void memcpy(void *dest, void *src, unsigned int count){
+    
 }
