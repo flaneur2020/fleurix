@@ -2,6 +2,10 @@ OUTPUT_FORMAT("binary")
 ENTRY("boot")
 SECTIONS {
     .text 0x7c00 : {
-      *(.text)
+        *(.text)
+        *(.rodata)
+    }
+    .data : {
+        *(.data)
     }
 }
