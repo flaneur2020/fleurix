@@ -1,19 +1,44 @@
 #include <sys.h>
 
 int main(){
-    cls();
-	char *str = "Hello, world", *ch;
-	short *vidmem = (short*) 0xb8000;
-	int i;
-	
-	for (ch = str, i = 0; *ch; ch++, i++)
-		vidmem[i] = (char) *ch | 0x0700;
+    init_video();
+    puts("hello~");
 		
-	for (;;)
-		;
+	for (;;);
+}
+
+void* memcpy(void *dest, void *src, size_t count){
+    char *sp = (char *)src;
+    char *dp = (char *)dest;
+    int i;
+    for (i=0; i<count; i++){
+        *dp++ = *sp++;
+    }
+    return dest;
+}
+
+void* memset(void *dest, char val, size_t count){
+    char *dp = (char *)dest;
+    int i;
+    for(i=0; i<count; i++){
+        *dp++ = val;
+    }
+    return dest;
+}
+
+short* memsetw(short *dest, short val, size_t count){
+    short *dp = (short *)dest;
+    int i;
+    for(i=0; i<count; i++){
+        *dp++ = val;
+    }
+    return dest;
 }
 
 
-void memcpy(void *dest, void *src, unsigned int count){
-    
+// on str
+size_t strlen(char *str){
+    char* sp;
+    for(sp=str; *sp!='\0'; sp++);
+    return sp-str;
 }
