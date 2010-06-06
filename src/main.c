@@ -2,8 +2,9 @@
 
 int main(){
     init_video();
-    puts("hello~");
-		
+    puts("Fleurix initalizing\n");
+    puts("[ok] vga \n");
+    // forerver loop
 	for (;;);
 }
 

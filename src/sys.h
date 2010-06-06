@@ -7,11 +7,11 @@
 typedef unsigned int    size_t;
 
 // in main.c
-// on mem
+// on Mem
 void *memcpy(void *dest, void *src, size_t count);
 void *memset(void *dest, char val, size_t count);
 short *memsetw(short *dest, short val, size_t count);
-
+// on String
 
 // in video.c
 void    init_video();
@@ -23,11 +23,11 @@ void    printf();
 // on x86
 // in & out
 static inline char port_inb(short _port){
-    char r;
+    char ret;
     __asm __volatile(
         "inb %1, %0" :
-        "=a" (r) : "dN" (_port));
-    return r;
+        "=a" (ret) : "dN" (_port));
+    return ret;
 }
 static inline void port_outb(short _port, char _data){
     __asm __volatile(

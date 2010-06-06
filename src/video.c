@@ -13,6 +13,17 @@ static short *vidmem = (char *) 0xb8000;
 static int   csr_x = 0;
 static int   csr_y = 0;
 
+
+void flush_csr(){
+    unsigned pos = csr_y * 80 + csr_x;
+    // TODO: bug here
+    //       I'm not sure if this fucked in port_outb or elsewhere
+    //port_outb(0x3D4, 14);
+    //port_outb(0x3D5, pos >> 8);
+    //port_outb(0x3D4, 15);
+    //port_outb(0x3D5, pos);
+}
+
 void cls(){
     int i;
     for(i = 0; i < 25; i++) {
@@ -20,27 +31,19 @@ void cls(){
     }
     csr_x = 0;
     csr_y = 0;
+    flush_csr();
 }
 
 void scroll(void) {
     if(csr_y >= 25) {
-        unsigned tmp = csr_y - 25 + 1;
-        memcpy(vidmem, vidmem + tmp * 80, (25 - tmp) * 80 * 2);
-        memsetw(vidmem + (25 - tmp) * 80, VID_BLANK, 80);
+        unsigned pos = csr_y - 25 + 1;
+        memcpy(vidmem, vidmem + pos * 80, (25 - pos) * 80 * 2);
+        memsetw(vidmem + (25 - pos) * 80, VID_BLANK, 80);
         csr_y = 25 - 1;
     }
 }
 
-void flush_csr(void) {
-    unsigned pos = csr_y * 80 + csr_x;
-    port_outb(0x3D4, 14);
-    port_outb(0x3D5, pos >> 8);
-    port_outb(0x3D4, 15);
-    port_outb(0x3D5, pos);
-}
-
-
-void putch(char c) {
+void putch(char c){
     if(c == '\b') {
         if(csr_x != 0) csr_x--;
     }
