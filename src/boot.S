@@ -27,9 +27,16 @@ _reset_drive:
     ; prepare to enter protect mode
     ;
 
-    ; clear ds
-    xor     ax,  ax
-    mov     ds,  ax
+    ; Enable the A20
+    in      al, 92h
+    or      al, 02h
+    out     92h, al
+
+    ; clear registers
+    xor     ax, ax
+    mov     ds, ax
+    mov     ss, ax
+    mov     es, ax
 
     ; clear the intrrupt
     cli
@@ -49,7 +56,7 @@ _start_pm:
     mov     ss,  ax
     mov     esp, 090000h
     ; jump to C!
-    ; never return should it be
+    ; never return it should  be
     jmp     08h:01000h
 
 _hang: 
