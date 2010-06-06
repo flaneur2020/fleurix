@@ -36,7 +36,6 @@ short* memsetw(short *dest, short val, size_t count){
     return dest;
 }
 
-
 // on str
 size_t strlen(char *str){
     char* sp;

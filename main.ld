@@ -1,5 +1,5 @@
 OUTPUT_FORMAT("binary")
-ENTRY("init")
+ENTRY("entry")
 SECTIONS {
     .text 0x1000 : {
         *(.text)

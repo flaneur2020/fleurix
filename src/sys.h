@@ -6,21 +6,22 @@
 
 typedef unsigned int    size_t;
 
-// in main.c
+// In main.c
 // on Mem
 void *memcpy(void *dest, void *src, size_t count);
 void *memset(void *dest, char val, size_t count);
 short *memsetw(short *dest, short val, size_t count);
 // on String
+size_t strlen(char *str);
 
-// in video.c
+// In video.c
 void    init_video();
 void    cls();
 void    putch(char ch);
 void    puts(char *ch);
 void    printf();
 
-// on x86
+// on x86, just inline
 // in & out
 static inline char port_inb(short _port){
     char ret;

@@ -35,12 +35,12 @@ end
 # mainly C part
 # => main.bin
 #######################################################################
-file 'main.bin' => ['init.o', 'main.o', 'video.o', 'main.ld'] do
-  sh "ld init.o main.o video.o -o main.bin -e c -T main.ld"
+file 'main.bin' => ['entry.o', 'main.o', 'video.o', 'main.ld'] do
+  sh "ld entry.o main.o video.o -o main.bin -e c -T main.ld"
 end
 
-file 'init.o' => ['src/init.S'] do
-  sh "nasm -f elf -o init.o src/init.S"
+file 'entry.o' => ['src/entry.S'] do
+  sh "nasm -f elf -o entry.o src/entry.S"
 end
 
 file 'main.o' => ['src/main.c'] do 
