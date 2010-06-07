@@ -4,6 +4,7 @@ int main(){
     init_video();
     puts("Fleurix initalizing\n");
     puts("[ok] vga \n");
+    puts("[ok] idt \n");
     // forerver loop
 	for (;;);
 }
@@ -42,3 +43,4 @@ size_t strlen(char *str){
     for(sp=str; *sp!='\0'; sp++);
     return sp-str;
 }
+

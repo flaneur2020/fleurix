@@ -5,6 +5,9 @@
  * */ 
 
 typedef unsigned int    size_t;
+typedef unsigned char   uint8_t;
+typedef unsigned short  uint16_t;
+typedef unsigned int    uint32_t;
 
 // In main.c
 // on Mem
@@ -21,17 +24,22 @@ void    putch(char ch);
 void    puts(char *ch);
 void    printf();
 
+// In idt.c
+void    init_idt();
+
 // on x86, just inline
 // in & out
-static inline char port_inb(short _port){
+// on x86, just inline
+static inline char inb(short port){
     char ret;
-    __asm __volatile(
-        "inb %1, %0" :
-        "=a" (ret) : "dN" (_port));
+    asm volatile(
+        "inb %1, %0"
+        : "=a" (ret) 
+        : "dN" (port));
     return ret;
 }
-static inline void port_outb(short _port, char _data){
-    __asm __volatile(
+static inline void outb(short port, char data){
+    asm volatile(
         "outb %1, %0"
-        : : "dN" (_port), "a" (_data));
+        :: "dN" (port), "a" (data));
 }

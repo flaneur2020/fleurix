@@ -1,5 +1,5 @@
-Incs  = '-Isrc'
-Flags = "-Wall -nostdinc -fno-builtin"
+Incs    = '-Isrc'
+Flags   = "-Wall -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin"
 
 task :default => :bochs
 
@@ -10,7 +10,7 @@ end
 task :build => 'kernel.img'
 
 task :clean do
-  sh "rm -rf boot.o main.o boot.bin main.bin kernel.img"
+  sh "rm -rf *.o *.bin *.img .bochsout"
 end
 
 #######################################################################
@@ -35,8 +35,8 @@ end
 # mainly C part
 # => main.bin
 #######################################################################
-file 'main.bin' => ['entry.o', 'main.o', 'video.o', 'main.ld'] do
-  sh "ld entry.o main.o video.o -o main.bin -e c -T main.ld"
+file 'main.bin' => ['entry.o', 'main.o', 'video.o', 'idt.o', 'main.ld'] do
+  sh "ld entry.o main.o video.o idt.o -o main.bin -e c -T main.ld"
 end
 
 file 'entry.o' => ['src/entry.S'] do
@@ -51,4 +51,6 @@ file 'video.o' => ['src/video.c'] do
   sh "gcc #{Flags} #{Incs} -o video.o -c src/video.c"
 end
 
-
+file 'idt.o' => ['src/idt.c'] do 
+  sh "gcc #{Flags} #{Incs} -o idt.o -c src/idt.c"
+end

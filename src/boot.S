@@ -5,8 +5,8 @@ _start:
 
     ; read the rest sectors to 0000:1000
 _reset_drive:
-    mov     ah, 0               ; RESET-command
-    int     13h                 ; Call interrupt 13h
+    mov     ah, 0                ; RESET-command
+    int     13h                  ; Call interrupt 13h
     or      ah, ah               ; Check for error code
     jnz     _reset_drive         ; Try again if ah != 0
 
@@ -15,7 +15,7 @@ _reset_drive:
     mov     bx, 0x1000          ; Destination address = 0000:1000
 
     mov     ah, 02h             ; READ SECTOR-command
-    mov     al, 02h             ; Number of sectors to read = 1
+    mov     al, 02fh            ; Number of sectors to read
     mov     ch, 0               ; Cylinder = 0
     mov     cl, 02h             ; Sector = 2
     mov     dh, 0               ; Head = 0

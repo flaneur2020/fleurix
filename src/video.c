@@ -18,10 +18,10 @@ void flush_csr(){
     unsigned pos = csr_y * 80 + csr_x;
     // TODO: bug here
     //       I'm not sure if this fucked in port_outb or elsewhere
-    //port_outb(0x3D4, 14);
-    //port_outb(0x3D5, pos >> 8);
-    //port_outb(0x3D4, 15);
-    //port_outb(0x3D5, pos);
+    outb(0x3D4, 14);
+    outb(0x3D5, pos >> 8);
+    outb(0x3D4, 15);
+    outb(0x3D5, pos);
 }
 
 void cls(){
@@ -76,6 +76,11 @@ void puts(char *str){
     for(i=0; i<strlen(str); i++){
         putch(str[i]);
     }
+}
+
+void panic(char *str){
+    puts(str);
+    for(;;);
 }
 
 void init_video(){
