@@ -2,13 +2,15 @@
 
 int main(){
     init_video();
-    puts("Fleurix initalizing\n");
-    puts("[ok] vga \n");
-    puts("[ok] idt \n");
+    puts("Fleurix initalizing, welcome\n");
+    puts("* init video");
+    init_idt();
+    puts("* init idt");
     // forerver loop
 	for (;;);
 }
 
+// on Memory
 void* memcpy(void *dest, void *src, size_t count){
     char *sp = (char *)src;
     char *dp = (char *)dest;
@@ -44,3 +46,25 @@ size_t strlen(char *str){
     return sp-str;
 }
 
+
+// x86 
+char inb(short port){
+    char ret;
+    asm volatile(
+        "inb %1, %0"
+        : "=a" (ret) 
+        : "dN" (port));
+    return ret;
+}
+
+void outb(short port, char data){
+    asm volatile(
+        "outb %1, %0"
+        :: "dN" (port), "a" (data));
+}     
+
+void lidt(struct idt_desc* idt_desc){
+    asm volatile(
+        "lidt %0"
+        :: "m"(idt_desc));
+}

@@ -25,21 +25,25 @@ void    puts(char *ch);
 void    printf();
 
 // In idt.c
+struct idt_entry {
+    uint16_t    base_lo;
+    uint16_t    sel;
+    uint8_t     always0;
+    uint8_t     flags;
+    uint16_t    base_hi;
+} __attribute__((packed));
+
+struct idt_desc {
+    uint16_t    limit;
+    uint32_t    base;
+} __attribute__((packed));     
+
 void    init_idt();
 
 // on x86, just inline
 // in & out
 // on x86, just inline
-static inline char inb(short port){
-    char ret;
-    asm volatile(
-        "inb %1, %0"
-        : "=a" (ret) 
-        : "dN" (port));
-    return ret;
-}
-static inline void outb(short port, char data){
-    asm volatile(
-        "outb %1, %0"
-        :: "dN" (port), "a" (data));
-}
+char    inb(short port);
+void    outb(short port, char data);
+void    lidt(struct idt_desc* idt_desc);
+

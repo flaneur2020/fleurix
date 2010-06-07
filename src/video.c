@@ -76,11 +76,7 @@ void puts(char *str){
     for(i=0; i<strlen(str); i++){
         putch(str[i]);
     }
-}
-
-void panic(char *str){
-    puts(str);
-    for(;;);
+    putch('\n');
 }
 
 void init_video(){

@@ -1,5 +1,5 @@
 Incs    = '-Isrc'
-Flags   = "-Wall -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin"
+Flags   = "-Wall -finline-functions -nostdinc -fno-builtin"
 
 task :default => :bochs
 
