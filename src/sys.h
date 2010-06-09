@@ -39,6 +39,13 @@ struct idt_desc {
     uint32_t    base;
 } __attribute__((packed));     
 
+struct regs {
+    uint gs, fs, es, ds;                            /* pushed the segs last */
+    uint edi, esi, ebp, esp, ebx, edx, ecx, eax;    /* pushed by 'pusha' */
+    uint int_no, err_code;                          /* our 'push byte #' and ecodes do this */
+    uint eip, cs, eflags, useresp, ss;              /* pushed by the processor automatically */ 
+};
+
 void    init_idt();
 
 // on x86, just inline
@@ -46,5 +53,5 @@ void    init_idt();
 // on x86, just inline
 char    inb     (short port);
 void    outb    (short port, char data);
-void    lidt    (struct idt_desc* idt_desc);
+void    lidt    (struct idt_desc idt_desc);
 

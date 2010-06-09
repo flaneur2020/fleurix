@@ -6,6 +6,10 @@ task :default => :bochs
 task :bochs => :build do
   sh "bochs -q -f .bochsrc"
 end
+
+task :debug => :build do
+  sh "bochsd -q -f .bochsrc"
+end
   
 task :build => 'kernel.img'
 
@@ -47,8 +51,8 @@ file 'entry.o' => ['src/entry.S'] do
 end
 
 [
-  ['src/print.c'],
   ['src/main.c'],
+  ['src/print.c'],
   ['src/idt.c']
 ].each do |fn_c, *_|
   fn_o = File.basename(fn_c).ext('o')

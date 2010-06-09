@@ -1,13 +1,13 @@
 #include <sys.h>
 
+
 int main(){
     init_video();
     puts("Fleurix initalizing, welcome\n\n");
     puts("* init video\n");
     init_idt();
     puts("* init idt\n");
-    printn(107, 10);
-    printf("hello, %d\n", 107);
+    printf("%d,\n", 1/0);
 	for (;;);
 }
 
@@ -47,6 +47,14 @@ size_t strlen(char *str){
     return sp-str;
 }
 
+// panic
+void panic(char *str){
+    printf("%s\n", str);
+    asm volatile("cli");
+    asm volatile("hlt");
+    for(;;);
+}
+
 // x86 
 char inb(short port){
     char ret;
@@ -63,8 +71,12 @@ void outb(short port, char data){
         :: "dN" (port), "a" (data));
 }     
 
-void lidt(struct idt_desc* idt_desc){
+void lidt(struct idt_desc idt_desc){
     asm volatile(
         "lidt %0"
-        :: "m"(idt_desc));
+        : "=m"(idt_desc));
+}
+
+void sti(){
+    asm volatile("sti\n");
 }
