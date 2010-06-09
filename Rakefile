@@ -1,5 +1,5 @@
-Incs    = '-Isrc'
-Flags   = "-Wall -finline-functions -nostdinc -fno-builtin"
+CIncs   = '-Isrc'
+CFlags  = "-Wall -finline-functions -nostdinc -fno-builtin"
 
 task :default => :bochs
 
@@ -35,22 +35,24 @@ end
 # mainly C part
 # => main.bin
 #######################################################################
-file 'main.bin' => ['entry.o', 'main.o', 'video.o', 'idt.o', 'main.ld'] do
-  sh "ld entry.o main.o video.o idt.o -o main.bin -e c -T main.ld"
+
+OFiles = %w{ entry.o main.o print.o idt.o }
+
+file 'main.bin' => OFiles + ['main.ld'] do
+  sh "ld #{OFiles * ' '} -o main.bin -e c -T main.ld"
 end
 
 file 'entry.o' => ['src/entry.S'] do
   sh "nasm -f elf -o entry.o src/entry.S"
 end
 
-file 'main.o' => ['src/main.c'] do 
-  sh "gcc #{Flags} #{Incs} -o main.o -c src/main.c"
-end
-
-file 'video.o' => ['src/video.c'] do
-  sh "gcc #{Flags} #{Incs} -o video.o -c src/video.c"
-end
-
-file 'idt.o' => ['src/idt.c'] do 
-  sh "gcc #{Flags} #{Incs} -o idt.o -c src/idt.c"
+[
+  ['src/print.c'],
+  ['src/main.c'],
+  ['src/idt.c']
+].each do |fn_c, *_|
+  fn_o = File.basename(fn_c).ext('o')
+  file fn_o => [fn_c, *_] do
+    sh "gcc #{CFlags} #{CIncs} -c #{fn_c}"
+  end
 end
