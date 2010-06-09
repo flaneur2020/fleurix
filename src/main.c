@@ -2,11 +2,12 @@
 
 int main(){
     init_video();
-    puts("Fleurix initalizing, welcome\n");
-    puts("* init video");
+    puts("Fleurix initalizing, welcome\n\n");
+    puts("* init video\n");
     init_idt();
-    puts("* init idt");
-    // forerver loop
+    puts("* init idt\n");
+    printn(107, 10);
+    printf("hello, %d\n", 107);
 	for (;;);
 }
 
@@ -45,7 +46,6 @@ size_t strlen(char *str){
     for(sp=str; *sp!='\0'; sp++);
     return sp-str;
 }
-
 
 // x86 
 char inb(short port){

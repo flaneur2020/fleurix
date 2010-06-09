@@ -15,7 +15,7 @@ static int   csr_y = 0;
 
 
 void flush_csr(){
-    unsigned pos = csr_y * 80 + csr_x;
+    uint pos = csr_y * 80 + csr_x;
     // TODO: bug here
     //       I'm not sure if this fucked in port_outb or elsewhere
     outb(0x3D4, 14);
@@ -36,7 +36,7 @@ void cls(){
 
 void scroll(void) {
     if(csr_y >= 25) {
-        unsigned pos = csr_y - 25 + 1;
+        uint pos = csr_y - 25 + 1;
         memcpy(vidmem, vidmem + pos * 80, (25 - pos) * 80 * 2);
         memsetw(vidmem + (25 - pos) * 80, VID_BLANK, 80);
         csr_y = 25 - 1;
@@ -58,7 +58,7 @@ void putch(char c){
         csr_y++;
     }
     else if(c >= ' ') {
-        unsigned *vchar = vidmem + (csr_y * 80 + csr_x);
+        uint *vchar = vidmem + (csr_y * 80 + csr_x);
         *vchar = c | VID_WHITE << 8;
         csr_x++;
     }
@@ -76,7 +76,41 @@ void puts(char *str){
     for(i=0; i<strlen(str); i++){
         putch(str[i]);
     }
-    putch('\n');
+}
+
+// print an unsigned integer
+void printn(uint n, uint b){
+    static char *ntab = "0123456789ABCDEF";
+    uint    a, m;
+    if (a = n / b){
+        printn(a, b);  
+    }
+    m = n % b;
+    putch( ntab[m] );
+}
+
+// a simpler printf
+// refer to unix v6
+void printf(char *fmt, ...){
+    char c, *s;
+    uint *adx = (uint*)(void*)&fmt + 1;
+_loop:
+    while((c = *fmt++) != '%'){
+        if (c == '\0') return;
+        putch(c);
+    }
+    c = *fmt++;
+    if (c == 'd' || c == 'l'){
+        printn(*adx, 10);
+    }
+    if (c == 'o' || c == 'x'){
+        printn(*adx, c=='o'? 8:16 );
+    }
+    if (c == 's'){
+        puts(*adx);
+    }
+    adx++;
+    goto _loop;
 }
 
 void init_video(){
