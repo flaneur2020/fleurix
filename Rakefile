@@ -14,7 +14,7 @@ end
 task :build => 'bin/kernel.img'
 
 task :clean do
-  sh "rm -rf bin/* .bochsout"
+  sh "rm -rf bin/* src/intv.S .bochsout"
 end
 
 #######################################################################
@@ -40,14 +40,28 @@ end
 # => main.bin
 #######################################################################
 
-OFiles = %w{ bin/entry.o bin/main.o bin/print.o bin/idt.o }
+OFiles = %w{ bin/entry.o bin/intv.o bin/main.o bin/print.o bin/idt.o }
 
-file 'bin/main.bin' => OFiles + ['main.ld'] do
-  sh "ld #{OFiles * ' '} -o bin/main.bin -e c -T main.ld"
+file 'bin/main.bin' => 'bin/main.elf' do
+  sh "objcopy -R .pdr -R .comment -R .note -S -O binary bin/main.elf bin/main.bin"
 end
 
-file 'bin/entry.o' => ['src/entry.S'] do
-  sh "nasm -f elf -o bin/entry.o src/entry.S"
+file 'bin/main.elf' => OFiles + ['main.ld'] do
+  sh "ld #{OFiles * ' '} -o bin/main.elf -e c -T main.ld"
+end
+
+file 'src/intv.S' => 'src/intv.S.rb' do 
+  sh 'ruby src/intv.S.rb > src/intv.S'
+end
+
+[
+  ['src/entry.S'],
+  ['src/intv.S']
+].each do |fn_s, *_|
+  fn_o = 'bin/'+File.basename(fn_s).ext('o')
+  file fn_o => [fn_s, *_] do
+    sh "nasm -f elf -o #{fn_o} #{fn_s}"
+  end
 end
 
 [
