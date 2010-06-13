@@ -2,4 +2,5 @@
 *.img
 *.o
 bin/*
+src/intv.S
 .bochsout
