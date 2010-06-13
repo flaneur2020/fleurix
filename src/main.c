@@ -74,7 +74,7 @@ void outb(short port, char data){
 void lidt(struct idt_desc idt_desc){
     asm volatile(
         "lidt %0"
-        : "=m"(idt_desc));
+        :: "m"(idt_desc));
 }
 
 void sti(){

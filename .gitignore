@@ -1,4 +1,5 @@
 *.bin
 *.img
 *.o
+bin/*
 .bochsout
