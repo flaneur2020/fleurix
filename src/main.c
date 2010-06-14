@@ -7,7 +7,7 @@ int main(){
     puts("* init video\n");
     init_idt();
     puts("* init idt\n");
-    printf("%d,\n", 1/0);
+    asm("int $0x80");
 	for (;;);
 }
 

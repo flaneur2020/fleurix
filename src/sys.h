@@ -10,6 +10,9 @@ typedef unsigned char   uint8_t;
 typedef unsigned short  uint16_t;
 typedef unsigned int    uint32_t;
 
+#define KERN_CS 0x08
+#define KERN_DS 0x10
+
 // In main.c
 // on Mem
 void    *memcpy     (void *dest, void *src, size_t count);
@@ -33,6 +36,8 @@ struct idt_entry {
     uint8_t     flags;
     uint16_t    base_hi;
 } __attribute__((packed));
+
+#define STS
 
 struct idt_desc {
     uint16_t    limit;

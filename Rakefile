@@ -48,6 +48,7 @@ end
 
 file 'bin/main.elf' => OFiles + ['main.ld'] do
   sh "ld #{OFiles * ' '} -o bin/main.elf -e c -T main.ld"
+  sh "nm bin/main.elf > main.nmtab"
 end
 
 file 'src/intv.S' => 'src/intv.S.rb' do 

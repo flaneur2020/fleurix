@@ -3,7 +3,7 @@ puts %{
 ; do not edit
 
 [section .text]
-[extern  int_handler]
+[extern  int_common_handler]
 
 _int_common_stub:
     pusha
@@ -18,7 +18,7 @@ _int_common_stub:
     mov gs, ax
     mov eax, esp
     push eax
-    mov eax, int_handler
+    mov eax, int_common_handler
     call eax
     pop eax
     pop gs
@@ -36,7 +36,7 @@ _int_common_stub:
     [global _int#{i}]
     _int#{i}:
       #{'push  byte 0' if i!=17 and (i<8 or i>14)}
-      push  byte #{i}
+      push  dword #{i}
       jmp   _int_common_stub
   }
 end
