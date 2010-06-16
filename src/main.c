@@ -7,12 +7,12 @@ int main(){
     puts("* init video\n");
     init_idt();
     puts("* init idt\n");
-    asm("int $0x80");
+    printf("%d", 1/0);
 	for (;;);
 }
 
 // on Memory
-void* memcpy(void *dest, void *src, size_t count){
+void* memcpy(void *dest, void *src, uint count){
     char *sp = (char *)src;
     char *dp = (char *)dest;
     int i;
@@ -22,7 +22,7 @@ void* memcpy(void *dest, void *src, size_t count){
     return dest;
 }
 
-void* memset(void *dest, char val, size_t count){
+void* memset(void *dest, char val, uint count){
     char *dp = (char *)dest;
     int i;
     for(i=0; i<count; i++){
@@ -31,7 +31,7 @@ void* memset(void *dest, char val, size_t count){
     return dest;
 }
 
-short* memsetw(short *dest, short val, size_t count){
+short* memsetw(short *dest, short val, uint count){
     short *dp = (short *)dest;
     int i;
     for(i=0; i<count; i++){
@@ -41,7 +41,7 @@ short* memsetw(short *dest, short val, size_t count){
 }
 
 // on str
-size_t strlen(char *str){
+uint strlen(char *str){
     char* sp;
     for(sp=str; *sp!='\0'; sp++);
     return sp-str;
@@ -71,10 +71,10 @@ void outb(short port, char data){
         :: "dN" (port), "a" (data));
 }     
 
-void lidt(struct idt_desc idt_desc){
+void lidt(struct idt_desc *idt_desc){
     asm volatile(
         "lidt %0"
-        :: "m"(idt_desc));
+        :: "m"(*idt_desc));
 }
 
 void sti(){

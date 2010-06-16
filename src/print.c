@@ -9,7 +9,7 @@
 #define VID_WHITE 0x07 // white on black text
 #define VID_BLANK (' ' | (VID_WHITE << 8)) // white on black text
 
-static short *vidmem = (char *) 0xb8000;
+static short *vidmem = (short *) 0xb8000;
 static int   csr_x = 0;
 static int   csr_y = 0;
 
@@ -56,7 +56,7 @@ void putch(char c){
         csr_y++;
     }
     else if(c >= ' ') {
-        uint *vchar = vidmem + (csr_y * 80 + csr_x);
+        short *vchar = vidmem + (csr_y * 80 + csr_x);
         *vchar = c | VID_WHITE << 8;
         csr_x++;
     }

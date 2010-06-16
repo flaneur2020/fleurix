@@ -48,7 +48,10 @@ uint irq_routines[16] = {
     0, 0, 0, 0, 0, 0, 0, 0
 }; 
 
-void set_idt_gate(int num, uint base, uint16_t sel, uint8_t flags) {
+
+/****************************************************************************/
+
+void idt_set_gate(int num, uint base, ushort sel, uchar flags) {
     idt[num].base_lo = (base & 0xFFFF);
     idt[num].base_hi = (base >> 16) & 0xFFFF;
     idt[num].sel = sel;
@@ -59,14 +62,14 @@ void set_idt_gate(int num, uint base, uint16_t sel, uint8_t flags) {
 void init_trap(){
     int i;
     for(i=0; i<32;i++){
-        set_idt_gate(i, _intv[i], KERN_CS, 0x8e);
+        idt_set_gate(i, _intv[i], KERN_CS, 0x8e);
     }
     // syscall
-    set_idt_gate(0x80, _intv[0x80], KERN_CS, 0x8e);
+    idt_set_gate(0x80, _intv[0x80], KERN_CS, 0x8e);
 }
 
-void init_irq(){
-    // remap the irq
+// remap the irq
+void irq_remap(){
     outb(0x20, 0x11);
     outb(0xA0, 0x11);
     outb(0x21, 0x20);
@@ -96,6 +99,6 @@ void init_idt(){
     // init 
     // init the idt as 0
     memset(&idt, 0, sizeof(struct idt_entry) * 256);
-    lidt(idt_desc);
+    lidt(&idt_desc);
     init_trap();
 }
