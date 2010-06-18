@@ -4,3 +4,4 @@
 bin/*
 src/intv.S
 .bochsout
+.nmtab
