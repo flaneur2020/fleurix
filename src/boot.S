@@ -10,9 +10,10 @@ _reset_drive:
     or      ah, ah               ; Check for error code
     jnz     _reset_drive         ; Try again if ah != 0
 
+    ; a TODO here, this code cannot load too much code :(
     mov     ax, 0
     mov     es, ax
-    mov     bx, 0x1000          ; Destination address = 0000:1000
+    mov     bx, 0x1000          ; Destination address = 1000:0000
 
     mov     ah, 02h             ; READ SECTOR-command
     mov     al, 02fh            ; Number of sectors to read
@@ -21,7 +22,7 @@ _reset_drive:
     mov     dh, 0               ; Head = 0
     int     13h                 ; Call interrupt 13h
     or      ah, ah              ; Check for error code
-    jnz     _reset_drive         ; Try again if ah != 0
+    jnz     _reset_drive        ; Try again if ah != 0
 
     ;
     ; prepare to enter protect mode

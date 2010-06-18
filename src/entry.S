@@ -2,6 +2,6 @@
 extern main
 
 _entry:
-  jmp main
+    jmp main
 
 

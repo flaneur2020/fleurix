@@ -2,12 +2,13 @@
 
 
 int main(){
-    init_video();
+    video_init();
     puts("Fleurix initalizing, welcome\n\n");
     puts("* init video\n");
-    init_idt();
+    idt_init();
     puts("* init idt\n");
-    printf("%d", 1/0);
+    timer_init(100);
+    asm volatile("sti");
 	for (;;);
 }
 
@@ -78,5 +79,7 @@ void lidt(struct idt_desc *idt_desc){
 }
 
 void sti(){
+    puts("~~~~~~~~~~~~~~\n");
     asm volatile("sti\n");
+    puts("~~~~~~~~~~~~~~\n");
 }

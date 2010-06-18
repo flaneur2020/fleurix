@@ -111,7 +111,7 @@ _loop:
     goto _loop;
 }
 
-void init_video(){
+void video_init(){
     vidmem = (char *) 0xb8000;
     cls();
 }

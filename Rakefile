@@ -40,7 +40,7 @@ end
 # => main.bin
 #######################################################################
 
-OFiles = %w{ bin/entry.o bin/intv.o bin/main.o bin/print.o bin/idt.o }
+OFiles = %w{ bin/entry.o bin/intv.o bin/main.o bin/print.o bin/idt.o bin/timer.o }
 
 file 'bin/main.bin' => 'bin/main.elf' do
   sh "objcopy -R .pdr -R .comment -R .note -S -O binary bin/main.elf bin/main.bin"
@@ -66,9 +66,10 @@ end
 end
 
 [
-  ['src/main.c'],
   ['src/print.c'],
-  ['src/idt.c']
+  ['src/idt.c'],
+  ['src/timer.c'],
+  ['src/main.c', 'src/sys.h']
 ].each do |fn_c, *_|
   fn_o = 'bin/'+File.basename(fn_c).ext('o')
   file fn_o => [fn_c, *_] do

@@ -27,6 +27,7 @@ _int_common_stub:
     pop ds
     popa
     add esp, 8
+    sti
     iret
 
 }
@@ -35,7 +36,8 @@ _int_common_stub:
   puts %{
     [global _int#{i}]
     _int#{i}:
-      #{'push  byte 0' if i!=17 and (i<8 or i>14)}
+      cli
+      #{'push  dword 0' if i!=17 and (i<8 or i>14)}
       push  dword #{i}
       jmp   _int_common_stub
   }

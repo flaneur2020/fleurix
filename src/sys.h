@@ -20,7 +20,7 @@ short   *memsetw    (short *dest, short val, uint count);
 uint    strlen(char *str);
 
 // In video.c
-void    init_video  ();
+void    video_init  ();
 void    cls         ();
 void    putch       (char ch);
 void    puts        (char *ch);
@@ -35,7 +35,6 @@ struct idt_entry {
     ushort      base_hi;
 } __attribute__((packed));
 
-#define STS
 
 struct idt_desc {
     ushort      limit;
@@ -43,13 +42,15 @@ struct idt_desc {
 } __attribute__((packed));     
 
 struct regs {
-    uint gs, fs, es, ds;                            /* pushed the segs last */
-    uint edi, esi, ebp, esp, ebx, edx, ecx, eax;    /* pushed by 'pusha' */
-    uint int_no, err_code;                          /* our 'push byte #' and ecodes do this */
-    uint eip, cs, eflags, useresp, ss;              /* pushed by the processor automatically */ 
+    uint        gs, fs, es, ds;                            /* pushed the segs last */
+    uint        edi, esi, ebp, esp, ebx, edx, ecx, eax;    /* pushed by 'pusha' */
+    uint        int_no, err_code;                          /* our 'push byte #' and ecodes do this */
+    uint        eip, cs, eflags, useresp, ss;              /* pushed by the processor automatically */ 
 };
 
-void    init_idt();
+#define IRQ0 32
+
+void    idt_init();
 
 // on x86, just inline
 // in & out

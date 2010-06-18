@@ -43,11 +43,8 @@ static char *fault_messages[] = {
     "Reserved"
 };
 
-uint irq_routines[16] = {
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0
-}; 
-
+// which inited as 0
+uint int_routines[256]; 
 
 /****************************************************************************/
 
@@ -59,16 +56,18 @@ void idt_set_gate(int num, uint base, ushort sel, uchar flags) {
     idt[num].flags = flags;
 }
 
-void init_trap(){
+void intv_install(){
     int i;
-    for(i=0; i<32;i++){
+    for(i=0; i<256;i++){
         idt_set_gate(i, _intv[i], KERN_CS, 0x8e);
     }
     // syscall
     idt_set_gate(0x80, _intv[0x80], KERN_CS, 0x8e);
 }
 
-// remap the irq
+/**********************************************************************/
+
+// if you do not remap irq, a Double Fault comes along with every intrupt
 void irq_remap(){
     outb(0x20, 0x11);
     outb(0xA0, 0x11);
@@ -82,23 +81,60 @@ void irq_remap(){
     outb(0xA1, 0x0);
 }
 
+void int_set_handler(int num, void (*handler)(struct regs *r)){
+    int_routines[num] = handler;
+}
+
+/**********************************************************************/
+
 void int_common_handler(struct regs *r) {
+    void (*handler)(struct regs *r);
+    handler = int_routines[r->int_no]; 
     // trap
     if (r->int_no < 32) {
-        printf("Panic: Exception %s \n", fault_messages[r->int_no]);
-        for (;;);
+        if (handler){
+            handler(r);
+        }
+        else {
+            printf("Panic: Unhandled Exception: %s \n", fault_messages[r->int_no]);
+            print_regs(r);
+            for(;;);
+        }
+    }
+    // irq
+    if (r->int_no >= 32) {
+        if (r->int_no >= 40) {
+            outb(0xA0, 0x20);
+        }
+        outb(0x20, 0x20);
+        if (handler){
+            handler(r);
+        }
     }
     // syscall
     // intr
 }
 
-void init_idt(){
+/***********************************************************************************/
+// helpers
+void print_regs(struct regs *r){
+    printf("gs = %x, fs = %x, es = %x, ds = %x\n", r->gs, r->fs, r->es, r->ds);
+    printf("edi = %x, esi = %x, ebp = %x, esp = %x \n",r->edi, r->esi, r->ebp, r->esp);
+    printf("ebx = %x, edx = %x, ecx = %x, eax = %x \n",r->ebx, r->edx, r->ecx, r->eax);
+    printf("int_no = %x, err_code = %x\n", r->int_no, r->err_code);
+    printf("eip = %x, cs = %x, eflags = %x\n", r->eip, r->cs, r->eflags);
+    printf("useresp = %x, ss = %x \n", r->useresp, r->ss);
+}
+
+void idt_init(){
     // init idt_desc
     idt_desc.limit = (sizeof (struct idt_entry) * 256) - 1;
     idt_desc.base = &idt;
-    // init 
-    // init the idt as 0
-    memset(&idt, 0, sizeof(struct idt_entry) * 256);
+    // init irq
+    irq_remap();
+    memsetw(int_routines, 0, sizeof(uint)*256);
+    // load it 
+    intv_install();
     lidt(&idt_desc);
-    init_trap();
 }
+
