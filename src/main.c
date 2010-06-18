@@ -70,16 +70,8 @@ void outb(short port, char data){
     asm volatile(
         "outb %1, %0"
         :: "dN" (port), "a" (data));
-}     
-
-void lidt(struct idt_desc *idt_desc){
-    asm volatile(
-        "lidt %0"
-        :: "m"(*idt_desc));
 }
 
 void sti(){
-    puts("~~~~~~~~~~~~~~\n");
     asm volatile("sti\n");
-    puts("~~~~~~~~~~~~~~\n");
 }

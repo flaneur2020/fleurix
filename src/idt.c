@@ -1,9 +1,15 @@
 #include <sys.h>
 
+// from intv.S
 extern uint _intv[256];
 
+// lidt idt_desc
 struct idt_entry   idt[256];
 struct idt_desc    idt_desc;
+
+// handlers to each int_no
+// which inited as 0
+static uint int_routines[256]; 
 
 static char *fault_messages[] = {
     "Division By Zero",
@@ -43,12 +49,9 @@ static char *fault_messages[] = {
     "Reserved"
 };
 
-// which inited as 0
-uint int_routines[256]; 
-
 /****************************************************************************/
 
-void idt_set_gate(int num, uint base, ushort sel, uchar flags) {
+static void idt_set_gate(int num, uint base, ushort sel, uchar flags) {
     idt[num].base_lo = (base & 0xFFFF);
     idt[num].base_hi = (base >> 16) & 0xFFFF;
     idt[num].sel = sel;
@@ -56,7 +59,7 @@ void idt_set_gate(int num, uint base, ushort sel, uchar flags) {
     idt[num].flags = flags;
 }
 
-void intv_install(){
+static void intv_init(){
     int i;
     for(i=0; i<256;i++){
         idt_set_gate(i, _intv[i], KERN_CS, 0x8e);
@@ -65,10 +68,16 @@ void intv_install(){
     idt_set_gate(0x80, _intv[0x80], KERN_CS, 0x8e);
 }
 
+static void idt_flush(){
+    asm volatile(
+        "lidt %0"
+        :: "m"(idt_desc));
+}
+
 /**********************************************************************/
 
 // if you do not remap irq, a Double Fault comes along with every intrupt
-void irq_remap(){
+static void irq_remap(){
     outb(0x20, 0x11);
     outb(0xA0, 0x11);
     outb(0x21, 0x20);
@@ -81,10 +90,6 @@ void irq_remap(){
     outb(0xA1, 0x0);
 }
 
-void int_set_handler(int num, void (*handler)(struct regs *r)){
-    int_routines[num] = handler;
-}
-
 /**********************************************************************/
 
 void int_common_handler(struct regs *r) {
@@ -94,12 +99,11 @@ void int_common_handler(struct regs *r) {
     if (r->int_no < 32) {
         if (handler){
             handler(r);
+            return;
         }
-        else {
-            printf("Panic: Unhandled Exception: %s \n", fault_messages[r->int_no]);
-            print_regs(r);
-            for(;;);
-        }
+        printf("Panic: Exception: %s \n", fault_messages[r->int_no]);
+        print_regs(r);
+        for(;;);
     }
     // irq
     if (r->int_no >= 32) {
@@ -115,8 +119,12 @@ void int_common_handler(struct regs *r) {
     // intr
 }
 
+void int_set_handler(int num, void (*handler)(struct regs *r)){
+    int_routines[num] = handler;
+}
+
 /***********************************************************************************/
-// helpers
+
 void print_regs(struct regs *r){
     printf("gs = %x, fs = %x, es = %x, ds = %x\n", r->gs, r->fs, r->es, r->ds);
     printf("edi = %x, esi = %x, ebp = %x, esp = %x \n",r->edi, r->esi, r->ebp, r->esp);
@@ -126,6 +134,8 @@ void print_regs(struct regs *r){
     printf("useresp = %x, ss = %x \n", r->useresp, r->ss);
 }
 
+/***********************************************************************************/
+
 void idt_init(){
     // init idt_desc
     idt_desc.limit = (sizeof (struct idt_entry) * 256) - 1;
@@ -133,8 +143,8 @@ void idt_init(){
     // init irq
     irq_remap();
     memsetw(int_routines, 0, sizeof(uint)*256);
-    // load it 
-    intv_install();
-    lidt(&idt_desc);
+    // load intr vectors and lidt 
+    intv_init();
+    idt_flush();
 }
 

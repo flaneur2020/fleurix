@@ -4,12 +4,17 @@
  *
  * */ 
 
+#ifndef SYS_H
+#define SYS_H
+
 typedef unsigned char   uchar;
 typedef unsigned short  ushort;
 typedef unsigned int    uint;
 
 #define KERN_CS 0x08
 #define KERN_DS 0x10
+
+#define IRQ0 32
 
 // In main.c
 // on Mem
@@ -48,7 +53,7 @@ struct regs {
     uint        eip, cs, eflags, useresp, ss;              /* pushed by the processor automatically */ 
 };
 
-#define IRQ0 32
+typedef void (*int_handler_t)(struct regs *r);
 
 void    idt_init();
 
@@ -59,3 +64,4 @@ char    inb     (short port);
 void    outb    (short port, char data);
 void    lidt    (struct idt_desc *idt_desc);
 
+#endif
