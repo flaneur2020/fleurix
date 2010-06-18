@@ -11,6 +11,8 @@ typedef unsigned char   uchar;
 typedef unsigned short  ushort;
 typedef unsigned int    uint;
 
+#define NULL ((void*)0)
+
 #define KERN_CS 0x08
 #define KERN_DS 0x10
 

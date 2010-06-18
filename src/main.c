@@ -7,7 +7,7 @@ int main(){
     puts("* init video\n");
     idt_init();
     puts("* init idt\n");
-    timer_init(100);
+    timer_init(100, NULL);
     asm volatile("sti");
 	for (;;);
 }
