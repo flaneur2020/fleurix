@@ -72,6 +72,4 @@ void outb(short port, char data){
         :: "dN" (port), "a" (data));
 }
 
-void sti(){
-    asm volatile("sti\n");
-}
+
