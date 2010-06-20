@@ -12,7 +12,7 @@ _reset_drive:
     or      ah, ah               ; Check for error code
     jnz     _reset_drive         ; Try again if ah != 0
 
-    ; load kernel to 0x10000 = 4000h:0000h
+    ; load kernel to 0x10000 = 1000h:0000h
     mov     ax, 1000h
     mov     es, ax
     mov     ds, ax
