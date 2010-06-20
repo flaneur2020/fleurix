@@ -1,12 +1,21 @@
 ENTRY(main)
 SECTIONS {
+    __begin__ = .;
     .text 0x10000 : {
-        bin/main.o *(.text)
+        __code__ = .;
+        bin/main.o *(.text);
         . = ALIGN(4096);
     }
     .data : {
-        *(.data)
-        *(.rodata)
+        __data__ = .;
+        *(.data);
+        *(.rodata);
         . = ALIGN(4096);
     }
+    .bss : {
+        __bss__ = .;
+        *(.bss);
+        . = ALIGN(4096);
+    }
+    __end__ = .;
 }
