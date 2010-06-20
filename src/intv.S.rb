@@ -32,7 +32,8 @@ _int_common_stub:
 
 }
 
-0.upto(255) do |i|
+NINT = 48
+0.upto(NINT) do |i|
   puts %{
     [global _int#{i}]
     _int#{i}:
@@ -51,6 +52,6 @@ puts %{
 
 _intv:
 }
-0.upto(255) do |i|
+0.upto(NINT) do |i|
   puts "  dd _int#{i}"
 end

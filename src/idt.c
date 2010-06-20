@@ -51,21 +51,35 @@ static char *fault_messages[] = {
 
 /****************************************************************************/
 
-void idt_set_gate(int num, uint base, ushort sel, uchar flags) {
-    idt[num].base_lo = (base & 0xFFFF);
-    idt[num].base_hi = (base >> 16) & 0xFFFF;
-    idt[num].sel = sel;
-    idt[num].always0 = 0;
-    idt[num].flags = flags;
+void idt_set_gate(uint num, uint base, ushort sel, uchar type, uchar dpl) {
+    idt[num].base_lo    = (base & 0xFFFF);
+    idt[num].base_hi    = (base >> 16) & 0xFFFF;
+    idt[num].sel        = sel;
+    idt[num].dpl        = dpl;
+    idt[num].type       = type;
+    idt[num].always0    = 0;
+    idt[num].p          = 1;
+    idt[num].sys        = 0;
+}
+
+void syst_set_gate(uint num, uint base){
+    idt_set_gate(num, base, KERN_CS, STS_TG, 3);
+}
+void intr_set_gate(uint num, uint base){
+    idt_set_gate(num, base, KERN_CS, STS_IG, 0);
+}
+void trap_set_gate(uint num, uint base){
+    idt_set_gate(num, base, KERN_CS, STS_TG, 0);
 }
 
 void intv_init(){
     int i;
-    for(i=0; i<256;i++){
-        idt_set_gate(i, _intv[i], KERN_CS, 0x8e);
-    }
-    // syscall
-    idt_set_gate(0x80, _intv[0x80], KERN_CS, 0x8e);
+    for(i=0;  i<32; i++){ trap_set_gate(i, _intv[i]); }
+    for(i=32; i<48; i++){ intr_set_gate(i, _intv[i]); }
+    syst_set_gate(0x03, _intv[0x03]); // int3
+    syst_set_gate(0x04, _intv[0x04]); // overflow
+    syst_set_gate(0x05, _intv[0x05]); // bound
+    syst_set_gate(0x80, _intv[0x80]); // syscall
 }
 
 void idt_flush(){
@@ -77,6 +91,7 @@ void idt_flush(){
 /**********************************************************************/
 
 // if you do not remap irq, a Double Fault comes along with every intrupt
+// 0 -> 32
 static void irq_remap(){
     outb(0x20, 0x11);
     outb(0xA0, 0x11);
@@ -142,7 +157,6 @@ void idt_init(){
     idt_desc.base = &idt;
     // init irq
     irq_remap();
-    memsetw(int_routines, 0, sizeof(uint)*256);
     // load intr vectors and lidt 
     intv_init();
     idt_flush();

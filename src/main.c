@@ -6,7 +6,8 @@ void main(){
     puts("* init video\n");
     idt_init();
     puts("* init idt\n");
-    timer_init(100, NULL);
+    timer_init(100);
+    //printf("%d\n", 1/0);
     asm volatile("sti");
 	for (;;);
 }
