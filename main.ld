@@ -1,12 +1,12 @@
 ENTRY(main)
 SECTIONS {
-    .text 0x1000 : {
+    .text 0x10000 : {
         bin/main.o *(.text)
-        *(.rodata)
         . = ALIGN(4096);
     }
     .data : {
         *(.data)
+        *(.rodata)
         . = ALIGN(4096);
     }
 }

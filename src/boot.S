@@ -1,21 +1,22 @@
 [bits 16]
+
 align 4
 
 [global _start]
 _start:
 
-    ; read the rest sectors to 0000:1000
+    ; read the rest sectors to 0x10000
 _reset_drive:
     mov     ah, 0                ; RESET-command
     int     13h                  ; Call interrupt 13h
     or      ah, ah               ; Check for error code
     jnz     _reset_drive         ; Try again if ah != 0
 
-    ; a TODO here, this code cannot load too much code :(
-    mov     ax, 0000h
+    ; load kernel to 0x10000 = 4000h:0000h
+    mov     ax, 1000h
     mov     es, ax
     mov     ds, ax
-    mov     bx, 1000h           ; Destination address = 4000:0000
+    mov     bx, 0000h           ; Destination address = 1000h:0000
 
     mov     ah, 02h             ; READ SECTOR-command
     mov     al, 02fh            ; Number of sectors to read
@@ -59,8 +60,9 @@ _start_pm:
     mov     ss,  ax
     mov     esp, 090000h
     ; jump to C!
+    ; jump to 0x10000!
     ; never return it should  be
-    jmp     08h:01000h
+    jmp     08h:010000h
 
 _hang: 
     jmp     _hang

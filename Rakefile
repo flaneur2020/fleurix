@@ -40,7 +40,7 @@ end
 # => main.bin
 #######################################################################
 
-OFiles = %w{ bin/main.o bin/intv.o bin/print.o bin/idt.o bin/timer.o }
+OFiles = %w{ bin/main.o bin/print.o bin/idt.o bin/timer.o bin/intv.o }
 
 file 'bin/main.bin' => 'bin/main.elf' do
   sh "objcopy -R .pdr -R .comment -R .note -S -O binary bin/main.elf bin/main.bin"
@@ -48,7 +48,7 @@ end
 
 file 'bin/main.elf' => OFiles + ['main.ld'] do
   sh "ld #{OFiles * ' '} -o bin/main.elf -e c -T main.ld"
-  sh "nm bin/main.elf > main.nmtab"
+  sh "(nm bin/main.elf | sort) > main.nmtab"
 end
 
 file 'src/intv.S' => 'src/intv.S.rb' do 
