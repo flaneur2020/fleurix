@@ -51,7 +51,7 @@ static char *fault_messages[] = {
 
 /****************************************************************************/
 
-static void idt_set_gate(int num, uint base, ushort sel, uchar flags) {
+void idt_set_gate(int num, uint base, ushort sel, uchar flags) {
     idt[num].base_lo = (base & 0xFFFF);
     idt[num].base_hi = (base >> 16) & 0xFFFF;
     idt[num].sel = sel;
@@ -59,7 +59,7 @@ static void idt_set_gate(int num, uint base, ushort sel, uchar flags) {
     idt[num].flags = flags;
 }
 
-static void intv_init(){
+void intv_init(){
     int i;
     for(i=0; i<256;i++){
         idt_set_gate(i, _intv[i], KERN_CS, 0x8e);
@@ -68,7 +68,7 @@ static void intv_init(){
     idt_set_gate(0x80, _intv[0x80], KERN_CS, 0x8e);
 }
 
-static void idt_flush(){
+void idt_flush(){
     asm volatile(
         "lidt %0"
         :: "m"(idt_desc));

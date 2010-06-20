@@ -1,7 +1,7 @@
-ENTRY("_entry")
+ENTRY(main)
 SECTIONS {
     .text 0x1000 : {
-        *(.text)
+        bin/main.o *(.text)
         *(.rodata)
         . = ALIGN(4096);
     }

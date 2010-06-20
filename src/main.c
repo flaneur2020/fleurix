@@ -1,7 +1,6 @@
 #include <sys.h>
 
-
-int main(){
+void main(){
     video_init();
     puts("Fleurix initalizing, welcome\n\n");
     puts("* init video\n");

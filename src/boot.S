@@ -1,6 +1,7 @@
 [bits 16]
 align 4
 
+[global _start]
 _start:
 
     ; read the rest sectors to 0000:1000
@@ -11,9 +12,10 @@ _reset_drive:
     jnz     _reset_drive         ; Try again if ah != 0
 
     ; a TODO here, this code cannot load too much code :(
-    mov     ax, 0
+    mov     ax, 0000h
     mov     es, ax
-    mov     bx, 0x1000          ; Destination address = 1000:0000
+    mov     ds, ax
+    mov     bx, 1000h           ; Destination address = 4000:0000
 
     mov     ah, 02h             ; READ SECTOR-command
     mov     al, 02fh            ; Number of sectors to read
