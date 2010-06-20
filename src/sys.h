@@ -100,8 +100,6 @@ struct regs {
     uint        eip, cs, eflags, useresp, ss;              /* pushed by the processor automatically */ 
 };
 
-typedef void (*int_handler_t)(struct regs *r);
-
 void    idt_init();
 
 // on x86, just inline
@@ -111,4 +109,7 @@ char    inb     (short port);
 void    outb    (short port, char data);
 void    lidt    (struct idt_desc *idt_desc);
 
+
+// timer.c
+void    do_timer();
 #endif

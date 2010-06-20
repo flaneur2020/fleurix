@@ -80,6 +80,10 @@ void intv_init(){
     syst_set_gate(0x04, _intv[0x04]); // overflow
     syst_set_gate(0x05, _intv[0x05]); // bound
     syst_set_gate(0x80, _intv[0x80]); // syscall
+    int_set_handler(IRQ0+0, &do_timer);        // in timer.c
+    //int_set_handler(IRQ0+1, NULL);        
+    //int_set_handler(IRQ0+2, NULL);        
+    //int_set_handler(IRQ0+3, NULL);        
 }
 
 void idt_flush(){
@@ -91,7 +95,8 @@ void idt_flush(){
 /**********************************************************************/
 
 // if you do not remap irq, a Double Fault comes along with every intrupt
-// 0 -> 32
+// 0  -> 32
+// 15 -> 47
 static void irq_remap(){
     outb(0x20, 0x11);
     outb(0xA0, 0x11);
