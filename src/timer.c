@@ -1,4 +1,5 @@
 #include <sys.h>
+#include <x86.h>
 
 static uint tick = 0;
 

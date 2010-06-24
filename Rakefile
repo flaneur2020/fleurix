@@ -1,10 +1,14 @@
-CIncs   = '-Isrc'
+CIncs   = '-Isrc/inc'
 CFlags  = "-Wall -finline-functions -nostdinc -fno-builtin"
 
 task :default => :bochs
 
 task :bochs => :build do
   sh "bochs -q -f .bochsrc"
+end
+
+task :nm => :build do 
+  sh 'cat main.nmtab'
 end
 
 task :debug => :build do
@@ -40,7 +44,7 @@ end
 # => main.bin
 #######################################################################
 
-OFiles = %w{ bin/main.o bin/print.o bin/idt.o bin/timer.o bin/intv.o }
+OFiles = %w{ bin/main.o bin/print.o bin/idt.o bin/timer.o bin/page.o bin/intv.o }
 
 file 'bin/main.bin' => 'bin/main.elf' do
   sh "objcopy -R .pdr -R .comment -R .note -S -O binary bin/main.elf bin/main.bin"
@@ -67,8 +71,9 @@ end
 [
   ['src/print.c'],
   ['src/idt.c'],
+  ['src/page.c'],
   ['src/timer.c'],
-  ['src/main.c', 'src/sys.h']
+  ['src/main.c', 'src/inc/sys.h', 'src/inc/x86.h']
 ].each do |fn_c, *_|
   fn_o = 'bin/'+File.basename(fn_c).ext('o')
   file fn_o => [fn_c, *_] do

@@ -1,4 +1,5 @@
 #include <sys.h>
+#include <x86.h>
 
 /*
  * width 80

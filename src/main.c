@@ -1,13 +1,13 @@
 #include <sys.h>
+#include <x86.h>
 
 void main(){
-    video_init();
-    puts("Fleurix initalizing, welcome\n\n");
-    puts("* init video\n");
-    idt_init();
-    puts("* init idt\n");
-    timer_init(100);
+    video_init();       puts("* init video\n");
+    idt_init();         puts("* init idt\n");
     //printf("%d\n", 1/0);
+    timer_init(100);    puts("* init timer\n");
+    page_init();        puts("* init paging\n");
+    puts("\nHello, Fleurix... \n\n");
     asm volatile("sti");
 	for (;;);
 }
@@ -55,21 +55,4 @@ void panic(char *str){
     asm volatile("hlt");
     for(;;);
 }
-
-// x86 
-char inb(short port){
-    char ret;
-    asm volatile(
-        "inb %1, %0"
-        : "=a" (ret) 
-        : "dN" (port));
-    return ret;
-}
-
-void outb(short port, char data){
-    asm volatile(
-        "outb %1, %0"
-        :: "dN" (port), "a" (data));
-}
-
 

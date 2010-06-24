@@ -1,4 +1,5 @@
 #include <sys.h>
+#include <x86.h>
 
 // from intv.S
 extern uint _intv[256];
