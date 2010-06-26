@@ -3,7 +3,7 @@
 
 static uint tick = 0;
 
-void do_timer(){
+void do_timer(struct regs *r){
     //puts("~~");
 }
 

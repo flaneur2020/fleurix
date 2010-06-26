@@ -63,34 +63,34 @@ void idt_set_gate(uint num, uint base, ushort sel, uchar type, uchar dpl) {
     idt[num].sys        = 0;
 }
 
-void syst_set_gate(uint num, uint base){
+void set_syst_gate(uint num, uint base){
     idt_set_gate(num, base, KERN_CS, STS_TG, 3);
 }
-void intr_set_gate(uint num, uint base){
+void set_intr_gate(uint num, uint base){
     idt_set_gate(num, base, KERN_CS, STS_IG, 0);
 }
-void trap_set_gate(uint num, uint base){
+void set_trap_gate(uint num, uint base){
     idt_set_gate(num, base, KERN_CS, STS_TG, 0);
 }
 
 void intv_init(){
     int i;
-    for(i=0;  i<32; i++){ trap_set_gate(i, _intv[i]); }
-    for(i=32; i<48; i++){ intr_set_gate(i, _intv[i]); }
-    syst_set_gate(0x03, _intv[0x03]); // int3
-    syst_set_gate(0x04, _intv[0x04]); // overflow
-    syst_set_gate(0x05, _intv[0x05]); // bound
-    syst_set_gate(0x80, _intv[0x80]); // syscall
+    for(i=0;  i<32; i++){ set_trap_gate(i, _intv[i]); }
+    for(i=32; i<48; i++){ set_intr_gate(i, _intv[i]); }
+    set_syst_gate(0x03, _intv[0x03]); // int3
+    set_syst_gate(0x04, _intv[0x04]); // overflow
+    set_syst_gate(0x05, _intv[0x05]); // bound
+    set_syst_gate(0x80, _intv[0x80]); // syscall
     int_set_handler(IRQ0+0, &do_timer);        // in timer.c
     //int_set_handler(IRQ0+1, NULL);        
     //int_set_handler(IRQ0+2, NULL);        
     //int_set_handler(IRQ0+3, NULL);        
 }
 
-void idt_flush(){
+void flush_idt(struct idt_desc idtd){
     asm volatile(
         "lidt %0"
-        :: "m"(idt_desc));
+        :: "m"(idtd));
 }
 
 /**********************************************************************/
@@ -165,6 +165,6 @@ void idt_init(){
     irq_remap();
     // load intr vectors and lidt 
     intv_init();
-    idt_flush();
+    flush_idt(idt_desc);
 }
 

@@ -1,7 +1,38 @@
 #include <sys.h>
 #include <x86.h>
 
-uchar frmtab[16*1024];
+
+void do_page_fault(struct regs *r){
+}
+
+/**************************************************************/
+// Allocate/free a Frame
+// palloc: tranverse frmmap, if 0, set it 1 and return the address
+// pfree: decrease the target in frmmap. 
+uchar frmmap[NFRAME] = {0, };
+
+uint palloc(){
+    int i;
+    for(i=0; i<NFRAME; i++){
+        if(frmmap[i]==0){
+            frmmap[i] = 1;
+            return LO_MEM + i*4096;
+        }
+    }
+    return 0;
+}
+
+uint pfree(uint addr){
+    int i;
+    i = (addr-LO_MEM) / 4096;
+    if(frmmap[i]==0){
+        return 0;
+    }
+    frmmap[i]--;
+    return i;
+}
+
+/***************************************************************/
 
 void flush_cr3(uint addr){
     asm volatile("mov %0, %%cr3":: "r"(addr));
@@ -15,8 +46,8 @@ void page_enable(){
 }
 
 void page_init(){
-    // a page directory have to make aligned to multiple of 4kb
-    // the page table comes right after the page directory
+    // address of a page directory have to make aligned to multiple of 4kb
+    // the page table comes right after the page directory, 0x1000 == 1024 * 4
 	uint *pdir = (uint *) 0x9C000;
 	uint *ptab = (uint *) 0x9D000; 
 	uint addr  = 0; 
@@ -25,7 +56,7 @@ void page_init(){
 	uint i;
 	for(i=0; i<1024; i++) {
 		ptab[i] = addr | 3; 
-		addr = addr + 4096; // 4096 = 4kb
+		addr += 4096; // 4096 = 4kb
 	};
 
 	// fill the first entry of the page directory

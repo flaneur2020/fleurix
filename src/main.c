@@ -9,6 +9,13 @@ void main(){
     page_init();        puts("* init paging\n");
     puts("\nHello, Fleurix... \n\n");
     asm volatile("sti");
+    int i;
+    for(i=0; i<NFRAME; i++){
+        uint addr = palloc();
+        printf("allocated %x\n", addr);
+        addr = pfree(addr);
+        printf("freed %x\n", addr);
+    }
 	for (;;);
 }
 

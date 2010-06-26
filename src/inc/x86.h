@@ -54,17 +54,7 @@
 // on MMU
 // Seg and Paging
 
-struct ptab_entry {
-    uint        present  :1;        // Page present in memory
-    uint        rw       :1;        // Read-only if clear, readwrite if set
-    uint        user     :1;        // Supervisor level only if clear
-    uint        accessed :1;        // Has the page been accessed since last refresh?
-    uint        dirty    :1;        // Has the page been written to since last refresh?
-    uint        always0  :7;        // Amalgamation of unused and reserved bits
-    uint        offset   :20;       // Frame address (shifted right 12 bits)
-} __attribute__((packed));
-
-struct pdir_entry {
+struct page_entry {
     uint        present  :1;        // Page present in memory
     uint        rw       :1;        // Read-only if clear, readwrite if set
     uint        user     :1;        // Supervisor level only if clear
@@ -76,6 +66,7 @@ struct pdir_entry {
 
 /********************************************************************************/
 // on Intrupt
+// idt and frame
 
 #define IRQ0 32
 
