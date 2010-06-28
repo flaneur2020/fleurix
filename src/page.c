@@ -5,12 +5,27 @@
 void do_page_fault(struct regs *r){
 }
 
+void do_no_page(struct regs *r){
+}
+
+void do_wp_page(struct regs *r){
+}
+
 /**************************************************************/
-// Allocate/free a Frame
-// palloc: tranverse frmmap, if 0, set it 1 and return the address
-// pfree: decrease the target in frmmap. 
+
+void copy_pages(){
+}
+
+void copy_ptabs(){
+}
+
+/**************************************************************/
+// Allocate/Free a Frame
+
 uchar frmmap[NFRAME] = {0, };
 
+// tranverse frmmap, if 0, set it 1 and return the address
+// if no frame availible, return 0
 uint palloc(){
     int i;
     for(i=0; i<NFRAME; i++){
@@ -22,6 +37,7 @@ uint palloc(){
     return 0;
 }
 
+// decrease the target in frmmap. 
 uint pfree(uint addr){
     int i;
     i = (addr-LO_MEM) / 4096;
@@ -52,9 +68,9 @@ void page_init(){
 	uint *ptab = (uint *) 0x9D000; 
 	uint addr  = 0; 
 
-	// map the first 4MB of memory
+	// map the first 1MB of memory
 	uint i;
-	for(i=0; i<1024; i++) {
+	for(i=0; i<1024/4; i++) {
 		ptab[i] = addr | 3; 
 		addr += 4096; // 4096 = 4kb
 	};
