@@ -1,9 +1,11 @@
+
+#include <param.h>
 #include <sys.h>
 #include <x86.h>
 
 void main(){
     video_init();       puts("* init video\n");
-    gdt_init();
+    gdt_init();         puts("* init gdt\n");
     idt_init();         puts("* init idt\n");
     //printf("%d\n", 1/0);
     timer_init(100);    puts("* init timer\n");
