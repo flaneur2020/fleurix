@@ -70,8 +70,7 @@ _hang:
 
 gdt:
 gdt_null:
-    dd  0
-    dd  0
+    dd  0, 0
 gdt_code:
     ; dword 1
     dw  0xffff

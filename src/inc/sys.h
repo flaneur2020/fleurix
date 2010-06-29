@@ -15,8 +15,13 @@ typedef unsigned int    uint;
 
 #define NULL ((void*)0)
 
+#define NPROC 128
+
+
 #define KERN_CS 0x08
 #define KERN_DS 0x10
+#define USER_CS 0x18
+#define USER_DS 0x20
 
 // Kernel is 1mb, which locates in 0~LO_MEM
 // main Mem(which procs live in) is 63mb, locates in LO_MEM~HI_MEM 

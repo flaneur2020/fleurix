@@ -5,7 +5,7 @@
 extern uint _intv[256];
 
 // lidt idt_desc
-struct idt_entry   idt[256];
+struct gate_desc   idt[256];
 struct idt_desc    idt_desc;
 
 // handlers to each int_no
@@ -159,7 +159,7 @@ void print_regs(struct regs *r){
 
 void idt_init(){
     // init idt_desc
-    idt_desc.limit = (sizeof (struct idt_entry) * 256) - 1;
+    idt_desc.limit = (sizeof (struct gate_desc) * 256) - 1;
     idt_desc.base = &idt;
     // init irq
     irq_remap();

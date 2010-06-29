@@ -1,6 +1,14 @@
 #include <sys.h>
 #include <x86.h>
 
+// the ONLY page directory
+// which indicates the linear address space of 4GB
+// each proc have a address space of 64MB, which starts at pid*64mb
+uint *pdir = (uint *) 0x9C000;
+
+uchar frmmap[NFRAME] = {0, };
+
+/**************************************************************/
 
 void do_page_fault(struct regs *r){
 }
@@ -13,16 +21,26 @@ void do_wp_page(struct regs *r){
 
 /**************************************************************/
 
-void copy_pages(){
+void put_page(uint la, uint pa){
+    uint *ptab = pdir[la>>12];
+    if (! ptab & 1){
+        ptab = palloc();
+        ptab = ((uint)ptab) |  3;
+        pdir[PDX(la)] = ptab;
+    }
+    ptab[PTX(la)] = pa | 3;
+    frmmap[pa/4096]++;
 }
 
-void copy_ptabs(){
+void copy_page(uint la1, uint la2){
+}
+
+void copy_ptab(){
 }
 
 /**************************************************************/
 // Allocate/Free a Frame
 
-uchar frmmap[NFRAME] = {0, };
 
 // tranverse frmmap, if 0, set it 1 and return the address
 // if no frame availible, return 0
@@ -64,13 +82,12 @@ void page_enable(){
 void page_init(){
     // address of a page directory have to make aligned to multiple of 4kb
     // the page table comes right after the page directory, 0x1000 == 1024 * 4
-	uint *pdir = (uint *) 0x9C000;
 	uint *ptab = (uint *) 0x9D000; 
 	uint addr  = 0; 
 
 	// map the first 1MB of memory
 	uint i;
-	for(i=0; i<1024/4; i++) {
+	for(i=0; i<1024; i++) {
 		ptab[i] = addr | 3; 
 		addr += 4096; // 4096 = 4kb
 	};

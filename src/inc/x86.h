@@ -54,7 +54,30 @@
 // on MMU
 // Seg and Paging
 
-struct page_entry {
+struct seg_desc {
+    uint        limit_lo:16;    // Low bits of segment limit
+    uint        base_lo :16;    // Low bits of segment base address
+    uint        base_mi :8;     // Middle bits of segment base address
+    uint        type    :4;     // Segment type (see STS_ constants)
+    uint        s       :1;     // 0 = system, 1 = application
+    uint        dpl     :2;     // Descriptor Privilege Level
+    uint        present :1;     // Present
+    uint        limit_hi:4;     // High bits of segment limit
+    uint        avl     :1;     // Unused (available for software use)
+    uint        r       :1;     // Reserved
+    uint        db      :1;     // 0 = 16-bit segment, 1 = 32-bit segment
+    uint        g       :1;     // Granularity: limit scaled by 4K when set
+    uint        base_hi :8;     // High bits of segment base address
+};
+
+struct gdt_desc {
+    ushort      limit;
+    uint        base;
+} __attribute__((packed));     
+
+// on Paging
+
+struct page_desc {
     uint        present  :1;        // Page present in memory
     uint        rw       :1;        // Read-only if clear, readwrite if set
     uint        user     :1;        // Supervisor level only if clear
@@ -64,13 +87,26 @@ struct page_entry {
     uint        offset   :20;       // Frame address (shifted right 12 bits)
 } __attribute__((packed));
 
+// A linear address 'la' has a three-part structure as follows:
+//
+// +--------10------+-------10-------+---------12----------+
+// | Page Directory |   Page Table   | Offset within Page  |
+// |      Index     |      Index     |                     |
+// +----------------+----------------+---------------------+
+//  \--- PDX(la) --/ \--- PTX(la) --/ \---- POFF(la) ----/
+//  \----------- PPN(la) -----------/
+//
+#define PDX(la)  ((uint)((la>>22)))
+#define PTX(la)  ((uint)((la<<12)&0x3FF))
+#define POFF(la) ((uint)((la&0xFFF)))
+
 /********************************************************************************/
 // on Intrupt
 // idt and frame
 
 #define IRQ0 32
 
-struct idt_entry {
+struct gate_desc {
     uint        base_lo :16;        // low address
     uint        sel     :16;        // selector
     uint        always0 :8;         // reserved

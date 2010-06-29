@@ -3,19 +3,16 @@
 
 void main(){
     video_init();       puts("* init video\n");
+    gdt_init();
     idt_init();         puts("* init idt\n");
     //printf("%d\n", 1/0);
     timer_init(100);    puts("* init timer\n");
     page_init();        puts("* init paging\n");
     puts("\nHello, Fleurix... \n\n");
     asm volatile("sti");
-    int i;
-    for(i=0; i<NFRAME; i++){
-        uint addr = palloc();
-        printf("allocated %x\n", addr);
-        addr = pfree(addr);
-        printf("freed %x\n", addr);
-    }
+    // for debug
+    uint la = 0x12345678;
+    printf("%x, %x, %x", PDX(la), PTX(la), POFF(la));
 	for (;;);
 }
 
