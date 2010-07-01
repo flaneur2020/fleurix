@@ -1,7 +1,7 @@
 
 #include <param.h>
-#include <sys.h>
 #include <x86.h>
+#include <sys.h>
 
 void main(){
     video_init();       puts("* init video\n");
@@ -10,11 +10,12 @@ void main(){
     //printf("%d\n", 1/0);
     timer_init(100);    puts("* init timer\n");
     page_init();        puts("* init paging\n");
+    sched_init();       puts("* init sched\n");
     puts("\nHello, Fleurix... \n\n");
     asm volatile("sti");
     // for debug
     uint la = 0x12345678;
-    printf("%x, %x, %x", PDX(la), PTX(la), POFF(la));
+    printf("%x, %x, %x\n", PDX(la), PTX(la), POFF(la));
 	for (;;);
 }
 
@@ -62,3 +63,5 @@ void panic(char *str){
     for(;;);
 }
 
+void nop(){
+}

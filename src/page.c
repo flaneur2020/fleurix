@@ -1,7 +1,7 @@
 
 #include <param.h>
-#include <sys.h>
 #include <x86.h>
+#include <sys.h>
 
 // the ONLY page directory
 // which indicates the linear address space of 4GB

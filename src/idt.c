@@ -1,7 +1,7 @@
 
 #include <param.h>
-#include <sys.h>
 #include <x86.h>
+#include <sys.h>
 
 // from intv.S
 extern uint _intv[256];

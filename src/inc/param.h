@@ -20,6 +20,12 @@ typedef unsigned int    uint;
 #define KERN_CS 0x08
 #define KERN_DS 0x10
 
+#define LDT0 3
+#define TSS0 4
+
+#define _LDT(n) ((LDT0+n*2)<<3)
+#define _TSS(n) ((TSS0+n*2)<<3)
+
 // Kernel is 1mb, which locates in 0~LO_MEM
 // main Mem(which procs live in) is 63mb, locates in LO_MEM~HI_MEM 
 #define LO_MEM 0x100000

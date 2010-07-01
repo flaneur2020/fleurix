@@ -48,7 +48,7 @@
 #define STS_TB      0xB     // Busy 32-bit TSS
 #define STS_CG      0xC     // 32-bit Call Gate
 #define STS_IG      0xE     // 32-bit Interrupt Gate
-#define STS_TG      0xF     // 32-bit Trap Gate
+#define STS_TRG      0xF     // 32-bit Trap Gate
 
 /**********************************************************************************/
 // on MMU
@@ -132,6 +132,9 @@ struct regs {
 
 
 /*****************************************************************************************************/
+// on task switching
+// tss
+
 struct tss_desc {
     uint        link, esp0;         
     ushort      ss0, __1;
@@ -147,7 +150,7 @@ struct tss_desc {
     ushort      fs, __8;
     ushort      gs, __9;
     ushort      ldt,__10;
-    ushort      trap, iomb;          
+    ushort      trap, iomb;
 } __attribute__((packed));     
 
 /*****************************************************************************************************/

@@ -26,9 +26,14 @@ void    printf      (char *fmt, ...);
 // idt.c
 void    idt_init();
 
+// gdt.c
+extern  struct seg_desc     gdt[];
+
 // page.c
 uint    palloc();
 uint    pfree       (uint addr);
+
+extern  uint        *pdir;
 
 // timer.c
 void    do_timer();
