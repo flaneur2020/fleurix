@@ -101,6 +101,8 @@ struct page_desc {
 #define POFF(la) ((uint)((la&0xFFF)))
 #define PPN(la)  (((uint) (la)) >> 12)
 
+#define PTE_ADDR(pte)	((uint)(pte) & ~0xFFF)
+
 // Page table/directory entry flags.
 #define PTE_P		0x001	// Present
 #define PTE_W		0x002	// Writeable

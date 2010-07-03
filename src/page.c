@@ -76,8 +76,8 @@ void copy_ptab(uint src, uint dst, uint limit){
 // traverse a linear address to physical address
 // TODO, have a check of PTE_P
 uint la2pa(uint la){
-    uint *ptab = PPN(pdir[PDX(la)]) << 12;
-    uint page  = PPN(ptab[PTX(la)]) << 12;
+    uint *ptab = PTE_ADDR(pdir[PDX(la)]);
+    uint page  = PTE_ADDR(ptab[PTX(la)]);
     return page + POFF(la);
 }
 
