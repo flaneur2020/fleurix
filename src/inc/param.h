@@ -14,7 +14,7 @@ typedef unsigned int    uint;
 
 #define NULL ((void*)0)
 
-#define NPROC 127
+#define NPROC 63
 #define NFRAME ((HI_MEM-LO_MEM)/4096)
 
 #define KERN_CS 0x08
@@ -27,8 +27,8 @@ typedef unsigned int    uint;
 #define _TSS(n) ((TSS0+n*2)<<3)
 
 // Kernel is 1mb, which locates in 0~LO_MEM
-// main Mem(which procs live in) is 63mb, locates in LO_MEM~HI_MEM 
+// main Mem(which procs live in) is 16mb, locates in LO_MEM~HI_MEM 
 #define LO_MEM 0x100000
-#define HI_MEM 0x4000000
+#define HI_MEM 0x1000000
 
 #endif

@@ -87,19 +87,23 @@ void page_init(){
 	uint *ptab = (uint *) 0x9D000; 
 	uint addr  = 0; 
 
-	// map the first 1MB of memory
-	uint i;
-	for(i=0; i<1024; i++) {
-		ptab[i] = addr | 3; 
-		addr += 4096; // 4096 = 4kb
-	};
-
-	// fill the first entry of the page directory
+	// map the top 16MB of memory
+    //
+    // fill the top four entry of the page directory
     // attribute set to: supervisor level, read/write, present(011 in binary)
-	pdir[0] = (uint)ptab | 3; 
+	uint i, j;
+    for(i=0; i<4; i++){
+        ptab = 0x9D000 + 0x1000*i;
+        pdir[i] = (uint)ptab | 3;
+        for(j=0; j<1024; j++) {
+            ptab[j] = addr | 3; 
+            addr += 4096; // 4096 = 4kb
+        }
+    }
+
 	// fill the rest of the page directory
     // attribute set to: supervisor level, read/write, not present(010 in binary)
-	for(i=1; i<1024; i++) {
+	for(i=4; i<1024; i++) {
 		pdir[i] = 0 | 2; 
 	};
 
