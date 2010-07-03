@@ -14,8 +14,8 @@ void main(){
     puts("\nHello, Fleurix... \n\n");
     asm volatile("sti");
     // for debug
-    uint la = 0x12345678;
-    printf("%x, %x, %x\n", PDX(la), PTX(la), POFF(la));
+    uint la = 0x109234;
+    printf("la2pa: %x, %x, %x~ %x, %x\n", PDX(la), PTX(la), POFF(la), la, la2pa(la));
 	for (;;);
 }
 
