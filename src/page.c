@@ -29,6 +29,8 @@
  *
  * */
 
+uint la2pa(uint la);
+
 // there might be a TODO here... 16mb is so poor boy~
 // the ONLY page directory, 
 // which indicates the linear address space of 4GB
@@ -50,25 +52,30 @@ void do_wp_page(struct regs *r){
 
 /**************************************************************/
 
-void put_page(uint la, uint pa){
+void put_page(uint la, uint pa, uint flag){
     uint *ptab = pdir[PDX(la)];
     if (! ptab & 1){
         ptab = palloc();
-        ptab = ((uint)ptab) |  3;
+        ptab = ((uint)ptab) | flag;
         pdir[PDX(la)] = ptab;
     }
-    ptab[PTX(la)] = pa | 3;
+    ptab[PTX(la)] = pa | flag;
     frmmap[pa/4096]++;
 }
 
-void copy_page(uint la1, uint la2){
+void copy_page(uint la1, uint la2, uint limit){
 }
 
 // copy page tables, as a helper of copy_proc()
 // it do NOT copy the data inside a frame, just remap it
 // and mark it READONLY. 
+// parameter src, dst, and limit are deserved multiple of 0x1000
 void copy_ptab(uint src, uint dst, uint limit){
-    
+    int off, la, pa;
+    for(off=0; off<limit; off+=0x1000){
+        pa = la2pa(src+off);
+        put_page(dst+off, pa, PTE_P);
+    }
 }
 
 /**************************************************************/
@@ -124,7 +131,7 @@ void page_enable(){
 void page_init(){
     // address of a page directory have to make aligned to multiple of 4kb
     // the page table comes right after the page directory, 0x1000 == 1024 * 4
-	uint *ptab = (uint*)((uint)pdir + 0x1000); 
+	uint *ptab;
 
 	// map the top 16MB of memory
     //
