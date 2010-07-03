@@ -14,13 +14,8 @@ struct proc {
     uchar               p_flag;
     uint                p_pid;
     uint                p_ppid;
-    struct user         *p_userp;
-};
-
-struct user {
-    struct proc         *u_procp;
-    struct seg_desc     u_ldt[3];
-    struct tss_desc     u_tss;
+    struct seg_desc     p_ldt[3];
+    struct tss_desc     p_tss;
 };
 
 // stat codes

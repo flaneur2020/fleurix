@@ -170,17 +170,12 @@ struct tss_desc {
 /*****************************************************************************************************/
 static inline uchar inb(ushort port){
     uchar ret;
-    asm volatile(
-        "inb %1, %0"
-        : "=a" (ret) 
-        : "dN" (port));
+    asm volatile( "inb %1, %0" : "=a" (ret) : "dN" (port));
     return ret;
 }
 
 static inline void outb(ushort port, uchar data){
-    asm volatile(
-        "outb %1, %0"
-        :: "dN" (port), "a" (data));
+    asm volatile( "outb %1, %0" :: "dN" (port), "a" (data));
 }
 
 #endif
