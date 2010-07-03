@@ -13,13 +13,43 @@ struct proc     *current;
 
 /*******************************************************************************/
 
-void copy_proc(int nr){
+void copy_proc(int nr, struct regs *r){
+    struct proc *p;
+
+    // TODO: have a check here
+    p = (struct proc *)palloc(); 
+    proc[nr] = p;
+    p->p_pid   = nr;
+    p->p_ppid  = current->p_pid;
+
+    p->p_tss.link   = 0;
+    p->p_tss.esp0   = (uint)p + 0x1000;
+    p->p_tss.ss0    = 0x10;
+    p->p_tss.eip    = r->eip;
+    p->p_tss.eflags = r->eflags;
+    p->p_tss.eax    = 0;
+    p->p_tss.ebx    = r->ebx;
+    p->p_tss.ecx    = r->ecx;
+    p->p_tss.edx    = r->edx;
+    p->p_tss.esp    = r->esp;
+    p->p_tss.ebp    = r->ebp;
+    p->p_tss.esi    = r->esi;
+    p->p_tss.edi    = r->edi;
+    p->p_tss.es     = r->es & 0xffff;
+    p->p_tss.cs     = r->cs & 0xffff;
+    p->p_tss.ss     = r->ss & 0xffff;
+    p->p_tss.ds     = r->ds & 0xffff;
+    p->p_tss.fs     = r->fs & 0xffff;
+    p->p_tss.gs     = r->gs & 0xffff;
+    p->p_tss.ldt    = _LDT(nr);
+    p->p_tss.iomb   = 0x80000000;
 }
 
 /*******************************************************************************/
 
 // init proc[0] 
 // set the proc0's TSS & LDT inside GDT
+// and make current as proc[0]
 void sched_init(){
     struct proc *p = current = proc[0] = mem_p0;
     p->p_pid = 0;
