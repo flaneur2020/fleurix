@@ -13,15 +13,21 @@ struct proc     *current;
 
 /*******************************************************************************/
 
-void copy_proc(int nr, struct regs *r){
+
+// main part of sys_fork()
+int copy_proc(int nr, struct regs *r){
     struct proc *p;
 
-    // TODO: have a check here
     p = (struct proc *)palloc(); 
+    if (p==NULL){
+        return -1;    
+    }
+
     proc[nr] = p;
     p->p_pid   = nr;
     p->p_ppid  = current->p_pid;
 
+    // init tss & ldt stuff
     p->p_tss.link   = 0;
     p->p_tss.esp0   = (uint)p + 0x1000;
     p->p_tss.ss0    = 0x10;
@@ -43,6 +49,18 @@ void copy_proc(int nr, struct regs *r){
     p->p_tss.gs     = r->gs & 0xffff;
     p->p_tss.ldt    = _LDT(nr);
     p->p_tss.iomb   = 0x80000000;
+
+    // set ldt
+    set_tss(&gdt[TSS0+nr*2], &(p->p_tss));
+    set_ldt(&gdt[LDT0+nr*2], &(p->p_ldt));
+
+    // set SRUN at last. just in case
+    p->p_stat = SRUN;
+
+    return nr;
+}
+
+void switch_to(uint nr){
 }
 
 /*******************************************************************************/
