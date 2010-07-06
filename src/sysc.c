@@ -9,6 +9,7 @@ int errno = 0;
 /***********************************************************/
 
 void sys_fork(struct regs *r){
+    copy_proc(r);
     printf("fork();\n");
 }
 
@@ -16,8 +17,8 @@ _syscall0(0, int, fork);
 
 /***********************************************************/
 
-static uint sys_routines[NSYSC+1] = {
-    &sys_fork,
+static uint sys_routines[NSYSC] = {
+    [0] = &sys_fork,
     0,
 }; 
 

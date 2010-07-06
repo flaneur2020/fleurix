@@ -35,7 +35,6 @@ _int_common_stub:
 NINT = 128
 0.upto(NINT) do |i|
   puts %{
-    [global _int#{i}]
     _int#{i}:
       cli
       #{'push  dword 0' if i!=17 and (i<8 or i>14)}

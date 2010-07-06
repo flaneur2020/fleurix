@@ -20,6 +20,9 @@
 struct seg_desc     gdt[3 + (NPROC+1)*2] = {0, };
 struct gdt_desc     gdt_desc;
 
+
+/******************************************************************/
+
 void set_seg(struct seg_desc *seg, uint base, uint limit, uint dpl, uint type){
     seg->limit_lo = ((limit) >> 12) & 0xffff;
     seg->base_lo  = (base) & 0xffff;
@@ -47,7 +50,17 @@ void set_tss(struct seg_desc *seg, uint base){
     seg->s = 0;
 }
 
-/******************************************************/
+/******************************************************************/
+
+uint get_seg_limit(struct seg_desc *seg){
+    return (seg->limit_lo | seg->limit_hi << 16);
+}
+
+uint get_seg_base(struct seg_desc *seg){
+    return (seg->base_lo | seg->base_mi << 16 | seg->base_hi << 25);
+}
+
+/******************************************************************/
 
 // refill the gdt
 // each proc have one idt and tss, which all masses here

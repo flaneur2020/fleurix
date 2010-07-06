@@ -13,14 +13,34 @@ struct proc     *current;
 
 /*******************************************************************************/
 
+int find_empty_pid(){
+    int nr;
+    for(nr=0; nr<NPROC; nr++){
+        if (proc[nr]==0){
+            return nr;
+        }
+    }
+    return NULL;
+}
+
+int copy_mem_to(struct proc *p){
+    uint old_limit = get_seg_limit(&(current->p_ldt[1])); 
+    uint old_base  = get_seg_base (&(current->p_ldt[1]));
+}
 
 // main part of sys_fork()
-int copy_proc(int nr, struct regs *r){
+int copy_proc(struct regs *r){
+    int nr;
     struct proc *p;
+    
+    nr = find_empty_pid();
+    if (nr==NULL){
+        return -1;
+    }
 
     p = (struct proc *)palloc(); 
     if (p==NULL){
-        return -1;    
+        return -1;
     }
 
     proc[nr] = p;

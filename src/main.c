@@ -2,6 +2,7 @@
 #include <param.h>
 #include <x86.h>
 #include <kern.h>
+#include <sched.h>
 
 void main(){
     video_init();       puts("* init video\n");
@@ -12,7 +13,7 @@ void main(){
     page_init();        puts("* init paging\n");
     sched_init();       puts("* init sched\n");
     puts("\nHello, Fleurix... \n\n");
-
+    
     asm volatile("sti");
     asm("int $0x80"::"a"(0));
     //printf("%d\n", 1/0);

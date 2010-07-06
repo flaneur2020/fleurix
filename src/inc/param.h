@@ -14,8 +14,8 @@ typedef unsigned int    uint;
 
 #define NULL ((void*)0)
 
-#define NSYSC 63
-#define NPROC 63
+#define NSYSC 64
+#define NPROC 64
 #define NFRAME ((HI_MEM-LO_MEM)/4096)
 
 #define KERN_CS 0x08
