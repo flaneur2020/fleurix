@@ -1,7 +1,7 @@
 
 #include <param.h>
 #include <x86.h>
-#include <sys.h>
+#include <kern.h>
 
 /**
  *  0x1000000   |---------------------------------------------- 16mb

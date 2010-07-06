@@ -1,7 +1,7 @@
 
 #include <param.h>
-#include <sys.h>
 #include <x86.h>
+#include <kern.h>
 
 /*
  * width 80

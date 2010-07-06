@@ -1,21 +1,22 @@
 
 #include <param.h>
 #include <x86.h>
-#include <sys.h>
+#include <kern.h>
 
 void main(){
     video_init();       puts("* init video\n");
-    gdt_init();         puts("* init gdt\n");
     idt_init();         puts("* init idt\n");
-    //printf("%d\n", 1/0);
+    nop();
+    gdt_init();         puts("* init gdt\n");
     timer_init(100);    puts("* init timer\n");
     page_init();        puts("* init paging\n");
-    sched_init();       puts("* init sched\n");
+    //sched_init();       puts("* init sched\n");
     puts("\nHello, Fleurix... \n\n");
+
     asm volatile("sti");
+    //printf("%d\n", 1/0);
+    //fork();
     // for debug
-    uint la = 0x109234;
-    printf("la2pa: %x, %x, %x~ %x, %x\n", PDX(la), PTX(la), POFF(la), la, la2pa(la));
 	for (;;);
 }
 

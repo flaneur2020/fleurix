@@ -1,6 +1,6 @@
 #include <param.h>
 #include <x86.h>
-#include <sys.h>
+#include <kern.h>
 
 /**
  *  GDT

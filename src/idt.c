@@ -1,7 +1,7 @@
 
 #include <param.h>
 #include <x86.h>
-#include <sys.h>
+#include <kern.h>
 
 // from intv.S
 extern uint _intv[256];
@@ -12,7 +12,7 @@ struct idt_desc    idt_desc;
 
 // handlers to each int_no
 // which inited as 0
-static uint int_routines[256]; 
+static uint int_routines[256] = {0, }; 
 
 static char *fault_messages[] = {
     "Division By Zero",
@@ -66,13 +66,13 @@ void idt_set_gate(uint num, uint base, ushort sel, uchar type, uchar dpl) {
 }
 
 void set_syst_gate(uint num, uint base){
-    idt_set_gate(num, base, KERN_CS, STS_TG, 3);
+    idt_set_gate(num, base, KERN_CS, STS_TRG, 3);
 }
 void set_intr_gate(uint num, uint base){
     idt_set_gate(num, base, KERN_CS, STS_IG, 0);
 }
 void set_trap_gate(uint num, uint base){
-    idt_set_gate(num, base, KERN_CS, STS_TG, 0);
+    idt_set_gate(num, base, KERN_CS, STS_TRG, 0);
 }
 
 void intv_init(){
@@ -87,6 +87,7 @@ void intv_init(){
     //int_set_handler(IRQ0+1, NULL);        
     //int_set_handler(IRQ0+2, NULL);        
     //int_set_handler(IRQ0+3, NULL);        
+    //int_set_handler(0x80,   &do_syscall);      // in syscall.c
 }
 
 void flush_idt(struct idt_desc idtd){

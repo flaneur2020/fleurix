@@ -1,7 +1,7 @@
 
 #include <param.h>
 #include <x86.h>
-#include <sys.h>
+#include <kern.h>
 #include <sched.h>
 
 // one page size, stores some info on proc[0] and its kernel stack
@@ -61,6 +61,8 @@ int copy_proc(int nr, struct regs *r){
 }
 
 void switch_to(uint nr){
+    ushort seg = _TSS(nr);
+    asm("jmp *%0" ::"a"(seg));
 }
 
 /*******************************************************************************/

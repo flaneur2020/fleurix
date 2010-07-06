@@ -1,6 +1,6 @@
 #include <param.h>
-#include <sys.h>
 #include <x86.h>
+#include <kern.h>
 
 static uint tick = 0;
 

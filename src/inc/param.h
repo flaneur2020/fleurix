@@ -14,6 +14,7 @@ typedef unsigned int    uint;
 
 #define NULL ((void*)0)
 
+#define NSYSC 63
 #define NPROC 63
 #define NFRAME ((HI_MEM-LO_MEM)/4096)
 
