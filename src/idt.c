@@ -87,7 +87,7 @@ void intv_init(){
     //int_set_handler(IRQ0+1, NULL);        
     //int_set_handler(IRQ0+2, NULL);        
     //int_set_handler(IRQ0+3, NULL);        
-    //int_set_handler(0x80,   &do_syscall);      // in syscall.c
+    int_set_handler(0x80,   &do_syscall);      // in syscall.c
 }
 
 void flush_idt(struct idt_desc idtd){
@@ -129,7 +129,7 @@ void int_common_handler(struct regs *r) {
         print_regs(r);
         for(;;);
     }
-    // irq
+    // irq, syscall and blah~
     if (r->int_no >= 32) {
         if (r->int_no >= 40) {
             outb(0xA0, 0x20);
@@ -139,8 +139,6 @@ void int_common_handler(struct regs *r) {
             handler(r);
         }
     }
-    // syscall
-    // intr
 }
 
 void int_set_handler(int num, void (*handler)(struct regs *r)){

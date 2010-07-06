@@ -143,7 +143,6 @@ void page_init(){
     for(i=0; i<4; i++){
         ptab = 0x1000 + 0x1000*i;
         pdir[i] = (uint)ptab | 3;
-        printf("pdr[%d]=%x\n", i, (uint)pdir[i]);
         for(j=0; j<1024; j++) {
             ptab[j] = addr | PTE_P | PTE_W; 
             addr += 4096; // 4096 = 4kb

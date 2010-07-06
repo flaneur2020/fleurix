@@ -10,10 +10,11 @@ void main(){
     gdt_init();         puts("* init gdt\n");
     timer_init(100);    puts("* init timer\n");
     page_init();        puts("* init paging\n");
-    //sched_init();       puts("* init sched\n");
+    sched_init();       puts("* init sched\n");
     puts("\nHello, Fleurix... \n\n");
 
     asm volatile("sti");
+    asm("int $0x80"::"a"(0));
     //printf("%d\n", 1/0);
     //fork();
     // for debug

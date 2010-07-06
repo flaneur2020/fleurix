@@ -32,7 +32,7 @@ _int_common_stub:
 
 }
 
-NINT = 48
+NINT = 128
 0.upto(NINT) do |i|
   puts %{
     [global _int#{i}]
