@@ -154,6 +154,9 @@ void print_regs(struct regs *r){
     printf("int_no = %x, err_code = %x\n", r->int_no, r->err_code);
     printf("eip = %x, cs = %x, eflags = %x\n", r->eip, r->cs, r->eflags);
     printf("useresp = %x, ss = %x \n", r->useresp, r->ss);
+    uint cr2;
+    asm("mov %%cr2, %%eax":"=a"(cr2));
+    printf("cr2=%x\n", cr2);
 }
 
 /***********************************************************************************/

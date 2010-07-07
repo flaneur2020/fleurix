@@ -8,17 +8,27 @@ int errno = 0;
 
 /***********************************************************/
 
-void sys_fork(struct regs *r){
-    copy_proc(r);
-    printf("fork();\n");
+void sys_null(){
+    ;
 }
 
-_syscall0(0, int, fork);
+void sys_fork(struct regs *r){
+    int ret;
+    ret = copy_proc(r);
+    if (ret<0){
+        panic("error fork()\n");
+    }
+    r->eax = 1;
+}
+
+_syscall0(0, int, null);
+_syscall0(1, int, fork);
 
 /***********************************************************/
 
 static uint sys_routines[NSYSC] = {
-    [0] = &sys_fork,
+    [0] = &sys_null,
+    [1] = &sys_fork,
     0,
 }; 
 

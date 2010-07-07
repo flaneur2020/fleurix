@@ -52,29 +52,46 @@ void do_wp_page(struct regs *r){
 
 /**************************************************************/
 
-void put_page(uint la, uint pa, uint flag){
+int put_page(uint la, uint pa, uint flag){
+    //printf("# %x -> %x\n", la, pa);
     uint *ptab = pdir[PDX(la)];
-    if (! ptab & 1){
+    if (!((uint)ptab & PTE_P)){
         ptab = palloc();
+        if (ptab==0){
+            panic("no availible frame");
+        }
         ptab = ((uint)ptab) | flag;
         pdir[PDX(la)] = ptab;
     }
     ptab[PTX(la)] = pa | flag;
     frmmap[pa/4096]++;
+    return 0;
 }
 
-void copy_page(uint la1, uint la2, uint limit){
+int copy_page(uint la1, uint la2, uint limit){
 }
 
 // copy page tables, as a helper of copy_proc()
 // it do NOT copy the data inside a frame, just remap it
 // and mark it READONLY. 
 // parameter src, dst, and limit are deserved multiple of 0x1000
-void copy_ptab(uint src, uint dst, uint limit){
+int copy_ptab(uint src, uint dst, uint limit){
     int off, la, pa;
-    for(off=0; off<limit; off+=0x1000){
+    for(off=0; off<=limit; off+=0x1000){
         pa = la2pa(src+off);
-        put_page(dst+off, pa, PTE_P);
+        put_page(dst+off, pa, PTE_P | PTE_W | PTE_U);
+    }
+    flush_cr3(pdir);
+    return 0;
+}
+
+/**************************************************************/
+
+void print_pdir(){
+    uint la, pa;
+    for(la=0x4000000; la<0x8000000; la+=0x1000){
+        pa = la2pa(la);
+        printf("%x -> %x\n", la, pa);   
     }
 }
 
@@ -83,7 +100,12 @@ void copy_ptab(uint src, uint dst, uint limit){
 // traverse a linear address to physical address
 // TODO, have a check of PTE_P
 uint la2pa(uint la){
-    uint *ptab = PTE_ADDR(pdir[PDX(la)]);
+    uint ret;
+    ret = pdir[PDX(la)];
+    if (!(ret & PTE_P)){
+        panic("invalid pde\n");
+    }
+    uint *ptab = PTE_ADDR(ret);
     uint page  = PTE_ADDR(ptab[PTX(la)]);
     return page + POFF(la);
 }
@@ -105,7 +127,7 @@ uint palloc(){
 }
 
 // decrease the target in frmmap. 
-uint pfree(uint addr){
+int pfree(uint addr){
     int i;
     i = (addr-LO_MEM) / 4096;
     if(frmmap[i]==0){
@@ -118,7 +140,7 @@ uint pfree(uint addr){
 /***************************************************************/
 
 void flush_cr3(uint addr){
-    asm volatile("mov %0, %%cr3":: "r"(addr));
+    asm volatile("mov %%eax, %%cr3":: "a"(addr));
 }
 
 void page_enable(){

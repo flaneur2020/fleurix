@@ -11,49 +11,88 @@ uchar           mem_p0[4096] = {0, };
 struct proc     *proc[NPROC] = {NULL, };
 struct proc     *current;
 
+
 /*******************************************************************************/
 
+/*
+ * invoked by do_timer() in timer.c;
+ * */
+void do_sched(struct regs *r){
+    int nr;
+    struct proc *p;
+    for(nr=0; nr<NPROC; nr++){
+        p = proc[nr];
+        if (p==NULL) continue;
+        if (p==current){ continue; }
+        switch_to(p);
+    }
+}
+
+/*******************************************************************************/
+
+/*
+ * find an empty proc slot, return the number as pid
+ * return 0 on fail
+ * */
 int find_empty_pid(){
     int nr;
     for(nr=0; nr<NPROC; nr++){
-        if (proc[nr]==0){
+        if (proc[nr]==NULL){
             return nr;
         }
     }
-    return NULL;
+    return 0;
 }
 
+/*
+ * copy the current proc's address space into a new proc
+ * return 0 on success
+ * */
 int copy_mem_to(struct proc *p){
     uint old_limit = get_seg_limit(&(current->p_ldt[1])); 
     uint old_base  = get_seg_base (&(current->p_ldt[1]));
+    uint new_base  = p->p_pid * 0x4000000;
+    p->p_textp     = new_base;
+    p->p_tsize     = old_limit;
+    set_seg(&(p->p_ldt[1]), new_base, old_limit, 0, STA_X | STA_R);
+    set_seg(&(p->p_ldt[2]), new_base, old_limit, 0, STA_W);
+
+    // copy page tables
+    int ret = copy_ptab(old_base, new_base, old_limit*0x1000);
+    if (ret!=0){
+        return -1;
+    }
+    return 0;
 }
 
-// main part of sys_fork()
+/*
+ * main part of sys_fork()
+ * */
 int copy_proc(struct regs *r){
-    int nr;
+    int nr, ret;
     struct proc *p;
     
     nr = find_empty_pid();
-    if (nr==NULL){
+    if (nr==0){
         return -1;
     }
 
     p = (struct proc *)palloc(); 
-    if (p==NULL){
+    if (p==0){
         return -1;
     }
 
     proc[nr] = p;
     p->p_pid   = nr;
     p->p_ppid  = current->p_pid;
-
+    
     // init tss & ldt stuff
     p->p_tss.link   = 0;
     p->p_tss.esp0   = (uint)p + 0x1000;
     p->p_tss.ss0    = 0x10;
     p->p_tss.eip    = r->eip;
     p->p_tss.eflags = r->eflags;
-    p->p_tss.eax    = 0;
+    p->p_tss.eax    = 0; //NOTE: this is why fork() returns 0
     p->p_tss.ebx    = r->ebx;
     p->p_tss.ecx    = r->ecx;
     p->p_tss.edx    = r->edx;
@@ -74,15 +113,29 @@ int copy_proc(struct regs *r){
     set_tss(&gdt[TSS0+nr*2], &(p->p_tss));
     set_ldt(&gdt[LDT0+nr*2], &(p->p_ldt));
 
+    // copy the address space
+    ret = copy_mem_to(p);
+    if (ret!=0){
+        pfree(p);
+        proc[0] = NULL;
+        return -1;
+    }
+
     // set SRUN at last. just in case
     p->p_stat = SRUN;
 
     return nr;
 }
 
-void switch_to(uint nr){
-    ushort seg = _TSS(nr);
-    asm("jmp *%0" ::"a"(seg));
+void switch_to(struct proc *p){
+    if (p==current){
+        return;
+    }
+    // this is
+    uint nr = p->p_pid;
+    current = p;
+    ljmp(_TSS(nr), 0);
+    // TODO: if math co-processor is used, clear TS in cr0
 }
 
 /*******************************************************************************/
@@ -97,8 +150,8 @@ void sched_init(){
     p->p_stat = SSTOP;
     p->p_flag = 0;
     // init it's LDT
-    set_seg(&(p->p_ldt[1]), 0, 4*1024*1024, 0, STA_X | STA_R);
-    set_seg(&(p->p_ldt[2]), 0, 4*1024*1024, 0, STA_W);
+    set_seg(&(p->p_ldt[1]), 0, 420*1024, 0, STA_X | STA_R);
+    set_seg(&(p->p_ldt[2]), 0, 420*1024, 0, STA_W);
     // init it's tss
     // NOTE: we assume this tss have been cleared as 0
     p->p_tss.esp0 = (uint)p + 4096;
@@ -128,4 +181,19 @@ void ltr(uint n){
 
 void lldt(uint n){
     asm("lldt %%ax"::"a"(n));
+}
+
+/*
+ * ljmp seg, offset...Lovely little instruction.
+ * But seg seems only availible for immediate value in compile time.
+ * Tricks needed, *Sucks*.
+ * */
+void ljmp(ushort seg, uint offset){
+    struct{ uint offset, seg } _tmp;
+    _tmp.offset = offset;
+    _tmp.seg    = seg;
+    asm volatile(
+        "ljmp %0"
+        ::"m"(*&_tmp.offset), "m"(*&_tmp.seg)
+        );
 }

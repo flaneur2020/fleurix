@@ -5,7 +5,10 @@
 static uint tick = 0;
 
 void do_timer(struct regs *r){
-    //puts("~~");
+    tick++;
+    if(tick % 100==0){
+        do_sched(r);
+    }
 }
 
 void timer_init(uint freq){

@@ -17,7 +17,7 @@
  *  ...
  * */
 
-struct seg_desc     gdt[3 + (NPROC+1)*2] = {0, };
+struct seg_desc     gdt[NSEG] = {0, };
 struct gdt_desc     gdt_desc;
 
 
@@ -52,6 +52,17 @@ void set_tss(struct seg_desc *seg, uint base){
 
 /******************************************************************/
 
+void set_seg_limit(struct seg_desc *seg, uint limit){
+    seg->limit_lo = ((limit) >> 12) & 0xffff;
+    seg->limit_hi = (uint) (limit) >> 28;
+}
+
+void set_seg_base(struct seg_desc *seg, uint base){
+    seg->base_lo  = (base) & 0xffff;
+    seg->base_mi  = ((base) >> 16) & 0xff;
+    seg->base_hi  = (base) >> 24;
+}
+
 uint get_seg_limit(struct seg_desc *seg){
     return (seg->limit_lo | seg->limit_hi << 16);
 }
@@ -68,7 +79,7 @@ void gdt_init(){
     set_seg(&gdt[1], 0, 0xffffffff, 0, STA_X | STA_R);
     set_seg(&gdt[2], 0, 0xffffffff, 0, STA_W);
     gdt_desc.base   = &gdt;
-    gdt_desc.limit  = (sizeof (struct seg_desc) * 5) - 1;
+    gdt_desc.limit  = (sizeof (struct seg_desc) * NSEG) - 1;
     asm volatile( "lgdt %0" :: "m"(gdt_desc));
 }
 
