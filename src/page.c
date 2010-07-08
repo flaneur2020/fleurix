@@ -52,16 +52,18 @@ void do_wp_page(struct regs *r){
 
 /**************************************************************/
 
+/*
+ * Map a linear address to physical address.  
+ * What a fuck!
+ * */
 int put_page(uint la, uint pa, uint flag){
-    //printf("# %x -> %x\n", la, pa);
     uint *ptab = pdir[PDX(la)];
     if (!((uint)ptab & PTE_P)){
         ptab = palloc();
         if (ptab==0){
             panic("no availible frame");
         }
-        ptab = ((uint)ptab) | flag;
-        pdir[PDX(la)] = ptab;
+        pdir[PDX(la)] = (uint)ptab | flag;
     }
     ptab[PTX(la)] = pa | flag;
     frmmap[pa/4096]++;
@@ -79,7 +81,7 @@ int copy_ptab(uint src, uint dst, uint limit){
     int off, la, pa;
     for(off=0; off<=limit; off+=0x1000){
         pa = la2pa(src+off);
-        put_page(dst+off, pa, PTE_P | PTE_W | PTE_U);
+        put_page(dst+off, pa, PTE_P | PTE_W);
     }
     flush_cr3(pdir);
     return 0;
@@ -87,25 +89,18 @@ int copy_ptab(uint src, uint dst, uint limit){
 
 /**************************************************************/
 
-void print_pdir(){
-    uint la, pa;
-    for(la=0x4000000; la<0x8000000; la+=0x1000){
-        pa = la2pa(la);
-        printf("%x -> %x\n", la, pa);   
-    }
-}
 
 /**************************************************************/
 
 // traverse a linear address to physical address
 // TODO, have a check of PTE_P
 uint la2pa(uint la){
-    uint ret;
-    ret = pdir[PDX(la)];
-    if (!(ret & PTE_P)){
+    uint pde;
+    pde = pdir[PDX(la)];
+    if (!(pde & PTE_P)){
         panic("invalid pde\n");
     }
-    uint *ptab = PTE_ADDR(ret);
+    uint *ptab = PTE_ADDR(pde);
     uint page  = PTE_ADDR(ptab[PTX(la)]);
     return page + POFF(la);
 }
@@ -180,5 +175,17 @@ void page_init(){
     // write page directory to cr3 and enable PE on cr0
     flush_cr3(pdir);
     page_enable();
+}
+
+void blah(){
+    // just for debug
+    uint addr = 0;
+    uint *ptab = palloc();
+    pdir[0x10] = (uint)ptab | 3;
+    int i;
+    for(i=0; i<1024; i++){
+        ptab[i] = addr | PTE_W | PTE_P;
+        addr += 4096;
+    }
 }
 
