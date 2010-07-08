@@ -54,17 +54,19 @@ void do_wp_page(struct regs *r){
 
 /*
  * Map a linear address to physical address.  
- * What a fuck!
+ * Debugging this is a horrible memory. What a fuck.
  * */
 int put_page(uint la, uint pa, uint flag){
-    uint *ptab = pdir[PDX(la)];
-    if (!((uint)ptab & PTE_P)){
-        ptab = palloc();
-        if (ptab==0){
+    uint pde = pdir[PDX(la)];
+    if (!(pde & PTE_P)){
+        //printf("allocate one frame\n");
+        pde = palloc();
+        if (pde==0){
             panic("no availible frame");
         }
-        pdir[PDX(la)] = (uint)ptab | flag;
+        pdir[PDX(la)] = pde | flag;
     }
+    uint *ptab = (uint *)PTE_ADDR(pde);
     ptab[PTX(la)] = pa | flag;
     frmmap[pa/4096]++;
     return 0;
@@ -78,10 +80,11 @@ int copy_page(uint la1, uint la2, uint limit){
 // and mark it READONLY. 
 // parameter src, dst, and limit are deserved multiple of 0x1000
 int copy_ptab(uint src, uint dst, uint limit){
-    int off, la, pa;
+    uint off, la, pa;
     for(off=0; off<=limit; off+=0x1000){
         pa = la2pa(src+off);
         put_page(dst+off, pa, PTE_P | PTE_W);
+        printf("%x %x\n", PTX(dst+off), pa);
     }
     flush_cr3(pdir);
     return 0;
@@ -93,16 +96,17 @@ int copy_ptab(uint src, uint dst, uint limit){
 /**************************************************************/
 
 // traverse a linear address to physical address
-// TODO, have a check of PTE_P
 uint la2pa(uint la){
-    uint pde;
-    pde = pdir[PDX(la)];
-    if (!(pde & PTE_P)){
+    uint pde = pdir[PDX(la)];
+    if(!(pde & PTE_P)){
         panic("invalid pde\n");
     }
-    uint *ptab = PTE_ADDR(pde);
-    uint page  = PTE_ADDR(ptab[PTX(la)]);
-    return page + POFF(la);
+    uint *ptab = (uint *)PTE_ADDR(pde);
+    uint pte = ptab[PTX(la)];
+    if(!(pte & PTE_P)){
+        panic("invalid pte\n");
+    }
+    return PTE_ADDR(pte) + POFF(la);
 }
 
 /**************************************************************/
@@ -183,8 +187,10 @@ void blah(){
     uint *ptab = palloc();
     pdir[0x10] = (uint)ptab | 3;
     int i;
-    for(i=0; i<1024; i++){
-        ptab[i] = addr | PTE_W | PTE_P;
+    for(i=0; i<=0x10000/4096; i++){
+        uint ptx=PTX(0x4000000+addr);
+        ptab[ptx] = addr | PTE_W | PTE_P;
+        printf("%x %x\n", ptx, addr);
         addr += 4096;
     }
 }

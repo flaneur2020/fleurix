@@ -15,15 +15,16 @@ void main(){
     
     asm volatile("sti");
 
-    /*
-    copy_ptab(0, 0x4000000, 0x1000);
+    copy_ptab(0, 0x4000000, 0x10000);
+
+    //blah();
 
     uint p=0x4000000;
-    printf("%d\n", *((uint*)(void*)(0x100)));
-    printf("%x\n", la2pa((p+0x100)));
+    printf("%d\n", *((uint*)(void*)(0x1000)));
+    printf("%x\n", la2pa((p+0x1000)));
     printf("%d\n", *((uint*)(void*)(p+0x100)));
-    */
 
+    /*
     if (0==fork()){
         printf("A\n");
         for(;;);
@@ -32,6 +33,7 @@ void main(){
         printf("B\n");
         for(;;);
     }
+    */
 
     nop();
 
