@@ -12,7 +12,7 @@
 
 #define _syscall0(NR, T0, FN)                   \
     T0 FN(){                                    \
-        uint r;                                 \
+        register r;                             \
         asm volatile(                           \
             "int $0x80"                         \
             :"=a"(r)                            \
@@ -27,7 +27,7 @@
 
 #define _syscall1(NR, T0, FN, T1)               \
     T0 FN(T1 p1){                               \
-        uint r;                                 \
+        register r;                             \
         asm volatile(                           \
             "int $0x80"                         \
             :"=a"(r)                            \
@@ -43,7 +43,7 @@
 
 #define _syscall2(NR, T0, FN, T1, T2)           \
     T0 FN(T1 p1, T2 p2){                        \
-        uint r;                                 \
+        register r;                             \
         asm volatile(                           \
             "int $0x80"                         \
             :"=a"(r)                            \

@@ -35,18 +35,20 @@ void set_seg(struct seg_desc *seg, uint base, uint limit, uint dpl, uint type){
     seg->avl      = 0;
     seg->r        = 0;
     seg->db       = 1;
-    seg->g        = 1;                    \
+    seg->g        = 1;                    
     seg->base_hi  = (base) >> 24;
 }
 
 void set_ldt(struct seg_desc *seg, uint base){
-    set_seg(seg, base, 3*8*0xfff, 0, STS_LDT);
+    set_seg(seg, base, 0, 0, STS_LDT);
+    seg->limit_lo = 0x68;
     seg->s = 0;
 }
 
 // sizeof(tss_desc) == 104
 void set_tss(struct seg_desc *seg, uint base){
-    set_seg(seg, base, 104*3*8*0xfff, 0, STS_TA);
+    set_seg(seg, base, 0, 0, STS_TA);
+    seg->limit_lo = 0x68;
     seg->s = 0;
 }
 
@@ -64,7 +66,7 @@ void set_seg_base(struct seg_desc *seg, uint base){
 }
 
 uint get_seg_limit(struct seg_desc *seg){
-    return (seg->limit_lo | seg->limit_hi << 16);
+    return (seg->limit_lo | seg->limit_hi << 16)<<12;
 }
 
 uint get_seg_base(struct seg_desc *seg){

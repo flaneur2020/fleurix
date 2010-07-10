@@ -59,7 +59,6 @@ void do_wp_page(struct regs *r){
 int put_page(uint la, uint pa, uint flag){
     uint pde = pdir[PDX(la)];
     if (!(pde & PTE_P)){
-        //printf("allocate one frame\n");
         pde = palloc();
         if (pde==0){
             panic("no availible frame");
@@ -77,14 +76,13 @@ int copy_page(uint la1, uint la2, uint limit){
 
 // copy page tables, as a helper of copy_proc()
 // it do NOT copy the data inside a frame, just remap it
-// and mark it READONLY. 
+// TODO: and mark it READONLY. 
 // parameter src, dst, and limit are deserved multiple of 0x1000
 int copy_ptab(uint src, uint dst, uint limit){
     uint off, la, pa;
     for(off=0; off<=limit; off+=0x1000){
         pa = la2pa(src+off);
         put_page(dst+off, pa, PTE_P | PTE_W);
-        printf("%x %x\n", PTX(dst+off), pa);
     }
     flush_cr3(pdir);
     return 0;
@@ -99,6 +97,7 @@ int copy_ptab(uint src, uint dst, uint limit){
 uint la2pa(uint la){
     uint pde = pdir[PDX(la)];
     if(!(pde & PTE_P)){
+        printf("%x: ", la);
         panic("invalid pde\n");
     }
     uint *ptab = (uint *)PTE_ADDR(pde);
@@ -179,19 +178,5 @@ void page_init(){
     // write page directory to cr3 and enable PE on cr0
     flush_cr3(pdir);
     page_enable();
-}
-
-void blah(){
-    // just for debug
-    uint addr = 0;
-    uint *ptab = palloc();
-    pdir[0x10] = (uint)ptab | 3;
-    int i;
-    for(i=0; i<=0x10000/4096; i++){
-        uint ptx=PTX(0x4000000+addr);
-        ptab[ptx] = addr | PTE_W | PTE_P;
-        printf("%x %x\n", ptx, addr);
-        addr += 4096;
-    }
 }
 

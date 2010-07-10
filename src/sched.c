@@ -24,8 +24,16 @@ void do_sched(struct regs *r){
         p = proc[nr];
         if (p==NULL) continue;
         if (p==current){ continue; }
-        switch_to(p);
+        switch_to(p, r);
     }
+}
+
+void switch_to(struct proc *p, struct regs *r){
+    if (p==current){
+        return;
+    }
+
+    return;
 }
 
 /*******************************************************************************/
@@ -54,11 +62,13 @@ int copy_mem_to(struct proc *p){
     uint new_base  = p->p_pid * 0x4000000;
     p->p_textp     = new_base;
     p->p_tsize     = old_limit;
+    //printf("base %x\n", new_base);
+    //printf("size %d\n", old_limit);
     set_seg(&(p->p_ldt[1]), new_base, old_limit, 0, STA_X | STA_R);
     set_seg(&(p->p_ldt[2]), new_base, old_limit, 0, STA_W);
 
     // copy page tables
-    int ret = copy_ptab(old_base, new_base, old_limit*0x1000);
+    int ret = copy_ptab(old_base, new_base, old_limit);
     if (ret!=0){
         return -1;
     }
@@ -109,10 +119,10 @@ int copy_proc(struct regs *r){
     p->p_tss.ldt    = _LDT(nr);
     p->p_tss.iomb   = 0x80000000;
 
-    // set ldt
+    // set gdt
     set_tss(&gdt[TSS0+nr*2], &(p->p_tss));
     set_ldt(&gdt[LDT0+nr*2], &(p->p_ldt));
-
+    
     // copy the address space
     ret = copy_mem_to(p);
     if (ret!=0){
@@ -127,17 +137,6 @@ int copy_proc(struct regs *r){
     return nr;
 }
 
-void switch_to(struct proc *p){
-    if (p==current){
-        return;
-    }
-    // this is
-    uint nr = p->p_pid;
-    current = p;
-    ljmp(_TSS(nr), 0);
-    // TODO: if math co-processor is used, clear TS in cr0
-}
-
 /*******************************************************************************/
 
 // init proc[0] 
@@ -149,25 +148,25 @@ void sched_init(){
     p->p_ppid = 0;
     p->p_stat = SSTOP;
     p->p_flag = 0;
-    // init it's LDT
-    set_seg(&(p->p_ldt[1]), 0, 420*1024, 0, STA_X | STA_R);
-    set_seg(&(p->p_ldt[2]), 0, 420*1024, 0, STA_W);
     // init it's tss
     // NOTE: we assume this tss have been cleared as 0
     p->p_tss.esp0 = (uint)p + 4096;
     p->p_tss.ss0  = KERN_DS; 
     p->p_tss.cr3  = pdir;
-    p->p_tss.es   = 0x17; //10111
-    p->p_tss.cs   = 0x17;
-    p->p_tss.ss   = 0x17;
-    p->p_tss.ds   = 0x17;
-    p->p_tss.fs   = 0x17;
-    p->p_tss.gs   = 0x17;
+    p->p_tss.es   = 0x14; //10100
+    p->p_tss.cs   = 0x12;
+    p->p_tss.ss   = 0x14;
+    p->p_tss.ds   = 0x14;
+    p->p_tss.fs   = 0x14;
+    p->p_tss.gs   = 0x14;
     p->p_tss.ldt  = _LDT(0);
     p->p_tss.iomb = 0x80000000;
     // put proc0's TSS & LDT inside GDT
     set_tss(&gdt[TSS0], &(p->p_tss));
     set_ldt(&gdt[LDT0], &(p->p_ldt));
+    // init it's LDT
+    set_seg(&(p->p_ldt[1]), 0, 420*1024, 0, STA_X | STA_R);
+    set_seg(&(p->p_ldt[2]), 0, 420*1024, 0, STA_W);
     // load to TR and LDTR
     ltr(_TSS(0));
     lldt(_LDT(0));

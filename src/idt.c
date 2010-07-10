@@ -153,10 +153,12 @@ void print_regs(struct regs *r){
     printf("ebx = %x, edx = %x, ecx = %x, eax = %x \n",r->ebx, r->edx, r->ecx, r->eax);
     printf("int_no = %x, err_code = %x\n", r->int_no, r->err_code);
     printf("eip = %x, cs = %x, eflags = %x\n", r->eip, r->cs, r->eflags);
-    printf("useresp = %x, ss = %x \n", r->useresp, r->ss);
-    uint cr2;
+    printf("useresp = %x, user_ss = %x \n", r->useresp, r->ss);
+    uint cr2, kern_ss;
     asm("mov %%cr2, %%eax":"=a"(cr2));
-    printf("cr2=%x\n", cr2);
+    printf("cr2 = %x, ", cr2);
+    asm("mov %%ss, %%eax":"=a"(kern_ss));
+    printf("kern_ss = %x\n", kern_ss);
 }
 
 /***********************************************************************************/

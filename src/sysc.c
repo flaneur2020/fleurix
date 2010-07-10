@@ -8,8 +8,8 @@ int errno = 0;
 
 /***********************************************************/
 
-void sys_null(){
-    ;
+void sys_debug(struct regs *r){
+    printf("eip: %x\n", r->eip);
 }
 
 void sys_fork(struct regs *r){
@@ -21,13 +21,13 @@ void sys_fork(struct regs *r){
     r->eax = 1;
 }
 
-_syscall0(0, int, null);
+_syscall0(0, int, debug);
 _syscall0(1, int, fork);
 
 /***********************************************************/
 
 static uint sys_routines[NSYSC] = {
-    [0] = &sys_null,
+    [0] = &sys_debug,
     [1] = &sys_fork,
     0,
 }; 

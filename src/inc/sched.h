@@ -18,6 +18,7 @@ struct proc {
     uint                p_tsize;
     struct seg_desc     p_ldt[3];
     struct tss_desc     p_tss;
+    struct regs         p_regs;
 };
 
 // stat codes

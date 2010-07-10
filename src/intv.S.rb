@@ -7,10 +7,10 @@ puts %{
 
 _int_common_stub:
     pusha
-    push ds
-    push es
-    push fs
-    push gs
+    push dword ds
+    push dword es
+    push dword fs
+    push dword gs
     mov ax, 0x10
     mov ds, ax
     mov es, ax
@@ -21,10 +21,10 @@ _int_common_stub:
     mov eax, int_common_handler
     call eax
     pop eax
-    pop gs
-    pop fs
-    pop es
-    pop ds
+    pop dword gs
+    pop dword fs
+    pop dword es
+    pop dword ds
     popa
     add esp, 8
     sti

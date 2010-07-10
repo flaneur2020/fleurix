@@ -48,7 +48,7 @@
 #define STS_TB      0xB     // Busy 32-bit TSS
 #define STS_CG      0xC     // 32-bit Call Gate
 #define STS_IG      0xE     // 32-bit Interrupt Gate
-#define STS_TRG      0xF     // 32-bit Trap Gate
+#define STS_TRG     0xF     // 32-bit Trap Gate
 
 /**********************************************************************************/
 // on MMU
@@ -141,7 +141,7 @@ struct regs {
     uint        edi, esi, ebp, esp, ebx, edx, ecx, eax;    /* pushed by 'pusha' */
     uint        int_no, err_code;                          /* our 'push byte #' and ecodes do this */
     uint        eip, cs, eflags, useresp, ss;              /* pushed by the processor automatically */ 
-} __attribute__((packed));     
+} __attribute__((packed));
 
 
 
@@ -150,7 +150,7 @@ struct regs {
 // tss
 
 struct tss_desc {
-    uint        link, esp0;         
+    uint        link, esp0;
     ushort      ss0, __1;
     uint        esp1;
     ushort      ss1, __2;
@@ -165,7 +165,7 @@ struct tss_desc {
     ushort      gs, __9;
     ushort      ldt,__10;
     ushort      trap, iomb;
-} __attribute__((packed));     
+} __attribute__((packed));
 
 /*****************************************************************************************************/
 static inline uchar inb(ushort port){
