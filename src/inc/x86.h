@@ -156,7 +156,8 @@ struct tss_desc {
     ushort      ss1, __2;
     uint        esp2;
     ushort      ss2, __3;
-    uint        cr3, eip, eflags, eax, ecx, edx, ebx, esp, ebp, esi, edi;
+    uint        cr3, eip, eflags;
+    uint        eax, ecx, edx, ebx, esp, ebp, esi, edi;
     ushort      es, __4;
     ushort      cs, __5;
     ushort      ss, __6;

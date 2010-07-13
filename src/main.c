@@ -11,18 +11,19 @@ void main(){
     page_init();        puts("* init paging\n");
     timer_init(1000);   puts("* init timer\n");
     sched_init();       puts("* init sched\n");
+    //umode_init();       puts("* init user mode");
 
     asm("sti");
     puts("\nHello, Fleurix... \n\n");
 
     //`~~~~~~~~~~~~~~~~~~~~~~
-
+    int ret=fork();
     asm("int $0x80"::"a"(0));
-    if (0==fork()){
-    asm("int $0x80"::"a"(0));
+    if (ret==0){
         printf("A\n");
     }
     else{
+        asm("int $0x80"::"a"(0));
         printf("B\n");
     }
 

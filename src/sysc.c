@@ -18,7 +18,7 @@ void sys_fork(struct regs *r){
     if (ret<0){
         panic("error fork()\n");
     }
-    r->eax = 1;
+    r->eax = ret;
 }
 
 _syscall0(0, int, debug);

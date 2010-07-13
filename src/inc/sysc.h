@@ -31,7 +31,7 @@
         asm volatile(                           \
             "int $0x80"                         \
             :"=a"(r)                            \
-            :"a"(__NR),                         \
+            :"a"(NR),                           \
              "b"((uint)p1)                      \
         );                                      \
         if (r<0){                               \
