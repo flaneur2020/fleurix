@@ -1,6 +1,8 @@
 CIncs   = '-Isrc/inc'
 CFlags  = "-Wall -finline-functions -nostdinc -fno-builtin"
 
+sh "mkdir bin" if not File.exists? 'bin'
+
 task :default => :bochs
 
 task :bochs => :build do
