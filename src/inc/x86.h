@@ -168,6 +168,8 @@ struct tss_desc {
     ushort      trap, iomb;
 } __attribute__((packed));
 
+extern struct tss_desc tss_desc;
+
 /*****************************************************************************************************/
 static inline uchar inb(ushort port){
     uchar ret;
@@ -178,6 +180,23 @@ static inline uchar inb(ushort port){
 static inline void outb(ushort port, uchar data){
     asm volatile( "outb %1, %0" :: "dN" (port), "a" (data));
 }
+
+#define umode_init() \
+    asm volatile( \
+        "movl   %%esp, %%eax    \n" \
+        "pushl  %%eax           \n" \
+        "pushl  $0x17           \n" \
+        "pushfl                 \n" \
+        "pushl  $0x17           \n" \
+        "pushl  $1f             \n" \
+        "iret                   \n" \
+        "1:                     \n" \
+        "movl   $0x17, %%eax    \n" \
+        "movw   %%ax, %%es      \n" \
+        "movw   %%ax, %%ds      \n" \
+        "movw   %%ax, %%fs      \n" \
+        "movw   %%ax, %%gs      \n" \
+        :::"ax")
 
 #endif
 

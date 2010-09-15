@@ -1,6 +1,7 @@
 #include <param.h>
 #include <x86.h>
 #include <kern.h>
+#include <sched.h>
 
 /**
  *  GDT
@@ -8,10 +9,10 @@
  *  0 NULL_SEG
  *  1 KERN_CS
  *  2 KERN_DS
- *  3 LDT0
- *  4 TSS0
+ *  3 TSS
+ *  4 LDT0
  *  5 LDT1
- *  6 TSS2
+ *  6 LDT2
  *  7 LDT3
  *  8 ...
  *  ...
@@ -19,7 +20,6 @@
 
 struct seg_desc     gdt[NSEG] = {0, };
 struct gdt_desc     gdt_desc;
-
 
 /******************************************************************/
 
@@ -41,7 +41,7 @@ void set_seg(struct seg_desc *seg, uint base, uint limit, uint dpl, uint type){
 
 void set_ldt(struct seg_desc *seg, uint base){
     set_seg(seg, base, 0, 0, STS_LDT);
-    seg->limit_lo = 0x68;
+    seg->limit_lo = 0x3;
     seg->s = 0;
 }
 
@@ -76,12 +76,15 @@ uint get_seg_base(struct seg_desc *seg){
 /******************************************************************/
 
 // refill the gdt
-// each proc have one idt and tss, which all masses here
+// each proc have one idt
 void gdt_init(){
     set_seg(&gdt[1], 0, 0xffffffff, 0, STA_X | STA_R);
     set_seg(&gdt[2], 0, 0xffffffff, 0, STA_W);
+    set_seg(&gdt[3], 0, 0xffffffff, 3, STA_X | STA_R);
+    set_seg(&gdt[4], 0, 0xffffffff, 3, STA_W);
     gdt_desc.base   = &gdt;
     gdt_desc.limit  = (sizeof (struct seg_desc) * NSEG) - 1;
+    // load gdt & tss
     asm volatile( "lgdt %0" :: "m"(gdt_desc));
 }
 

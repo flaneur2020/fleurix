@@ -16,9 +16,10 @@ struct proc {
     uint                p_ppid;
     uint               *p_textp;
     uint                p_tsize;
+    uint                p_esp0;
+    uint                p_esp3;
     struct seg_desc     p_ldt[3];
-    struct tss_desc     p_tss;
-    struct regs         p_regs;
+    struct regs        *p_regs;
 };
 
 // stat codes
@@ -35,6 +36,5 @@ struct proc {
 #define SSWAP       0x8         // proc is being swapped out
 #define STRC        0x10        // proc is being traced
 #define SWTED       0x20        // another tracing flag
-
 
 #endif

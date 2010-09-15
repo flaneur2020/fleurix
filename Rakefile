@@ -14,7 +14,7 @@ task :nm => :build do
 end
 
 task :debug => :build do
-  sh "bochsd -q -f .bochsrc"
+  sh "bochs-dbg -q -f .bochsrc"
 end
   
 task :build => 'bin/kernel.img'
@@ -82,6 +82,6 @@ end
 ].each do |fn_c, *_|
   fn_o = 'bin/'+File.basename(fn_c).ext('o')
   file fn_o => [fn_c, *_] do
-    sh "gcc #{CFlags} #{CIncs} -o #{fn_o} -c #{fn_c}"
+    sh "gcc #{CFlags} #{CIncs} -o #{fn_o} -c #{fn_c} 2>&1"
   end
 end

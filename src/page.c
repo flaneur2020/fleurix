@@ -42,6 +42,13 @@ uchar frmmap[NFRAME] = {0, };
 /**************************************************************/
 
 void do_page_fault(struct regs *r){
+    uint cr2;
+    asm volatile("movl %%cr2, %0":"=a"(cr2));
+    printf("page_fault: %x\n", cr2);
+    debug_regs(r);
+    uint la = PTE_ADDR(cr2);
+    uint pa = palloc();
+    put_page(la, pa, PTE_P | PTE_W);
 }
 
 void do_no_page(struct regs *r){
@@ -174,6 +181,9 @@ void page_init(){
 	for(i=4; i<1024; i++) {
 		pdir[i] = 0 | PTE_W; 
 	};
+
+    // int handler
+    int_set_handler(0x0E, do_page_fault);
 
     // write page directory to cr3 and enable PE on cr0
     flush_cr3(pdir);

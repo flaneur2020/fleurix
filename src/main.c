@@ -4,6 +4,8 @@
 #include <kern.h>
 #include <sched.h>
 
+char user_stack[1024];
+
 void main(){
     video_init();       puts("* init video\n");
     idt_init();         puts("* init idt\n");
@@ -11,21 +13,32 @@ void main(){
     page_init();        puts("* init paging\n");
     timer_init(1000);   puts("* init timer\n");
     sched_init();       puts("* init sched\n");
-    //umode_init();       puts("* init user mode");
+   asm volatile("  \ 
+     cli; \ 
+     mov $0x23, %ax; \ 
+     mov %ax, %ds; \ 
+     mov %ax, %es; \ 
+     mov %ax, %fs; \ 
+     mov %ax, %gs; \ 
+                   \ 
+     mov %esp, %eax; \ 
+     pushl $0x23; \ 
+     pushl %eax; \ 
+     pushf; \ 
+     pushl $0x1B; \ 
+     push $1f; \ 
+     iret; \ 
+   1: \ 
+     ");
 
-    asm("sti");
-    puts("\nHello, Fleurix... \n\n");
+    //fork();
 
-    //`~~~~~~~~~~~~~~~~~~~~~~
-    int ret=fork();
-    asm("int $0x80"::"a"(0));
-    if (ret==0){
-        printf("A\n");
-    }
-    else{
-        asm("int $0x80"::"a"(0));
-        printf("B\n");
-    }
+    //debug_proc_list();
+
+    //panic("`");
+
+    //asm("sti");
+    //puts("\nHello, Fleurix... \n\n");
 
 	for (;;);
 }
@@ -71,11 +84,13 @@ void panic(char *str){
     printf("%s\n", str);
     asm volatile("cli");
     asm volatile("hlt");
-    for(;;);
 }
 
-void nop(){
-    printf("------------------------\n");
+void debug_eip(){
+    uint eip;
+    asm("popl %0":"=a"(eip));
+    asm("pushl %0"::"a"(eip));
+    printf("%x\n", eip);
 }
 
 

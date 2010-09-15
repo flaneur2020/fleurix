@@ -16,19 +16,21 @@ typedef unsigned int    uint;
 
 #define NSYSC 64
 #define NPROC 64
-#define NSEG  (3+(NPROC+1)*2)
-#define NFRAME ((HI_MEM-LO_MEM)/4096)
+#define NSEG  (4+NPROC+1)
+
+#define PSIZE 0x1000
+#define NFRAME ((HI_MEM-LO_MEM)/PSIZE)
+
 
 #define KERN_CS 0x08
 #define KERN_DS 0x10
 #define USER_CS (0x08|3)
 #define USER_CS (0x10|3)
 
-#define LDT0 3
-#define TSS0 4
-
-#define _LDT(n) ((LDT0+n*2)<<3)
-#define _TSS(n) ((TSS0+n*2)<<3)
+#define TSS0 5
+#define _TSS (TSS0<<3)
+#define LDT0 (TSS0+1)
+#define _LDT(n) ((LDT0+n)<<3)
 
 // Kernel is 1mb, which locates in 0~LO_MEM
 // main Mem(which procs live in) is 16mb, locates in LO_MEM~HI_MEM 

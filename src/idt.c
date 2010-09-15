@@ -125,8 +125,8 @@ void int_common_handler(struct regs *r) {
             handler(r);
             return;
         }
-        printf("Panic: Exception: %s \n", fault_messages[r->int_no]);
-        print_regs(r);
+        printf("Exception: %s \n", fault_messages[r->int_no]);
+        debug_regs(r);
         for(;;);
     }
     // irq, syscall and blah~
@@ -147,7 +147,7 @@ void int_set_handler(int num, void (*handler)(struct regs *r)){
 
 /***********************************************************************************/
 
-void print_regs(struct regs *r){
+void debug_regs(struct regs *r){
     printf("gs = %x, fs = %x, es = %x, ds = %x\n", r->gs, r->fs, r->es, r->ds);
     printf("edi = %x, esi = %x, ebp = %x, esp = %x \n",r->edi, r->esi, r->ebp, r->esp);
     printf("ebx = %x, edx = %x, ecx = %x, eax = %x \n",r->ebx, r->edx, r->ecx, r->eax);

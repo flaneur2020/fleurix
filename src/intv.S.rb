@@ -3,6 +3,7 @@ puts %{
 ; do not edit
 
 [section .text]
+[global _int_restore_regs]
 [extern  int_common_handler]
 
 _int_common_stub:
@@ -17,10 +18,11 @@ _int_common_stub:
     mov fs, ax
     mov gs, ax
     mov eax, esp
-    push eax
+    push eax                        ; esp0
     mov eax, int_common_handler
     call eax
-    pop eax
+_int_restore_regs:
+    pop eax                         ; esp ignored
     pop dword gs
     pop dword fs
     pop dword es
