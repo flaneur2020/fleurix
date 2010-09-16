@@ -48,7 +48,8 @@ void do_page_fault(struct regs *r){
     debug_regs(r);
     uint la = PTE_ADDR(cr2);
     uint pa = palloc();
-    put_page(la, pa, PTE_P | PTE_W);
+    put_page(la, pa, PTE_P | PTE_W | PTE_U);
+    for(;;);
 }
 
 void do_no_page(struct regs *r){
@@ -89,7 +90,7 @@ int copy_ptab(uint src, uint dst, uint limit){
     uint off, la, pa;
     for(off=0; off<=limit; off+=0x1000){
         pa = la2pa(src+off);
-        put_page(dst+off, pa, PTE_P | PTE_W);
+        put_page(dst+off, pa, PTE_P | PTE_W | PTE_U);
     }
     flush_cr3(pdir);
     return 0;
@@ -169,9 +170,9 @@ void page_init(){
 	uint addr = 0; 
     for(i=0; i<4; i++){
         ptab = 0x1000 + 0x1000*i;
-        pdir[i] = (uint)ptab | 3;
+        pdir[i] = (uint)ptab | PTE_P | PTE_W | PTE_U;
         for(j=0; j<1024; j++) {
-            ptab[j] = addr | PTE_P | PTE_W; 
+            ptab[j] = addr | PTE_P | PTE_W | PTE_U; 
             addr += 4096; // 4096 = 4kb
         }
     }
@@ -179,7 +180,7 @@ void page_init(){
 	// fill the rest of the page directory
     // attribute set to: supervisor level, read/write, not present(010 in binary)
 	for(i=4; i<1024; i++) {
-		pdir[i] = 0 | PTE_W; 
+		pdir[i] = 0 | PTE_W | PTE_U; 
 	};
 
     // int handler

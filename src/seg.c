@@ -35,7 +35,7 @@ void set_seg(struct seg_desc *seg, uint base, uint limit, uint dpl, uint type){
     seg->avl      = 0;
     seg->r        = 0;
     seg->db       = 1;
-    seg->g        = 1;                    
+    seg->g        = 1;
     seg->base_hi  = (base) >> 24;
 }
 
