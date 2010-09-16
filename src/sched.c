@@ -5,7 +5,7 @@
 
 // one page size, stores some info on proc[0] and its kernel stack
 // NOTE: inialized as 0!
-uchar           mem_p0[4096] = {0, };
+uchar           mem_p0[1024] = {0, };
 
 struct proc     *proc[NPROC] = {NULL, NULL, };
 struct proc     *current;
@@ -150,6 +150,25 @@ void sched_init(){
     set_ldt(&gdt[LDT0], &(p->p_ldt));
     lldt(_LDT(p->p_pid));
 }
+
+void umode_init(){
+    asm volatile( 
+        "mov $0x23, %ax;"
+        "mov %ax, %ds;" 
+        "mov %ax, %es;" 
+        "mov %ax, %fs;"
+        "mov %ax, %gs;" 
+        "mov %esp, %eax;"
+        "pushl $0x23;"
+        "pushl %eax;"
+        "pushf;"
+        "pushl $0x1B;"
+        "push $1f;"
+        "iret;"
+        "1:"
+        );
+}
+
 
 
 /***********************************************************************/

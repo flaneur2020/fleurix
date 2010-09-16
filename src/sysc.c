@@ -21,14 +21,23 @@ void sys_fork(struct regs *r){
     r->eax = ret;
 }
 
+// NOTE: for debug right now
+void sys_putc(struct regs *r){
+    char ch = r->eax;
+    putch(ch);
+    r->eax = 0;
+}
+
 _syscall0(0, int, debug);
 _syscall0(1, int, fork);
+_syscall1(2, int, putc, char);
 
 /***********************************************************/
 
 static uint sys_routines[NSYSC] = {
     [0] = &sys_debug,
     [1] = &sys_fork,
+    [2] = &sys_putc,
     0,
 }; 
 

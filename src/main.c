@@ -12,27 +12,13 @@ void main(){
     idt_init();         puts("* init idt\n");
     gdt_init();         puts("* init gdt\n");
     page_init();        puts("* init paging\n");
+    // move stack into a touchable place
+    asm volatile("mov %0, %%esp;"::"a"(user_stack+0x1000));
     sched_init();       puts("* init sched\n");
-    asm volatile("  \ 
-        cli; \ 
-        mov $0x23, %ax; \ 
-        mov %ax, %ds; \ 
-        mov %ax, %es; \ 
-        mov %ax, %fs; \ 
-        mov %ax, %gs; \ 
-        \ 
-        mov %esp, %eax; \ 
-        pushl $0x23; \ 
-        pushl %eax; \ 
-        pushf; \ 
-        pushl $0x1B; \ 
-        push $1f; \ 
-        iret; \ 
-        1: \ 
-        ");
-    for(;;);
+    // proc[0] arises now
+    umode_init();       puts("* init user mode\n");
 
-    //fork();
+    for(;;);
 
     //debug_proc_list();
 
@@ -41,7 +27,6 @@ void main(){
     //asm("sti");
     //puts("\nHello, Fleurix... \n\n");
 
-	for (;;);
 }
 
 // on Memory
