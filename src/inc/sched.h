@@ -22,6 +22,8 @@ struct proc {
     struct regs        *p_regs;
 };
 
+extern struct proc      *current;
+
 // stat codes
 #define SSLEEP      1           // sleeping on high priority
 #define SWAIT       2           // sleeping on low  priority

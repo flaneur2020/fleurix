@@ -18,11 +18,11 @@ _int_common_stub:
     mov fs, ax
     mov gs, ax
     mov eax, esp
-    push eax                        ; esp0
+    push eax                        ; esp is just the pointer to struct regs *.
     mov eax, int_common_handler
     call eax
-_int_restore_regs:
     pop eax                         ; esp ignored
+_int_restore_regs:
     pop dword gs
     pop dword fs
     pop dword es

@@ -8,19 +8,20 @@ char user_stack[1024];
 
 void main(){
     video_init();       puts("* init video\n");
-    timer_init(1000);   puts("* init timer\n");
     idt_init();         puts("* init idt\n");
     gdt_init();         puts("* init gdt\n");
     page_init();        puts("* init paging\n");
     // move stack into a touchable place
     asm volatile("mov %0, %%esp;"::"a"(user_stack+0x1000));
+    timer_init(1000);   puts("* init timer\n");
     sched_init();       puts("* init sched\n");
     // proc[0] arises now
-    umode_init();       puts("* init user mode\n");
+    puts("* init user mode");
+    asm volatile("sti;");
+    umode_init();       
 
     for(;;);
 
-    //debug_proc_list();
 
     //panic("`");
 

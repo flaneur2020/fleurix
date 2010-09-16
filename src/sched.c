@@ -8,7 +8,7 @@
 uchar           mem_p0[1024] = {0, };
 
 struct proc     *proc[NPROC] = {NULL, NULL, };
-struct proc     *current;
+struct proc     *current = NULL;
 
 struct tss_desc tss;
 
@@ -20,11 +20,12 @@ struct tss_desc tss;
  * invoked by do_timer() in timer.c;
  * */
 void do_sched(struct regs *r){
+    printf("do sched \n");
     uint i;
     struct proc *p;
     for (i=0; i<NPROC; i++){
         p = proc[i];
-        if (p && p!=current){
+        if (p){
             // TODO: if ok, just iret normally
             swtch(current, current);
         }
@@ -35,11 +36,11 @@ void swtch(struct proc *from, struct proc *to){
     printf("swtch: from %x to %x\n", from, to);
     // change ldt & tss
     lldt(_LDT(to->p_pid));
-    tss.esp0 = to->p_esp0;
+    tss.esp0 = to + 0x100a;
     asm volatile(
-        "mov    %%eax, %%esp        \n"
-        "jmp    _int_restore_regs   \n"
-        ::"a"(to->p_esp0));
+        "mov    %%eax, %%esp;"
+        "jmp    _int_restore_regs;"
+        ::"a"(to->p_regs));
 }
 
 /*******************************************************************************/
@@ -153,16 +154,16 @@ void sched_init(){
 
 void umode_init(){
     asm volatile( 
-        "mov $0x23, %ax;"
+        "mov $0x17, %ax;"
         "mov %ax, %ds;" 
         "mov %ax, %es;" 
         "mov %ax, %fs;"
         "mov %ax, %gs;" 
         "mov %esp, %eax;"
-        "pushl $0x23;"
+        "pushl $0x17;"
         "pushl %eax;"
         "pushf;"
-        "pushl $0x1B;"
+        "pushl $0x0f;"
         "push $1f;"
         "iret;"
         "1:"
