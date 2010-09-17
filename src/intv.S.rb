@@ -6,6 +6,11 @@ puts %{
 [global _int_restore_regs]
 [extern  int_common_handler]
 
+;; 
+;; this routine is called on each isr & irq is raised. store the current cpu state on the kernel stack.
+;; kernel stack is pointed by the esp0 field inside tss.
+;; 
+;; the routine _int_restore_regs is just called from *swtch*. 
 _int_common_stub:
     pusha
     push dword ds

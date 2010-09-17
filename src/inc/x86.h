@@ -137,7 +137,7 @@ struct idt_desc {
 } __attribute__((packed));     
 
 struct regs {
-    uint        gs, fs, es, ds;                       /* pushed the segs last */
+    uint        gs, fs, es, ds;                             /* pushed the segs last */
     uint        edi, esi, ebp, esp, ebx, edx, ecx, eax;     /* pushed by 'pusha' */
     uint        int_no, err_code;                           /* our 'push byte #' and ecodes do this */
     uint        eip, cs, eflags, esp3, ss3;                 /* pushed by the processor automatically */ 

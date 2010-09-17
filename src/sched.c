@@ -32,11 +32,17 @@ void do_sched(struct regs *r){
     }
 }
 
+/*
+ * do the switch task! i still didn't catch the usage the TSS hardware stuff. software is better, people says.
+ * switch the kernel task, and do a IRET. We assume that every task switching just occured in a trap routine,
+ * and all the state stuff have been pushed in right place. Note that when a IRQ raised, CPU fetch the cs & 
+ * eip from IDT, while ss0 & esp0 from the current TSS.
+ * */
 void swtch(struct proc *from, struct proc *to){
     printf("swtch: from %x to %x\n", from, to);
     // change ldt & tss
+    tss.esp0 = (uint)to + 0x100a;
     lldt(_LDT(to->p_pid));
-    tss.esp0 = to + 0x100a;
     asm volatile(
         "mov    %%eax, %%esp;"
         "jmp    _int_restore_regs;"

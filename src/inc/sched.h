@@ -9,15 +9,18 @@
 #ifndef SCHED_H
 #define SCHED_H
 
+/*
+ * struct proc indicated some info on sched.
+ * */
 struct proc {
     uchar               p_stat;
     uchar               p_flag;
     uint                p_pid;
     uint                p_ppid;
-    uint               *p_textp;
+    uint                p_text;
     uint                p_tsize;
-    uint                p_esp0;
-    uint                p_esp3;
+    uint                p_stack;
+    uint                p_brk;
     struct seg_desc     p_ldt[3];
     struct regs        *p_regs;
 };
