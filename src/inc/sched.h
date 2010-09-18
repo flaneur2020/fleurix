@@ -17,7 +17,7 @@ struct proc {
     uchar               p_flag;
     uint                p_pid;
     uint                p_ppid;
-    uint                p_text;
+    uint                p_textp;
     uint                p_tsize;
     uint                p_stack;
     uint                p_brk;

@@ -119,7 +119,7 @@ static void irq_remap(){
 void int_common_handler(struct regs *r) {
     void (*handler)(struct regs *r);
     handler = int_routines[r->int_no]; 
-    if (current != NULL){
+    if (current!=NULL && current->p_regs==NULL) {
         current->p_regs = r;
     }
     // trap
@@ -142,6 +142,8 @@ void int_common_handler(struct regs *r) {
             handler(r);
         }
     }
+    // clear pointer to trap
+    current->p_regs = NULL;
 }
 
 void int_set_handler(int num, void (*handler)(struct regs *r)){

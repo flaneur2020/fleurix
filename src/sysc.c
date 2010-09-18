@@ -1,4 +1,3 @@
-
 #include <param.h>
 #include <x86.h>
 #include <kern.h>
@@ -9,12 +8,14 @@ int errno = 0;
 /***********************************************************/
 
 void sys_debug(struct regs *r){
-    printf("eip: %x\n", r->eip);
+    printf("int x80. eax=0! \n", r->eip);
 }
 
 void sys_fork(struct regs *r){
+    return;
     int ret;
-    ret = copy_proc(r);
+    puts("~~");
+    asm("hlt");
     if (ret<0){
         panic("error fork()\n");
     }
@@ -34,6 +35,7 @@ static uint sys_routines[NSYSC] = {
 }; 
 
 void do_syscall(struct regs *r){
+    printf("do_syscall();\n");
     void (*handler)(struct regs *r);
     handler = sys_routines[r->eax];
     

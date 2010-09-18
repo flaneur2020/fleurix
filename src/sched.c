@@ -7,7 +7,7 @@
 // NOTE: inialized as 0!
 uchar           mem_p0[1024] = {0, };
 
-struct proc     *proc[NPROC] = {NULL, NULL, };
+struct proc     *proc[NPROC] = {NULL, };
 struct proc     *current = NULL;
 
 struct tss_desc tss;
@@ -41,8 +41,9 @@ void do_sched(struct regs *r){
 void swtch(struct proc *from, struct proc *to){
     printf("swtch: from %x to %x\n", from, to);
     // change ldt & tss
-    tss.esp0 = (uint)to + 0x100a;
+    tss.esp0 = (uint)to + 0x1000;
     lldt(_LDT(to->p_pid));
+    current = to;
     asm volatile(
         "mov    %%eax, %%esp;"
         "jmp    _int_restore_regs;"
@@ -90,45 +91,36 @@ int copy_mem_to(struct proc *p){
  * main part of sys_fork()
  * */
 int copy_proc(struct regs *r){
-    int nr, ret;
+    uint nr; 
     struct proc *p;
-
+    
     nr = find_empty_pid();
     if (nr==0){
-        return -1;
+        panic("copy_proc(): no pid availible.");
     }
 
-    // allocated a page size for struct proc and kernel stack.
-    p = (struct proc *)palloc(); 
-    if (p==0){
-        return -1;
+    p = (struct proc *) palloc(); 
+    if (p==NULL){
+        panic("copy_proc(): no page availible.");
     }
 
     proc[nr] = p;
-    p->p_pid   = nr;
-    p->p_ppid  = current->p_pid;
-    p->p_flag  = current->p_flag;
-    // TODO: esp0, esp3
-    p->p_esp0  = p + PSIZE;
-    p->p_esp3  = current->p_esp3;
-    // fill ldt into gdt
-    set_ldt(&gdt[LDT0+nr*2], &(p->p_ldt));
-    // copy the address space. ldt is set here
-    ret = copy_mem_to(p);
-    if (ret!=0){
-        pfree(p);
-        proc[0] = NULL;
-        panic("error in copy_proc");
-        return -1;
+    p->p_pid = nr;
+    p->p_ppid = current->p_ppid;
+    p->p_flag = current->p_flag;
+    // init kernel stack
+    struct regs *trap = ((struct regs *)(uint)p + 0x1000) - 1;
+    *trap = *r;
+    trap->eax = 0;
+
+    if (copy_mem_to(p) != 0){
+        panic("copy_proc(): error on copy mem.");
     }
 
-    // init its stack for *iret*. for stack switching.
-    
-
-    // set SRUN at last. just in case
     p->p_stat = SRUN;
     return nr;
 }
+
 
 /*******************************************************************************/
 
@@ -143,11 +135,9 @@ void sched_init(){
     p->p_ppid = 0;
     p->p_stat = SSTOP;
     p->p_flag = 0;
-    // init its stack info
-    p->p_esp0 = (uint)p + 4096;
     // init tss
     tss.ss0  = KERN_DS;
-    tss.esp0 = p->p_esp0;
+    tss.esp0 = (uint)p + 0x1000;
     set_tss(&gdt[TSS0], &tss);
     ltr(_TSS);
     // init its ldt
@@ -193,7 +183,7 @@ void debug_proc_list(){
 
 void debug_proc(struct proc *p){
     printf("%s ", (p==current)? "-":" " );
-    printf("pid:%d esp3:%x esp0:%x\n", p->p_pid, p->p_esp3, p->p_esp0);
+    printf("pid:%d esp0:%x\n", p->p_pid, (uint)p+0x1000);
 }
 
 

@@ -46,7 +46,7 @@ end
 # => main.bin
 #######################################################################
 
-OFiles = %w{ bin/main.o bin/sched.o bin/seg.o bin/print.o bin/sysc.o bin/idt.o bin/timer.o bin/page.o bin/intv.o }
+OFiles = %w{ bin/main.o bin/seg.o bin/sched.o bin/print.o bin/sysc.o bin/idt.o bin/timer.o bin/page.o bin/intv.o }
 
 file 'bin/main.bin' => 'bin/main.elf' do
   sh "objcopy -R .pdr -R .comment -R .note -S -O binary bin/main.elf bin/main.bin"

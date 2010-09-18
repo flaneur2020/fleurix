@@ -19,7 +19,7 @@ _reset_drive:
     mov     bx, 0000h           ; Destination address = 1000h:0000
 
     mov     ah, 02h             ; READ SECTOR-command
-    mov     al, 02fh            ; Number of sectors to read
+    mov     al, 045h            ; Number of sectors to read
     mov     ch, 0               ; Cylinder = 0
     mov     cl, 02h             ; Sector = 2
     mov     dh, 0               ; Head = 0

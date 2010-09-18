@@ -46,9 +46,6 @@ void do_page_fault(struct regs *r){
     asm volatile("movl %%cr2, %0":"=a"(cr2));
     printf("page_fault: %x\n", cr2);
     debug_regs(r);
-    uint la = PTE_ADDR(cr2);
-    uint pa = palloc();
-    put_page(la, pa, PTE_P | PTE_W | PTE_U);
     for(;;);
 }
 
@@ -129,6 +126,7 @@ uint palloc(){
             return LO_MEM + i*4096;
         }
     }
+    panic("palloc(): no availible page.\n");
     return 0;
 }
 
