@@ -2,32 +2,28 @@
 #include <x86.h>
 #include <kern.h>
 #include <sched.h>
-#include <sysc.h>
+#include <syscall.h>
 
 void main(){
     video_init();       puts("* init video\n");
     gdt_init();         puts("* init gdt\n");
     idt_init();         puts("* init idt\n");
     page_init();        puts("* init paging\n");
-    // move stack into a touchable place
     timer_init(1000);   puts("* init timer\n");
     sched_init();       puts("* init sched\n");
     //asm("int $0x80"::"a"(0));
     // proc[0] arises now
     puts("* init user mode");
-    asm volatile("sti;");
+    //asm volatile("sti;");
     umode_init();       
-
-    //asm("int $0x80"::"a"(1));
+    asm("int $0x80"::"a"(1));
     
     for(;;);
-
 
     //panic("`");
 
     //asm("sti");
     //puts("\nHello, Fleurix... \n\n");
-
 }
 
 // on Memory

@@ -149,7 +149,7 @@ struct idt_desc {
     uint        base;
 } __attribute__((packed));     
 
-struct regs {
+struct trap_frame {
     uint        gs, fs, es, ds;                             /* pushed the segs last */
     uint        edi, esi, ebp, esp, ebx, edx, ecx, eax;     /* pushed by 'pusha' */
     uint        int_no, err_code;                           /* our 'push byte #' and ecodes do this */

@@ -7,11 +7,11 @@ int errno = 0;
 
 /***********************************************************/
 
-void sys_debug(struct regs *r){
+void sys_debug(struct trap_frame *r){
     printf("int x80;; eip=%x! \n", r->eip);
 }
 
-void sys_fork(struct regs *r){
+void sys_fork(struct trap_frame *r){
     int ret = copy_proc(r);
     if (ret<0){
         panic("error fork()\n");
@@ -31,9 +31,9 @@ static uint sys_routines[NSYSC] = {
     0,
 }; 
 
-void do_syscall(struct regs *r){
+void do_syscall(struct trap_frame *r){
     printf("do_syscall();\n");
-    void (*handler)(struct regs *r);
+    void (*handler)(struct trap_frame *r);
     handler = sys_routines[r->eax];
     
     if(handler){

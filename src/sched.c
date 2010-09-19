@@ -19,7 +19,7 @@ struct tss_desc tss;
 /*
  * invoked by do_timer() in timer.c;
  * */
-void do_sched(struct regs *r){
+void do_sched(struct trap_frame *tf){
     printf("do sched \n");
     uint i;
     struct proc *p;
@@ -47,7 +47,7 @@ void swtch(struct proc *from, struct proc *to){
     asm volatile(
         "mov    %%eax, %%esp;"
         "jmp    _int_restore_regs;"
-        ::"a"(to->p_regs));
+        ::"a"(to->p_trap));
 }
 
 /*******************************************************************************/
@@ -90,7 +90,7 @@ int copy_mem_to(struct proc *p){
 /*
  * main part of sys_fork()
  * */
-int copy_proc(struct regs *r){
+int copy_proc(struct trap_frame *tf){
     uint nr; 
     struct proc *p;
     
@@ -109,9 +109,9 @@ int copy_proc(struct regs *r){
     p->p_ppid = current->p_ppid;
     p->p_flag = current->p_flag;
     // init kernel stack
-    struct regs *trap = ((struct regs *)(uint)p + 0x1000) - 1;
-    *trap = *r;
-    trap->eax = 0;
+    struct trap_frame *_tf = ((struct trap_frame *)(uint)p + 0x1000) - 1;
+    *_tf = *tf;
+    _tf->eax = 0;
 
     if (copy_mem_to(p) != 0){
         panic("copy_proc(): error on copy mem.");
@@ -141,8 +141,8 @@ void sched_init(){
     set_tss(&gdt[TSS0], &tss);
     ltr(_TSS);
     // init its ldt
-    set_seg(&(p->p_ldt[1]), 0, 0xffffffff, 3, STA_X | STA_R);
-    set_seg(&(p->p_ldt[2]), 0, 0xffffffff, 3, STA_W);
+    set_seg(&(p->p_ldt[1]), 0, 420*1024, 3, STA_X | STA_R);
+    set_seg(&(p->p_ldt[2]), 0, 420*1024, 3, STA_W);
     // put proc0's LDT inside GDT & lldt
     set_ldt(&gdt[LDT0], &(p->p_ldt));
     lldt(_LDT(p->p_pid));

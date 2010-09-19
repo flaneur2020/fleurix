@@ -41,18 +41,18 @@ uchar frmmap[NFRAME] = {0, };
 
 /**************************************************************/
 
-void do_page_fault(struct regs *r){
+void do_page_fault(struct trap_frame *tf){
     uint cr2;
     asm volatile("movl %%cr2, %0":"=a"(cr2));
     printf("page_fault: %x\n", cr2);
-    debug_regs(r);
+    debug_regs(tf);
     for(;;);
 }
 
-void do_no_page(struct regs *r){
+void do_no_page(struct trap_frame *r){
 }
 
-void do_wp_page(struct regs *r){
+void do_wp_page(struct trap_frame *r){
 }
 
 /**************************************************************/
@@ -68,22 +68,22 @@ int put_page(uint la, uint pa, uint flag){
         if (pde==0){
             panic("no availible frame");
         }
-        pdir[PDX(la)] = pde | flag;
+        pdir[PDX(la)] = pde | PTE_P | PTE_W | PTE_U;
     }
     uint *ptab = (uint *)PTE_ADDR(pde);
     ptab[PTX(la)] = pa | flag;
-    frmmap[pa/4096]++;
+    frmmap[pa/0x1000]++;
     return 0;
 }
 
-int copy_page(uint la1, uint la2, uint limit){
-}
-
-// copy page tables, as a helper of copy_proc()
-// it do NOT copy the data inside a frame, just remap it
-// TODO: and mark it READONLY. 
-// parameter src, dst, and limit are deserved multiple of 0x1000
+/*
+ * copy page tables, as a helper of copy_proc()
+ * it do NOT copy the data inside a frame, just remap it
+ * TODO: and mark it READONLY. 
+ * parameter src, dst, and limit are deserved multiple of 0x1000
+ * */
 int copy_ptab(uint src, uint dst, uint limit){
+    printf("copy_ptab(): src=%x, dst=%x, limit=%x\n", src, dst, limit);
     uint off, la, pa;
     for(off=0; off<=limit; off+=0x1000){
         pa = la2pa(src+off);

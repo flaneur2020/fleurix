@@ -22,7 +22,7 @@ struct proc {
     uint                p_stack;
     uint                p_brk;
     struct seg_desc     p_ldt[3];
-    struct regs        *p_regs;
+    struct trap_frame  *p_trap;
 };
 
 extern struct proc      *current;

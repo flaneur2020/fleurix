@@ -116,11 +116,11 @@ static void irq_remap(){
 
 /**********************************************************************/
 
-void int_common_handler(struct regs *r) {
-    void (*handler)(struct regs *r);
+void int_common_handler(struct trap_frame *r) {
+    void (*handler)(struct trap_frame *r);
     handler = int_routines[r->int_no]; 
-    if (current!=NULL && current->p_regs==NULL) {
-        current->p_regs = r;
+    if (current!=NULL && current->p_trap==NULL) {
+        current->p_trap = r;
     }
     // trap
     if (r->int_no < 32) {
@@ -143,16 +143,16 @@ void int_common_handler(struct regs *r) {
         }
     }
     // clear pointer to trap
-    current->p_regs = NULL;
+    current->p_trap = NULL;
 }
 
-void int_set_handler(int num, void (*handler)(struct regs *r)){
+void int_set_handler(int num, void (*handler)(struct trap_frame *r)){
     int_routines[num] = handler;
 }
 
 /***********************************************************************************/
 
-void debug_regs(struct regs *r){
+void debug_regs(struct trap_frame *r){
     printf("gs = %x, fs = %x, es = %x, ds = %x\n", r->gs, r->fs, r->es, r->ds);
     printf("edi = %x, esi = %x, ebp = %x, esp = %x \n",r->edi, r->esi, r->ebp, r->esp);
     printf("ebx = %x, edx = %x, ecx = %x, eax = %x \n",r->ebx, r->edx, r->ecx, r->eax);
