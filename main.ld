@@ -3,7 +3,7 @@ SECTIONS {
     __begin__ = .;
     .text 0x10000 : {
         __code__ = .;
-        bin/main.o *(.text);
+        bin/main.o(.text) *(.text);
         . = ALIGN(4096);
     }
     .data : {

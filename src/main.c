@@ -4,24 +4,21 @@
 #include <sched.h>
 #include <sysc.h>
 
-char user_stack[1024];
-
 void main(){
     video_init();       puts("* init video\n");
     gdt_init();         puts("* init gdt\n");
     idt_init();         puts("* init idt\n");
     page_init();        puts("* init paging\n");
     // move stack into a touchable place
-    asm volatile("mov %0, %%esp;"::"a"(user_stack+0x1000));
     timer_init(1000);   puts("* init timer\n");
     sched_init();       puts("* init sched\n");
     //asm("int $0x80"::"a"(0));
     // proc[0] arises now
     puts("* init user mode");
-    //asm volatile("sti;");
+    asm volatile("sti;");
     umode_init();       
 
-    asm("int $0x80"::"a"(0));
+    //asm("int $0x80"::"a"(1));
     
     for(;;);
 

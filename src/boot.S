@@ -19,7 +19,7 @@ _reset_drive:
     mov     bx, 0000h           ; Destination address = 1000h:0000
 
     mov     ah, 02h             ; READ SECTOR-command
-    mov     al, 045h            ; Number of sectors to read
+    mov     al, 72              ; Number of sectors to read
     mov     ch, 0               ; Cylinder = 0
     mov     cl, 02h             ; Sector = 2
     mov     dh, 0               ; Head = 0
@@ -32,9 +32,18 @@ _reset_drive:
     ;
 
     ; Enable the A20
-    in      al, 92h
-    or      al, 02h
-    out     92h, al
+seta20.1:
+    in      al, byte 0x64
+    test    al, byte 0x2
+    jnz     seta20.1
+    mov     al, byte 0xd1
+    out     byte 0x64, al
+seta20.2:
+    in      al, byte 0x64
+    test    al, byte 0x2
+    jnz     seta20.2
+    mov     al, byte 0xdf
+    out     byte 0x60, al
 
     ; clear registers
     xor     ax, ax
@@ -58,7 +67,7 @@ _start_pm:
     mov     ax,  10h
     mov     ds,  ax
     mov     ss,  ax
-    mov     esp, 090000h
+    mov     esp, 010000h
     ; jump to C!
     ; jump to 0x10000!
     ; never return it should  be

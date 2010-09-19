@@ -8,14 +8,11 @@ int errno = 0;
 /***********************************************************/
 
 void sys_debug(struct regs *r){
-    printf("int x80. eax=0! \n", r->eip);
+    printf("int x80;; eip=%x! \n", r->eip);
 }
 
 void sys_fork(struct regs *r){
-    return;
-    int ret;
-    puts("~~");
-    asm("hlt");
+    int ret = copy_proc(r);
     if (ret<0){
         panic("error fork()\n");
     }
