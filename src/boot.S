@@ -67,6 +67,7 @@ _start_pm:
     mov     ax,  10h
     mov     ds,  ax
     mov     ss,  ax
+    ; move stack to 0x10000! it grows downwards
     mov     esp, 010000h
     ; jump to C!
     ; jump to 0x10000!
