@@ -20,14 +20,14 @@ struct tss_desc tss;
  * invoked by do_timer() in timer.c;
  * */
 void do_sched(struct trap_frame *tf){
-    printf("do sched \n");
+    //printf("do sched \n");
     uint i;
     struct proc *p;
     for (i=0; i<NPROC; i++){
         p = proc[i];
-        if (p){
-            // TODO: if ok, just iret normally
-            swtch(current, current);
+        if (p && p!=current){
+            // if ok, just iret normally
+            swtch(current, p);
         }
     }
 }
@@ -39,7 +39,7 @@ void do_sched(struct trap_frame *tf){
  * eip from IDT, while ss0 & esp0 from the current TSS.
  * */
 void swtch(struct proc *from, struct proc *to){
-    printf("swtch: from %x to %x\n", from, to);
+//printf("swtch: from %x to %x\n", from, to);
     // change ldt & tss
     tss.esp0 = (uint)to + 0x1000;
     lldt(_LDT(to->p_pid));
@@ -76,9 +76,8 @@ int copy_mem_to(struct proc *p){
     uint new_base  = p->p_pid * 0x4000000;
     p->p_textp     = new_base;
     p->p_tsize     = old_limit;
-    set_seg(&(p->p_ldt[1]), new_base, old_limit, 0, STA_X | STA_R);
-    set_seg(&(p->p_ldt[2]), new_base, old_limit, 0, STA_W);
-
+    set_seg(&(p->p_ldt[1]), new_base, old_limit, 3, STA_X | STA_R);
+    set_seg(&(p->p_ldt[2]), new_base, old_limit, 3, STA_W);
     // copy page tables
     int ret = copy_ptab(old_base, new_base, old_limit);
     if (ret!=0){
@@ -112,7 +111,9 @@ int copy_proc(struct trap_frame *tf){
     struct trap_frame *_tf = ((struct trap_frame *)(uint)p + 0x1000) - 1;
     *_tf = *tf;
     _tf->eax = 0;
+    p->p_trap = _tf;
 
+    set_ldt(&gdt[LDT0+p->p_pid], p->p_ldt);
     if (copy_mem_to(p) != 0){
         panic("copy_proc(): error on copy mem.");
     }

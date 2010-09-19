@@ -14,10 +14,12 @@ void main(){
     //asm("int $0x80"::"a"(0));
     // proc[0] arises now
     puts("* init user mode");
-    //asm volatile("sti;");
+    asm volatile("sti;");
     umode_init();       
-    asm("int $0x80"::"a"(1));
-    
+    int ret = fork();
+    while(1){
+        asm("int $0x80"::"a"(0));
+    }
     for(;;);
 
     //panic("`");

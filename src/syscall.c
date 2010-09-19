@@ -2,13 +2,16 @@
 #include <x86.h>
 #include <kern.h>
 #include <syscall.h>
+#include <sched.h>
+
 
 int errno = 0;
 
 /***********************************************************/
 
 void sys_debug(struct trap_frame *r){
-    printf("int x80;; eip=%x! \n", r->eip);
+    printf("%x", current->p_pid);
+    //debug_proc_list();
 }
 
 void sys_fork(struct trap_frame *r){
@@ -32,7 +35,7 @@ static uint sys_routines[NSYSC] = {
 }; 
 
 void do_syscall(struct trap_frame *r){
-    printf("do_syscall();\n");
+    //printf("do_syscall();\n");
     void (*handler)(struct trap_frame *r);
     handler = sys_routines[r->eax];
     

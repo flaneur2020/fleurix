@@ -116,49 +116,51 @@ static void irq_remap(){
 
 /**********************************************************************/
 
-void int_common_handler(struct trap_frame *r) {
-    void (*handler)(struct trap_frame *r);
-    handler = int_routines[r->int_no]; 
-    if (current!=NULL && current->p_trap==NULL) {
-        current->p_trap = r;
+void int_common_handler(struct trap_frame *tf) {
+    void (*handler)(struct trap_frame *tf);
+    handler = int_routines[tf->int_no]; 
+    if (current!=NULL) {
+        current->p_trap = tf;
     }
     // trap
-    if (r->int_no < 32) {
+    if (tf->int_no < 32) {
         if (handler){
-            handler(r);
+            handler(tf);
             return;
         }
-        printf("Exception: %s \n", fault_messages[r->int_no]);
-        debug_regs(r);
+        printf("Exception: %s \n", fault_messages[tf->int_no]);
+        debug_regs(tf);
         for(;;);
     }
     // irq, syscall and blah~
-    if (r->int_no >= 32) {
-        if (r->int_no >= 40) {
+    if (tf->int_no >= 32) {
+        if (tf->int_no >= 40) {
             outb(0xA0, 0x20);
         }
         outb(0x20, 0x20);
         if (handler){
-            handler(r);
+            handler(tf);
         }
     }
-    // clear pointer to trap
-    current->p_trap = NULL;
+    // restore the trap frame
+    if (current!=NULL) {
+        current->p_trap = tf;
+    }
 }
 
-void int_set_handler(int num, void (*handler)(struct trap_frame *r)){
+void int_set_handler(int num, void (*handler)(struct trap_frame *tf)){
     int_routines[num] = handler;
 }
 
 /***********************************************************************************/
 
-void debug_regs(struct trap_frame *r){
-    printf("gs = %x, fs = %x, es = %x, ds = %x\n", r->gs, r->fs, r->es, r->ds);
-    printf("edi = %x, esi = %x, ebp = %x, esp = %x \n",r->edi, r->esi, r->ebp, r->esp);
-    printf("ebx = %x, edx = %x, ecx = %x, eax = %x \n",r->ebx, r->edx, r->ecx, r->eax);
-    printf("int_no = %x, err_code = %x\n", r->int_no, r->err_code);
-    printf("eip = %x, cs = %x, eflags = %x\n", r->eip, r->cs, r->eflags);
-    printf("esp3 = %x, ss3 = %x \n", r->esp3, r->ss3);
+void debug_regs(struct trap_frame *tf){
+    printf("gs = %x, fs = %x, es = %x, ds = %x\n", tf->gs, tf->fs, tf->es, tf->ds);
+    printf("edi = %x, esi = %x, ebp = %x, esp = %x \n",tf->edi, tf->esi, tf->ebp, tf->esp);
+    printf("ebx = %x, edx = %x, ecx = %x, eax = %x \n",tf->ebx, tf->edx, tf->ecx, tf->eax);
+    printf("int_no = %x, err_code = %x\n", tf->int_no, tf->err_code);
+    printf("eip = %x, cs = %x, eflags = %x\n", tf->eip, tf->cs, tf->eflags);
+    printf("esp3 = %x, ss3 = %x \n", tf->esp3, tf->ss3);
     uint cr2, kern_ss;
     asm("mov %%cr2, %%eax":"=a"(cr2));
     printf("cr2 = %x, ", cr2);

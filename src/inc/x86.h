@@ -157,7 +157,6 @@ struct trap_frame {
 } __attribute__((packed));
 
 
-
 /*****************************************************************************************************/
 // on task switching
 // tss
@@ -181,9 +180,10 @@ struct tss_desc {
     ushort      trap, iomb;
 } __attribute__((packed));
 
-extern struct tss_desc tss_desc;
+extern struct tss_desc tss;
 
 /*****************************************************************************************************/
+
 static inline uchar inb(ushort port){
     uchar ret;
     asm volatile( "inb %1, %0" : "=a" (ret) : "dN" (port));
