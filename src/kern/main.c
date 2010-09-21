@@ -5,25 +5,20 @@
 #include <syscall.h>
 
 void main(){
-    video_init();       puts("* init video\n");
+    tty_init();         puts("* init tty\n");
     gdt_init();         puts("* init gdt\n");
     idt_init();         puts("* init idt\n");
     page_init();        puts("* init paging\n");
     timer_init(1000);   puts("* init timer\n");
     sched_init();       puts("* init sched\n");
-    //asm("int $0x80"::"a"(0));
     // proc[0] arises now
-    puts("* init user mode");
+    puts("* init user mode\n");
+    panic("~");
     asm volatile("sti;");
-    umode_init();       
+    umode_init();
     int ret = fork();
     asm("int $0x80"::"a"(0),"b"(ret));
     for(;;);
-
-    //panic("`");
-
-    //asm("sti");
-    //puts("\nHello, Fleurix... \n\n");
 }
 
 // on Memory
@@ -61,19 +56,3 @@ uint strlen(char *str){
     for(sp=str; *sp!='\0'; sp++);
     return sp-str;
 }
-
-// panic
-void panic(char *str){
-    printf("%s\n", str);
-    asm volatile("cli");
-    asm volatile("hlt");
-}
-
-void debug_eip(){
-    uint eip;
-    asm("popl %0":"=a"(eip));
-    asm("pushl %0"::"a"(eip));
-    printf("%x\n", eip);
-}
-
-

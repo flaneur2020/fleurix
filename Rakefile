@@ -33,8 +33,8 @@ end
 #######################################################################
 # => boot.bin
 #######################################################################
-file 'bin/boot.o' => ['src/boot.S'] do
-  sh "nasm -f elf -o bin/boot.o src/boot.S"
+file 'bin/boot.o' => ['src/boot/boot.S'] do
+  sh "nasm -f elf -o bin/boot.o src/boot/boot.S"
 end
 
 file 'bin/boot.bin' => ['bin/boot.o', 'boot.ld'] do 
@@ -57,12 +57,12 @@ file 'bin/main.elf' => OFiles + ['main.ld'] do
   sh "(nm bin/main.elf | sort) > main.nmtab"
 end
 
-file 'src/intv.S' => 'src/intv.S.rb' do 
+file 'src/kern/intv.S' => 'src/kern/intv.S.rb' do 
   sh 'ruby src/intv.S.rb > src/intv.S'
 end
 
 [
-  ['src/intv.S']
+  ['src/kern/intv.S']
 ].each do |fn_s, *_|
   fn_o = 'bin/'+File.basename(fn_s).ext('o')
   file fn_o => [fn_s, *_] do
@@ -71,14 +71,14 @@ end
 end
 
 [
-  ['src/print.c'],
-  ['src/syscall.c'],
-  ['src/sched.c'],
-  ['src/seg.c'],
-  ['src/idt.c'],
-  ['src/page.c'],
-  ['src/timer.c'],
-  ['src/main.c']
+  ['src/kern/print.c'],
+  ['src/kern/syscall.c'],
+  ['src/kern/sched.c'],
+  ['src/kern/seg.c'],
+  ['src/kern/idt.c'],
+  ['src/kern/page.c'],
+  ['src/kern/timer.c'],
+  ['src/kern/main.c']
 ].each do |fn_c, *_|
   fn_o = 'bin/'+File.basename(fn_c).ext('o')
   file fn_o => [fn_c, *_] do
