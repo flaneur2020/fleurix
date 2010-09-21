@@ -17,7 +17,7 @@ short   *memsetw(short *dest, short val, uint count);
 uint    strlen(char *str);
 
 // video.c
-void    video_init();
+void    tty_init();
 void    cls();
 void    putch(char ch);
 void    puts(char *ch);
@@ -52,10 +52,11 @@ void    ltr(uint n);
 void    lldt(uint n);
 void    ljmp(ushort seg, uint offset);
 
-#define panic(str) \
-    do {\
-        printf("*panic* %s:%d: %s", __FILE__, __LINE__, str);\
-        asm volatile("hlt"); \
+#define panic(str)  \
+    do {            \
+        printf("PANIC %s:%d: %s\n", __FILE__, __LINE__, str);\
+        asm volatile("cli");\
+        asm volatile("hlt");\
     } while(0)
 
 #endif

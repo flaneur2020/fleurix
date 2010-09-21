@@ -1,8 +1,8 @@
 /**
  *
- * just misc right now
+ * macro helpers on doing syscall.
  *
- * _Fleurer<me.ssword@gmail.com>
+ * fleurer<me.ssword@gmail.com>
  *
  * */
 

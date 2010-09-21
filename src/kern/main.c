@@ -11,11 +11,11 @@ void main(){
     page_init();        puts("* init paging\n");
     timer_init(1000);   puts("* init timer\n");
     sched_init();       puts("* init sched\n");
-    //asm("int $0x80"::"a"(0));
     // proc[0] arises now
-    puts("* init user mode");
+    puts("* init user mode\n");
     asm volatile("sti;");
-    umode_init();       
+    umode_init();
+
     int ret = fork();
     if (ret){
         while(1) asm("int $0x80"::"a"(0),"b"(1));
@@ -28,7 +28,7 @@ void main(){
 }
 
 // on Memory
-void* memcpy(void *dest, void *src, uint count){
+void* memcpy(void *dest, void *src, uint count) {
     char *sp = (char *)src;
     char *dp = (char *)dest;
     int i;
@@ -62,5 +62,6 @@ uint strlen(char *str){
     for(sp=str; *sp!='\0'; sp++);
     return sp-str;
 }
+
 
 

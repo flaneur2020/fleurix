@@ -9,16 +9,16 @@ int errno = 0;
 
 /***********************************************************/
 
-void sys_debug(struct trap_frame *r){
-    printf("%x", r->ebx);
+void sys_debug(struct trap_frame *tf){
+    printf("%x", tf->ebx);
 }
 
-void sys_fork(struct trap_frame *r){
-    int ret = copy_proc(r);
+void sys_fork(struct trap_frame *tf){
+    int ret = copy_proc(tf);
     if (ret<0){
         panic("error fork()\n");
     }
-    r->eax = ret;
+    tf->eax = ret;
 }
 
 // NOTE: for debug right now
