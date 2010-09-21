@@ -17,15 +17,14 @@ void main(){
     asm volatile("sti;");
     umode_init();       
     int ret = fork();
-    while(1){
-        asm("int $0x80"::"a"(0));
+    if (ret){
+        while(1) asm("int $0x80"::"a"(0),"b"(1));
     }
+    else {
+        while(1) asm("int $0x80"::"a"(0),"b"(0));
+    }
+
     for(;;);
-
-    //panic("`");
-
-    //asm("sti");
-    //puts("\nHello, Fleurix... \n\n");
 }
 
 // on Memory
@@ -62,20 +61,6 @@ uint strlen(char *str){
     char* sp;
     for(sp=str; *sp!='\0'; sp++);
     return sp-str;
-}
-
-// panic
-void panic(char *str){
-    printf("%s\n", str);
-    asm volatile("cli");
-    asm volatile("hlt");
-}
-
-void debug_eip(){
-    uint eip;
-    asm("popl %0":"=a"(eip));
-    asm("pushl %0"::"a"(eip));
-    printf("%x\n", eip);
 }
 
 

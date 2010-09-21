@@ -10,8 +10,7 @@ int errno = 0;
 /***********************************************************/
 
 void sys_debug(struct trap_frame *r){
-    printf("%x", current->p_pid);
-    //debug_proc_list();
+    printf("%x", r->ebx);
 }
 
 void sys_fork(struct trap_frame *r){

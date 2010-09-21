@@ -52,4 +52,10 @@ void    ltr(uint n);
 void    lldt(uint n);
 void    ljmp(ushort seg, uint offset);
 
+#define panic(str) \
+    do {\
+        printf("*panic* %s:%d: %s", __FILE__, __LINE__, str);\
+        asm volatile("hlt"); \
+    } while(0)
+
 #endif
