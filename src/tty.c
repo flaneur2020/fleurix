@@ -114,7 +114,7 @@ _loop:
     goto _loop;
 }
 
-void video_init(){
+void tty_init(){
     vidmem = (char *) 0xb8000;
     cls();
 }
