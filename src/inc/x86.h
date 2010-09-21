@@ -114,6 +114,13 @@ struct page_desc {
 #define PTE_PS		0x080	// Page Size
 #define PTE_MBZ		0x180	// Bits must be zero
 
+// Page Fault error code flags
+#define PFE_P       0x001   // Causing the fault was not a Present page
+#define PFE_W       0x002   // Causing the fault was on a Wirite
+#define PFE_U       0x004   // The fault was caused in User mode
+#define PFE_RSVD    0x008   // The Fault was caused by reserved bits set to 1 in a page directory
+#define PFE_I       0x010   // The Fault was caused on a instruction fetch.
+
 // Control Register flags
 #define CR0_PE		0x00000001	// Protection Enable
 #define CR0_MP		0x00000002	// Monitor coProcessor
@@ -128,8 +135,11 @@ struct page_desc {
 #define CR0_PG		0x80000000	// Paging
 
 /********************************************************************************/
-// on Intrupt
-// idt and frame
+
+/* 
+ * on trap
+ * idt and trap frame
+ */
 
 #define IRQ0 32
 

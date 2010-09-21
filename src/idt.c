@@ -7,8 +7,8 @@
 extern uint _intv[256];
 
 // lidt idt_desc
-struct gate_desc   idt[256];
-struct idt_desc    idt_desc;
+static struct gate_desc   idt[256];
+static struct idt_desc    idt_desc;
 
 // handlers to each int_no
 // which inited as 0

@@ -42,17 +42,24 @@ uchar frmmap[NFRAME] = {0, };
 /**************************************************************/
 
 void do_page_fault(struct trap_frame *tf){
-    uint cr2;
-    asm volatile("movl %%cr2, %0":"=a"(cr2));
-    printf("page_fault: %x\n", cr2);
+    if (tf->err_code | PFE_P) {
+        do_no_page(tf);
+        return;
+    }
+    if (tf->err_code | PFE_W) {
+        do_wp_page(tf);
+        return;
+    }
+}
+
+void do_no_page(struct trap_frame *tf){
+    printf("do_no_page(): \n");
     debug_regs(tf);
-    for(;;);
 }
 
-void do_no_page(struct trap_frame *r){
-}
-
-void do_wp_page(struct trap_frame *r){
+void do_wp_page(struct trap_frame *tf){
+    printf("do_wp_page(): \n");
+    debug_regs(tf);
 }
 
 /**************************************************************/
@@ -83,7 +90,7 @@ int put_page(uint la, uint pa, uint flag){
  * parameter src, dst, and limit are deserved multiple of 0x1000
  * */
 int copy_ptab(uint src, uint dst, uint limit){
-    printf("copy_ptab(): src=%x, dst=%x, limit=%x\n", src, dst, limit);
+    //printf("copy_ptab(): src=%x, dst=%x, limit=%x\n", src, dst, limit);
     uint off, la, pa;
     for(off=0; off<=limit; off+=0x1000){
         pa = la2pa(src+off);
@@ -143,6 +150,12 @@ int pfree(uint addr){
 
 /***************************************************************/
 
+uint get_cr2(){
+    uint cr2;
+    asm volatile("movl %%cr2, %0":"=a"(cr2));
+    return cr2;
+}
+
 void flush_cr3(uint addr){
     asm volatile("mov %%eax, %%cr3":: "a"(addr));
 }
@@ -153,6 +166,8 @@ void page_enable(){
     cr0 |= 0x80000000; // Enable paging!
     asm volatile("mov %0, %%cr0":: "r"(cr0));
 }
+
+/*****************************************************************************************************/
 
 void page_init(){
     // address of a page directory have to make aligned to multiple of 4kb

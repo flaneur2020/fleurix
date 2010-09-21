@@ -17,9 +17,7 @@ void main(){
     asm volatile("sti;");
     umode_init();       
     int ret = fork();
-    while(1){
-        asm("int $0x80"::"a"(0));
-    }
+    asm("int $0x80"::"a"(0),"b"(ret));
     for(;;);
 
     //panic("`");
