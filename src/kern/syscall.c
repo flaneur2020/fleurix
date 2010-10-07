@@ -1,9 +1,8 @@
 #include <param.h>
 #include <x86.h>
 #include <kern.h>
-#include <syscall.h>
 #include <sched.h>
-
+#include <unistd.h>
 
 int errno = 0;
 
@@ -20,10 +19,6 @@ void sys_fork(struct trap_frame *tf){
     }
     tf->eax = ret;
 }
-
-// NOTE: for debug right now
-_syscall0(0, int, debug);
-_syscall0(1, int, fork);
 
 /***********************************************************/
 

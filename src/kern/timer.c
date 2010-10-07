@@ -4,7 +4,7 @@
 
 #define HZ 100
 
-static uint tick = 0;
+static volatile uint tick = 0;
 
 void do_timer(struct regs *r){
     tick++;

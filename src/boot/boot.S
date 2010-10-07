@@ -67,8 +67,8 @@ _start_pm:
     mov     ax,  10h
     mov     ds,  ax
     mov     ss,  ax
-    ; move stack to 0x10000! it grows downwards
-    mov     esp, 010000h
+    ; move stack to 0xfffc! it grows downwards
+    mov     esp, 0FFFCh
     ; jump to C!
     ; jump to 0x10000!
     ; never return it should  be
@@ -76,7 +76,6 @@ _start_pm:
 
 _hang: 
     jmp     _hang
-
 
 gdt:
 gdt_null:
