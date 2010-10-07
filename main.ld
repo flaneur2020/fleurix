@@ -3,13 +3,13 @@ SECTIONS {
     __begin__ = .;
     .text 0x10000 : {
         __code__ = .;
-        bin/main.o(.text) *(.text);
+        bin/entry.o(.text) bin/main.o(.text) *(.text);
         . = ALIGN(4096);
     }
     .data : {
         __data__ = .;
-        *(.data);
         *(.rodata);
+        *(.data);
         . = ALIGN(4096);
     }
     .bss : {

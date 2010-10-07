@@ -2,7 +2,7 @@
 #include <x86.h>
 #include <kern.h>
 #include <sched.h>
-#include <syscall.h>
+#include <unistd.h>
 
 void main(){
     tty_init();         puts("* init tty\n");
