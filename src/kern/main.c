@@ -9,7 +9,7 @@ void main(){
     gdt_init();         puts("* init gdt\n");
     idt_init();         puts("* init idt\n");
     page_init();        puts("* init paging\n");
-    timer_init(1000);   puts("* init timer\n");
+    timer_init();       puts("* init timer\n");
     sched_init();       puts("* init sched\n");
     // proc[0] arises now
     puts("* init user mode\n");

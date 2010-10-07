@@ -44,7 +44,7 @@ _do_find:
  * eip from IDT, while ss0 & esp0 from the current TSS.
  * */
 void swtch(struct proc *from, struct proc *to){
-//printf("swtch: from %x to %x\n", from, to);
+    //printf("swtch: from %x to %x\n", from, to);
     // change ldt & tss
     tss.esp0 = (uint)to + 0x1000;
     lldt(_LDT(to->p_pid));
@@ -154,6 +154,9 @@ void sched_init(){
     lldt(_LDT(p->p_pid));
 }
 
+/*
+ * Move into user space(ring3) by iret.
+ * */
 void umode_init(){
     asm volatile( 
         "mov $0x17, %ax;"
