@@ -1,7 +1,6 @@
 /*
  * Misc on x86
- * Consts on CPU
- * and structures of so many descriptors
+ * constants and structures for so many descriptors
  *
  *  _Fleurer<me.ssword@gmail.com>
  * */
@@ -202,6 +201,16 @@ static inline uchar inb(ushort port){
 
 static inline void outb(ushort port, uchar data){
     asm volatile( "outb %1, %0" :: "dN" (port), "a" (data));
+}
+
+static inline uchar inw(ushort port){
+    ushort ret;
+    asm volatile( "inw %1, %0" : "=a" (ret) : "dN" (port));
+    return ret;
+}
+
+static inline void outw(ushort port, ushort data){
+    asm volatile( "outw %1, %0" :: "dN" (port), "a" (data));
 }
 
 #endif

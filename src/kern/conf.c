@@ -5,10 +5,8 @@
 #include <buf.h>
 #include <conf.h>
 
-/* empty routine */
-int nulldev(){
-}
+struct bdevsw   bdevsw[] = {
+    { &nulldev, &nulldev, &hdreq, &hdtab }
+};
 
-/* it should raise an ENODEV error when being called.*/
-int nodev(){
-}
+

@@ -79,6 +79,11 @@ end
   ['src/kern/idt.c'],
   ['src/kern/page.c'],
   ['src/kern/timer.c'],
+
+  ['src/kern/conf.c'],
+  ['src/kern/bio.c'],
+  ['src/kern/buf.c'],
+
   ['src/kern/main.c']
 ].each do |fn_c, *_|
   fn_o = 'bin/'+File.basename(fn_c).ext('o')
