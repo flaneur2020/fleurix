@@ -13,10 +13,12 @@
  * struct proc indicated some info on sched.
  * */
 struct proc {
-    uchar               p_stat;
+    uchar               p_stat;         
     uchar               p_flag;
-    uint                p_pid;
-    uint                p_ppid;
+    uint                p_chan;         /* the event the proc is awaiting */
+    uint                p_error;        /* return error code */
+    uint                p_pid;          
+    uint                p_ppid;         /* parent's pid */
     uint                p_textp;
     uint                p_tsize;
     uint                p_stack;

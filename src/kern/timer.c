@@ -9,7 +9,7 @@ static volatile uint tick = 0;
 void do_timer(struct regs *r){
     tick++;
     if(tick % 10==0){
-        do_sched(r);
+        swtch();
     }
 }
 

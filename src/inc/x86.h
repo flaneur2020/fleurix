@@ -213,5 +213,39 @@ static inline void outw(ushort port, ushort data){
     asm volatile( "outw %1, %0" :: "dN" (port), "a" (data));
 }
 
+// load each proc's TSS into tr
+static inline void ltr(uint n){
+    asm volatile("ltr %%ax"::"a"(n));
+}
+
+static inline void lldt(uint n){
+    asm volatile("lldt %%ax"::"a"(n));
+}
+
+/*
+ * ljmp seg, offset...Lovely little instruction.
+ * But seg seems only availible for immediate value at compile time.
+ * Tricks needed, *Sucks*.
+ * */
+static inline void ljmp(ushort seg, uint offset){
+    struct{ uint offset, seg } _tmp;
+    _tmp.offset = offset;
+    _tmp.seg    = seg;
+    asm volatile(
+        "ljmp %0"
+        ::"m"(_tmp)
+        );
+}
+
+static inline void lcall(ushort seg, uint offset){
+    struct{ uint offset, seg } _tmp;
+    _tmp.offset = offset;
+    _tmp.seg    = seg;
+    asm volatile(
+        "lcall %0"
+        ::"m"(_tmp)
+        );
+}
+
 #endif
 

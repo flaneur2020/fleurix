@@ -5,7 +5,7 @@
 
 // one page size, stores some info on proc[0] and its kernel stack
 // NOTE: inialized as 0!
-uchar           mem_p0[1024] = {0, };
+uchar           kstack0[1024] = {0, };
 
 struct proc     *proc[NPROC] = {NULL, };
 struct proc     *current = NULL;
@@ -16,19 +16,42 @@ struct tss_desc tss;
 
 /*******************************************************************************/
 
+/* TODO: priority should be considered later. */
+void sleep(uint chan){
+    current->p_chan = chan;
+    current->p_stat = SWAIT;
+    swtch();
+}
+
+void wakeup(uint chan){
+    struct proc *p;
+    int i;
+    for(i=0; i<NPROC; i++){
+        if ((p = proc[i]) == NULL) continue;
+        if (p->p_chan == chan) {
+            setrun(p);
+        }
+    }
+} 
+
+void setrun(struct proc *p){
+    p->p_chan = 0;
+    p->p_stat = SRUN;
+}
+
 /*
  * invoked by do_timer() in timer.c;
  * Round Robbin right now.
  * */
-void do_sched(struct trap_frame *tf){
+void swtch(){
     struct proc *p;
     uint i = current->p_pid + 1;
 _do_find:
     for (; i<NPROC; i++){
-        p = proc[i];
-        if (p){
+        if ((p = proc[i]) == NULL) continue;
+        if (p->p_stat == SRUN){
             // if ok, just iret normally
-            swtch(current, p);
+            swtch_to(current, p);
         }
     }
     if (i==NPROC){
@@ -43,7 +66,7 @@ _do_find:
  * and all the state stuff have been pushed in right place. Note that when a IRQ raised, CPU fetch the cs & 
  * eip from IDT, while ss0 & esp0 from the current TSS.
  * */
-void swtch(struct proc *from, struct proc *to){
+void swtch_to(struct proc *from, struct proc *to){
     //printf("swtch: from %x to %x\n", from, to);
     // change ldt & tss
     tss.esp0 = (uint)to + 0x1000;
@@ -110,7 +133,7 @@ int copy_proc(struct trap_frame *tf){
 
     proc[nr] = p;
     p->p_pid = nr;
-    p->p_ppid = current->p_ppid;
+    p->p_ppid = current->p_pid;
     p->p_flag = current->p_flag;
     // init kernel stack
     struct trap_frame *_tf = ((struct trap_frame *)(uint)p + 0x1000) - 1;
@@ -136,7 +159,7 @@ int copy_proc(struct trap_frame *tf){
  * and make current as proc[0]
  */
 void sched_init(){
-    struct proc *p = current = proc[0] = (struct proc *)(uint) mem_p0;
+    struct proc *p = current = proc[0] = (struct proc *)(uint) kstack0;
     p->p_pid = 0;
     p->p_ppid = 0;
     p->p_stat = SSTOP;
@@ -147,8 +170,8 @@ void sched_init(){
     set_tss(&gdt[TSS0], &tss);
     ltr(_TSS);
     // init its ldt
-    set_seg(&(p->p_ldt[1]), 0, 420*1024, 3, STA_X | STA_R);
-    set_seg(&(p->p_ldt[2]), 0, 420*1024, 3, STA_W);
+    set_seg(&(p->p_ldt[1]), 0, 640*1024, 3, STA_X | STA_R);
+    set_seg(&(p->p_ldt[2]), 0, 640*1024, 3, STA_W);
     // put proc0's LDT inside GDT & lldt
     set_ldt(&gdt[LDT0], &(p->p_ldt));
     lldt(_LDT(p->p_pid));
@@ -197,37 +220,5 @@ void debug_proc(struct proc *p){
 
 
 /***********************************************************************/
-// load proc[n]'s TSS into tr
-void ltr(uint n){
-    asm volatile("ltr %%ax"::"a"(n));
-}
 
-void lldt(uint n){
-    asm volatile("lldt %%ax"::"a"(n));
-}
-
-/*
- * ljmp seg, offset...Lovely little instruction.
- * But seg seems only availible for immediate value at compile time.
- * Tricks needed, *Sucks*.
- * */
-void ljmp(ushort seg, uint offset){
-    struct{ uint offset, seg } _tmp;
-    _tmp.offset = offset;
-    _tmp.seg    = seg;
-    asm volatile(
-        "ljmp %0"
-        ::"m"(_tmp)
-        );
-}
-
-void lcall(ushort seg, uint offset){
-    struct{ uint offset, seg } _tmp;
-    _tmp.offset = offset;
-    _tmp.seg    = seg;
-    asm volatile(
-        "lcall %0"
-        ::"m"(_tmp)
-        );
-}
 
