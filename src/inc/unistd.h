@@ -32,7 +32,7 @@
             "int $0x80"                         \
             :"=a"(r)                            \
             :"a"(NR),                           \
-             "b"((uint)p1)                      \
+             "b"((int)p1)                       \
         );                                      \
         if (r<0){                               \
             errno = -r;                         \
@@ -48,8 +48,8 @@
             "int $0x80"                         \
             :"=a"(r)                            \
             :"a"(NR),                           \
-             "b"((uint)p1),                     \
-             "c"((uint)p2)                      \
+             "b"((int)p1),                      \
+             "c"((int)p2)                       \
         );                                      \
         if (r<0){                               \
             errno = -r;                         \
@@ -60,7 +60,8 @@
 
 extern int errno;
 
-static inline _syscall0(0, int, debug);
-static inline _syscall0(1, int, fork); 
+static inline _syscall0(0, int, debug); 
+static inline _syscall1(1, int, putn, int);
+static inline _syscall0(2, int, fork); 
 
 #endif

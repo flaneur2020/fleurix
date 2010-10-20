@@ -70,7 +70,7 @@ uint get_seg_limit(struct seg_desc *seg){
 }
 
 uint get_seg_base(struct seg_desc *seg){
-    return (seg->base_lo | seg->base_mi << 16 | seg->base_hi << 25);
+    return (seg->base_lo | seg->base_mi << 16 | seg->base_hi << 24);
 }
 
 /******************************************************************/

@@ -13,7 +13,7 @@
  * struct proc indicated some info on sched.
  * */
 struct proc {
-    uchar               p_stat;         
+    uchar               p_stat;
     uchar               p_flag;
     uint                p_chan;         /* the event the proc is awaiting */
     uint                p_error;        /* return error code */

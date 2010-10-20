@@ -50,8 +50,7 @@ _do_find:
     for (; i<NPROC; i++){
         if ((p = proc[i]) == NULL) continue;
         if (p->p_stat == SRUN){
-            // if ok, just iret normally
-            swtch_to(current, p);
+            swtch_to(p);
         }
     }
     if (i==NPROC){
@@ -66,8 +65,8 @@ _do_find:
  * and all the state stuff have been pushed in right place. Note that when a IRQ raised, CPU fetch the cs & 
  * eip from IDT, while ss0 & esp0 from the current TSS.
  * */
-void swtch_to(struct proc *from, struct proc *to){
-    //printf("swtch: from %x to %x\n", from, to);
+void swtch_to(struct proc *to){
+    // printf("from: %x, to: %x\n", current, to);
     // change ldt & tss
     tss.esp0 = (uint)to + 0x1000;
     lldt(_LDT(to->p_pid));
@@ -100,8 +99,12 @@ int find_empty_pid(){
  * */
 int copy_mem_to(struct proc *p){
     uint old_limit = get_seg_limit(&(current->p_ldt[1])); 
-    uint old_base  = get_seg_base (&(current->p_ldt[1]));
+    uint old_base  = get_seg_base(&(current->p_ldt[1])); 
     uint new_base  = p->p_pid * 0x4000000;
+    printf("current->p_pid=%d\n", current->p_pid);
+    printf("p->p_pid=%d\n", p->p_pid);
+    printf("old_base=%x\n", old_base);
+    printf("new_base=%x\n", new_base);
     p->p_textp     = new_base;
     p->p_tsize     = old_limit;
     set_seg(&(p->p_ldt[1]), new_base, old_limit, 3, STA_X | STA_R);
@@ -162,8 +165,8 @@ void sched_init(){
     struct proc *p = current = proc[0] = (struct proc *)(uint) kstack0;
     p->p_pid = 0;
     p->p_ppid = 0;
-    p->p_stat = SSTOP;
-    p->p_flag = 0;
+    p->p_stat = SRUN;
+    p->p_flag = SLOAD;
     // init tss
     tss.ss0  = KERN_DS;
     tss.esp0 = (uint)p + 0x1000;
@@ -215,7 +218,7 @@ void debug_proc_list(){
 
 void debug_proc(struct proc *p){
     printf("%s ", (p==current)? "-":" " );
-    printf("pid:%d esp0:%x\n", p->p_pid, (uint)p+0x1000);
+    printf("pid:%d stat:%d esp0:%x\n", p->p_pid, p->p_stat, (uint)p+0x1000);
 }
 
 

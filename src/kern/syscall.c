@@ -9,7 +9,6 @@ int errno = 0;
 /***********************************************************/
 
 void sys_debug(struct trap_frame *tf){
-    printf("%x", tf->ebx);
 }
 
 void sys_fork(struct trap_frame *tf){
@@ -20,11 +19,16 @@ void sys_fork(struct trap_frame *tf){
     tf->eax = ret;
 }
 
+void sys_putn(struct trap_frame *tf){
+    printf("%x", tf->ebx);
+}
+
 /***********************************************************/
 
 static uint sys_routines[NSYSC] = {
     [0] = &sys_debug,
-    [1] = &sys_fork,
+    [1] = &sys_putn,
+    [2] = &sys_fork,
     0,
 }; 
 

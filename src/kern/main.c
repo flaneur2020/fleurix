@@ -16,12 +16,14 @@ void main(){
     asm volatile("sti;");
     umode_init();
 
-    int ret = fork();
-    if (ret){
-        while(1) asm("int $0x80"::"a"(0),"b"(1));
+    if(fork()){
+        while(1) asm("int $0x80"::"a"(1),"b"(0));
+    }
+    else if (fork()){
+        while(1) asm("int $0x80"::"a"(1),"b"(1));
     }
     else {
-        while(1) asm("int $0x80"::"a"(0),"b"(0));
+        while(1) asm("int $0x80"::"a"(1),"b"(2));
     }
 
     for(;;);
