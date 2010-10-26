@@ -6,8 +6,8 @@
  *
  * */ 
 
-#ifndef SCHED_H
-#define SCHED_H
+#ifndef PROC_H
+#define PROC_H
 
 /*
  * struct proc indicated some info on sched.
@@ -43,5 +43,7 @@ extern struct proc      *current;
 #define SSWAP       0x8         // proc is being swapped out
 #define STRC        0x10        // proc is being traced
 #define SWTED       0x20        // another tracing flag
+
+// error code
 
 #endif
