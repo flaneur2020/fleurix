@@ -42,7 +42,7 @@ _int_restore_regs:
 NINT = 128
 0.upto(NINT) do |i|
   puts %{
-    _int#{i}:
+    _hwint#{i}:
       cli
       #{'push  dword 0' if i!=17 and (i<8 or i>14)}
       push  dword #{i}
@@ -54,10 +54,10 @@ end
 puts %{
 ; vector table
 [section .data]
-[global  _intv]
+[global  _hwint]
 
-_intv:
+_hwint:
 }
 0.upto(NINT) do |i|
-  puts "  dd _int#{i}"
+  puts "  dd _hwint#{i}"
 end

@@ -20,7 +20,7 @@ end
 task :build => 'bin/kernel.img'
 
 task :clean do
-  sh "rm -rf bin/* src/kern/intv.S .bochsout"
+  sh "rm -rf bin/* src/kern/hwint.S .bochsout"
 end
 
 #######################################################################
@@ -46,7 +46,7 @@ end
 # => main.bin
 #######################################################################
 
-OFiles = %w{ bin/entry.o bin/main.o bin/seg.o bin/sched.o bin/tty.o bin/syscall.o bin/idt.o bin/timer.o bin/page.o bin/intv.o }
+OFiles = %w{ bin/entry.o bin/main.o bin/seg.o bin/sched.o bin/tty.o bin/syscall.o bin/trap.o bin/timer.o bin/page.o bin/hwint.o }
 
 file 'bin/main.bin' => 'bin/main.elf' do
   sh "objcopy -R .pdr -R .comment -R .note -S -O binary bin/main.elf bin/main.bin"
@@ -57,12 +57,12 @@ file 'bin/main.elf' => OFiles + ['main.ld'] do
   sh "(nm bin/main.elf | sort) > main.nmtab"
 end
 
-file 'src/kern/intv.S' => 'src/kern/intv.S.rb' do 
-  sh 'ruby src/kern/intv.S.rb > src/kern/intv.S'
+file 'src/kern/hwint.S' => 'src/kern/hwint.S.rb' do 
+  sh 'ruby src/kern/hwint.S.rb > src/kern/hwint.S'
 end
 
 [
-  ['src/kern/intv.S'],
+  ['src/kern/hwint.S'],
   ['src/kern/entry.S']
 ].each do |fn_s, *_|
   fn_o = 'bin/'+File.basename(fn_s).ext('o')
@@ -76,7 +76,7 @@ end
   ['src/kern/syscall.c'],
   ['src/kern/sched.c'],
   ['src/kern/seg.c'],
-  ['src/kern/idt.c'],
+  ['src/kern/trap.c'],
   ['src/kern/page.c'],
   ['src/kern/timer.c'],
 

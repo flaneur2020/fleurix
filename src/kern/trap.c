@@ -3,8 +3,8 @@
 #include <kern.h>
 #include <sched.h>
 
-// from intv.S
-extern uint _intv[256];
+// from hwint.S
+extern uint _hwint[256];
 
 // lidt idt_desc
 struct gate_desc   idt[256];
@@ -75,14 +75,14 @@ void set_trap_gate(uint num, uint base){
     idt_set_gate(num, base, KERN_CS, STS_TRG, 0);
 }
 
-void intv_init(){
+void hwint_init(){
     int i;
-    for(i=0;  i<32; i++){ set_trap_gate(i, _intv[i]); }
-    for(i=32; i<48; i++){ set_intr_gate(i, _intv[i]); }
-    set_syst_gate(0x03, _intv[0x03]); // int3
-    set_syst_gate(0x04, _intv[0x04]); // overflow
-    set_syst_gate(0x05, _intv[0x05]); // bound
-    set_syst_gate(0x80, _intv[0x80]); // syscall
+    for(i=0;  i<32; i++){ set_trap_gate(i, _hwint[i]); }
+    for(i=32; i<48; i++){ set_intr_gate(i, _hwint[i]); }
+    set_syst_gate(0x03, _hwint[0x03]); // int3
+    set_syst_gate(0x04, _hwint[0x04]); // overflow
+    set_syst_gate(0x05, _hwint[0x05]); // bound
+    set_syst_gate(0x80, _hwint[0x80]); // syscall
     int_set_handler(IRQ0+0, &do_timer);        // in timer.c
     //int_set_handler(IRQ0+1, NULL);        
     //int_set_handler(IRQ0+2, NULL);        
@@ -177,7 +177,7 @@ void idt_init(){
     // init irq
     irq_remap();
     // load intr vectors and lidt 
-    intv_init();
+    hwint_init();
     flush_idt(idt_desc);
 }
 

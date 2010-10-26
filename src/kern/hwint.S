@@ -38,903 +38,903 @@ _int_restore_regs:
     iret
 
 
-    _int0:
+    _hwint0:
       cli
       push  dword 0
       push  dword 0
       jmp   _int_common_stub
   
 
-    _int1:
+    _hwint1:
       cli
       push  dword 0
       push  dword 1
       jmp   _int_common_stub
   
 
-    _int2:
+    _hwint2:
       cli
       push  dword 0
       push  dword 2
       jmp   _int_common_stub
   
 
-    _int3:
+    _hwint3:
       cli
       push  dword 0
       push  dword 3
       jmp   _int_common_stub
   
 
-    _int4:
+    _hwint4:
       cli
       push  dword 0
       push  dword 4
       jmp   _int_common_stub
   
 
-    _int5:
+    _hwint5:
       cli
       push  dword 0
       push  dword 5
       jmp   _int_common_stub
   
 
-    _int6:
+    _hwint6:
       cli
       push  dword 0
       push  dword 6
       jmp   _int_common_stub
   
 
-    _int7:
+    _hwint7:
       cli
       push  dword 0
       push  dword 7
       jmp   _int_common_stub
   
 
-    _int8:
+    _hwint8:
       cli
       
       push  dword 8
       jmp   _int_common_stub
   
 
-    _int9:
+    _hwint9:
       cli
       
       push  dword 9
       jmp   _int_common_stub
   
 
-    _int10:
+    _hwint10:
       cli
       
       push  dword 10
       jmp   _int_common_stub
   
 
-    _int11:
+    _hwint11:
       cli
       
       push  dword 11
       jmp   _int_common_stub
   
 
-    _int12:
+    _hwint12:
       cli
       
       push  dword 12
       jmp   _int_common_stub
   
 
-    _int13:
+    _hwint13:
       cli
       
       push  dword 13
       jmp   _int_common_stub
   
 
-    _int14:
+    _hwint14:
       cli
       
       push  dword 14
       jmp   _int_common_stub
   
 
-    _int15:
+    _hwint15:
       cli
       push  dword 0
       push  dword 15
       jmp   _int_common_stub
   
 
-    _int16:
+    _hwint16:
       cli
       push  dword 0
       push  dword 16
       jmp   _int_common_stub
   
 
-    _int17:
+    _hwint17:
       cli
       
       push  dword 17
       jmp   _int_common_stub
   
 
-    _int18:
+    _hwint18:
       cli
       push  dword 0
       push  dword 18
       jmp   _int_common_stub
   
 
-    _int19:
+    _hwint19:
       cli
       push  dword 0
       push  dword 19
       jmp   _int_common_stub
   
 
-    _int20:
+    _hwint20:
       cli
       push  dword 0
       push  dword 20
       jmp   _int_common_stub
   
 
-    _int21:
+    _hwint21:
       cli
       push  dword 0
       push  dword 21
       jmp   _int_common_stub
   
 
-    _int22:
+    _hwint22:
       cli
       push  dword 0
       push  dword 22
       jmp   _int_common_stub
   
 
-    _int23:
+    _hwint23:
       cli
       push  dword 0
       push  dword 23
       jmp   _int_common_stub
   
 
-    _int24:
+    _hwint24:
       cli
       push  dword 0
       push  dword 24
       jmp   _int_common_stub
   
 
-    _int25:
+    _hwint25:
       cli
       push  dword 0
       push  dword 25
       jmp   _int_common_stub
   
 
-    _int26:
+    _hwint26:
       cli
       push  dword 0
       push  dword 26
       jmp   _int_common_stub
   
 
-    _int27:
+    _hwint27:
       cli
       push  dword 0
       push  dword 27
       jmp   _int_common_stub
   
 
-    _int28:
+    _hwint28:
       cli
       push  dword 0
       push  dword 28
       jmp   _int_common_stub
   
 
-    _int29:
+    _hwint29:
       cli
       push  dword 0
       push  dword 29
       jmp   _int_common_stub
   
 
-    _int30:
+    _hwint30:
       cli
       push  dword 0
       push  dword 30
       jmp   _int_common_stub
   
 
-    _int31:
+    _hwint31:
       cli
       push  dword 0
       push  dword 31
       jmp   _int_common_stub
   
 
-    _int32:
+    _hwint32:
       cli
       push  dword 0
       push  dword 32
       jmp   _int_common_stub
   
 
-    _int33:
+    _hwint33:
       cli
       push  dword 0
       push  dword 33
       jmp   _int_common_stub
   
 
-    _int34:
+    _hwint34:
       cli
       push  dword 0
       push  dword 34
       jmp   _int_common_stub
   
 
-    _int35:
+    _hwint35:
       cli
       push  dword 0
       push  dword 35
       jmp   _int_common_stub
   
 
-    _int36:
+    _hwint36:
       cli
       push  dword 0
       push  dword 36
       jmp   _int_common_stub
   
 
-    _int37:
+    _hwint37:
       cli
       push  dword 0
       push  dword 37
       jmp   _int_common_stub
   
 
-    _int38:
+    _hwint38:
       cli
       push  dword 0
       push  dword 38
       jmp   _int_common_stub
   
 
-    _int39:
+    _hwint39:
       cli
       push  dword 0
       push  dword 39
       jmp   _int_common_stub
   
 
-    _int40:
+    _hwint40:
       cli
       push  dword 0
       push  dword 40
       jmp   _int_common_stub
   
 
-    _int41:
+    _hwint41:
       cli
       push  dword 0
       push  dword 41
       jmp   _int_common_stub
   
 
-    _int42:
+    _hwint42:
       cli
       push  dword 0
       push  dword 42
       jmp   _int_common_stub
   
 
-    _int43:
+    _hwint43:
       cli
       push  dword 0
       push  dword 43
       jmp   _int_common_stub
   
 
-    _int44:
+    _hwint44:
       cli
       push  dword 0
       push  dword 44
       jmp   _int_common_stub
   
 
-    _int45:
+    _hwint45:
       cli
       push  dword 0
       push  dword 45
       jmp   _int_common_stub
   
 
-    _int46:
+    _hwint46:
       cli
       push  dword 0
       push  dword 46
       jmp   _int_common_stub
   
 
-    _int47:
+    _hwint47:
       cli
       push  dword 0
       push  dword 47
       jmp   _int_common_stub
   
 
-    _int48:
+    _hwint48:
       cli
       push  dword 0
       push  dword 48
       jmp   _int_common_stub
   
 
-    _int49:
+    _hwint49:
       cli
       push  dword 0
       push  dword 49
       jmp   _int_common_stub
   
 
-    _int50:
+    _hwint50:
       cli
       push  dword 0
       push  dword 50
       jmp   _int_common_stub
   
 
-    _int51:
+    _hwint51:
       cli
       push  dword 0
       push  dword 51
       jmp   _int_common_stub
   
 
-    _int52:
+    _hwint52:
       cli
       push  dword 0
       push  dword 52
       jmp   _int_common_stub
   
 
-    _int53:
+    _hwint53:
       cli
       push  dword 0
       push  dword 53
       jmp   _int_common_stub
   
 
-    _int54:
+    _hwint54:
       cli
       push  dword 0
       push  dword 54
       jmp   _int_common_stub
   
 
-    _int55:
+    _hwint55:
       cli
       push  dword 0
       push  dword 55
       jmp   _int_common_stub
   
 
-    _int56:
+    _hwint56:
       cli
       push  dword 0
       push  dword 56
       jmp   _int_common_stub
   
 
-    _int57:
+    _hwint57:
       cli
       push  dword 0
       push  dword 57
       jmp   _int_common_stub
   
 
-    _int58:
+    _hwint58:
       cli
       push  dword 0
       push  dword 58
       jmp   _int_common_stub
   
 
-    _int59:
+    _hwint59:
       cli
       push  dword 0
       push  dword 59
       jmp   _int_common_stub
   
 
-    _int60:
+    _hwint60:
       cli
       push  dword 0
       push  dword 60
       jmp   _int_common_stub
   
 
-    _int61:
+    _hwint61:
       cli
       push  dword 0
       push  dword 61
       jmp   _int_common_stub
   
 
-    _int62:
+    _hwint62:
       cli
       push  dword 0
       push  dword 62
       jmp   _int_common_stub
   
 
-    _int63:
+    _hwint63:
       cli
       push  dword 0
       push  dword 63
       jmp   _int_common_stub
   
 
-    _int64:
+    _hwint64:
       cli
       push  dword 0
       push  dword 64
       jmp   _int_common_stub
   
 
-    _int65:
+    _hwint65:
       cli
       push  dword 0
       push  dword 65
       jmp   _int_common_stub
   
 
-    _int66:
+    _hwint66:
       cli
       push  dword 0
       push  dword 66
       jmp   _int_common_stub
   
 
-    _int67:
+    _hwint67:
       cli
       push  dword 0
       push  dword 67
       jmp   _int_common_stub
   
 
-    _int68:
+    _hwint68:
       cli
       push  dword 0
       push  dword 68
       jmp   _int_common_stub
   
 
-    _int69:
+    _hwint69:
       cli
       push  dword 0
       push  dword 69
       jmp   _int_common_stub
   
 
-    _int70:
+    _hwint70:
       cli
       push  dword 0
       push  dword 70
       jmp   _int_common_stub
   
 
-    _int71:
+    _hwint71:
       cli
       push  dword 0
       push  dword 71
       jmp   _int_common_stub
   
 
-    _int72:
+    _hwint72:
       cli
       push  dword 0
       push  dword 72
       jmp   _int_common_stub
   
 
-    _int73:
+    _hwint73:
       cli
       push  dword 0
       push  dword 73
       jmp   _int_common_stub
   
 
-    _int74:
+    _hwint74:
       cli
       push  dword 0
       push  dword 74
       jmp   _int_common_stub
   
 
-    _int75:
+    _hwint75:
       cli
       push  dword 0
       push  dword 75
       jmp   _int_common_stub
   
 
-    _int76:
+    _hwint76:
       cli
       push  dword 0
       push  dword 76
       jmp   _int_common_stub
   
 
-    _int77:
+    _hwint77:
       cli
       push  dword 0
       push  dword 77
       jmp   _int_common_stub
   
 
-    _int78:
+    _hwint78:
       cli
       push  dword 0
       push  dword 78
       jmp   _int_common_stub
   
 
-    _int79:
+    _hwint79:
       cli
       push  dword 0
       push  dword 79
       jmp   _int_common_stub
   
 
-    _int80:
+    _hwint80:
       cli
       push  dword 0
       push  dword 80
       jmp   _int_common_stub
   
 
-    _int81:
+    _hwint81:
       cli
       push  dword 0
       push  dword 81
       jmp   _int_common_stub
   
 
-    _int82:
+    _hwint82:
       cli
       push  dword 0
       push  dword 82
       jmp   _int_common_stub
   
 
-    _int83:
+    _hwint83:
       cli
       push  dword 0
       push  dword 83
       jmp   _int_common_stub
   
 
-    _int84:
+    _hwint84:
       cli
       push  dword 0
       push  dword 84
       jmp   _int_common_stub
   
 
-    _int85:
+    _hwint85:
       cli
       push  dword 0
       push  dword 85
       jmp   _int_common_stub
   
 
-    _int86:
+    _hwint86:
       cli
       push  dword 0
       push  dword 86
       jmp   _int_common_stub
   
 
-    _int87:
+    _hwint87:
       cli
       push  dword 0
       push  dword 87
       jmp   _int_common_stub
   
 
-    _int88:
+    _hwint88:
       cli
       push  dword 0
       push  dword 88
       jmp   _int_common_stub
   
 
-    _int89:
+    _hwint89:
       cli
       push  dword 0
       push  dword 89
       jmp   _int_common_stub
   
 
-    _int90:
+    _hwint90:
       cli
       push  dword 0
       push  dword 90
       jmp   _int_common_stub
   
 
-    _int91:
+    _hwint91:
       cli
       push  dword 0
       push  dword 91
       jmp   _int_common_stub
   
 
-    _int92:
+    _hwint92:
       cli
       push  dword 0
       push  dword 92
       jmp   _int_common_stub
   
 
-    _int93:
+    _hwint93:
       cli
       push  dword 0
       push  dword 93
       jmp   _int_common_stub
   
 
-    _int94:
+    _hwint94:
       cli
       push  dword 0
       push  dword 94
       jmp   _int_common_stub
   
 
-    _int95:
+    _hwint95:
       cli
       push  dword 0
       push  dword 95
       jmp   _int_common_stub
   
 
-    _int96:
+    _hwint96:
       cli
       push  dword 0
       push  dword 96
       jmp   _int_common_stub
   
 
-    _int97:
+    _hwint97:
       cli
       push  dword 0
       push  dword 97
       jmp   _int_common_stub
   
 
-    _int98:
+    _hwint98:
       cli
       push  dword 0
       push  dword 98
       jmp   _int_common_stub
   
 
-    _int99:
+    _hwint99:
       cli
       push  dword 0
       push  dword 99
       jmp   _int_common_stub
   
 
-    _int100:
+    _hwint100:
       cli
       push  dword 0
       push  dword 100
       jmp   _int_common_stub
   
 
-    _int101:
+    _hwint101:
       cli
       push  dword 0
       push  dword 101
       jmp   _int_common_stub
   
 
-    _int102:
+    _hwint102:
       cli
       push  dword 0
       push  dword 102
       jmp   _int_common_stub
   
 
-    _int103:
+    _hwint103:
       cli
       push  dword 0
       push  dword 103
       jmp   _int_common_stub
   
 
-    _int104:
+    _hwint104:
       cli
       push  dword 0
       push  dword 104
       jmp   _int_common_stub
   
 
-    _int105:
+    _hwint105:
       cli
       push  dword 0
       push  dword 105
       jmp   _int_common_stub
   
 
-    _int106:
+    _hwint106:
       cli
       push  dword 0
       push  dword 106
       jmp   _int_common_stub
   
 
-    _int107:
+    _hwint107:
       cli
       push  dword 0
       push  dword 107
       jmp   _int_common_stub
   
 
-    _int108:
+    _hwint108:
       cli
       push  dword 0
       push  dword 108
       jmp   _int_common_stub
   
 
-    _int109:
+    _hwint109:
       cli
       push  dword 0
       push  dword 109
       jmp   _int_common_stub
   
 
-    _int110:
+    _hwint110:
       cli
       push  dword 0
       push  dword 110
       jmp   _int_common_stub
   
 
-    _int111:
+    _hwint111:
       cli
       push  dword 0
       push  dword 111
       jmp   _int_common_stub
   
 
-    _int112:
+    _hwint112:
       cli
       push  dword 0
       push  dword 112
       jmp   _int_common_stub
   
 
-    _int113:
+    _hwint113:
       cli
       push  dword 0
       push  dword 113
       jmp   _int_common_stub
   
 
-    _int114:
+    _hwint114:
       cli
       push  dword 0
       push  dword 114
       jmp   _int_common_stub
   
 
-    _int115:
+    _hwint115:
       cli
       push  dword 0
       push  dword 115
       jmp   _int_common_stub
   
 
-    _int116:
+    _hwint116:
       cli
       push  dword 0
       push  dword 116
       jmp   _int_common_stub
   
 
-    _int117:
+    _hwint117:
       cli
       push  dword 0
       push  dword 117
       jmp   _int_common_stub
   
 
-    _int118:
+    _hwint118:
       cli
       push  dword 0
       push  dword 118
       jmp   _int_common_stub
   
 
-    _int119:
+    _hwint119:
       cli
       push  dword 0
       push  dword 119
       jmp   _int_common_stub
   
 
-    _int120:
+    _hwint120:
       cli
       push  dword 0
       push  dword 120
       jmp   _int_common_stub
   
 
-    _int121:
+    _hwint121:
       cli
       push  dword 0
       push  dword 121
       jmp   _int_common_stub
   
 
-    _int122:
+    _hwint122:
       cli
       push  dword 0
       push  dword 122
       jmp   _int_common_stub
   
 
-    _int123:
+    _hwint123:
       cli
       push  dword 0
       push  dword 123
       jmp   _int_common_stub
   
 
-    _int124:
+    _hwint124:
       cli
       push  dword 0
       push  dword 124
       jmp   _int_common_stub
   
 
-    _int125:
+    _hwint125:
       cli
       push  dword 0
       push  dword 125
       jmp   _int_common_stub
   
 
-    _int126:
+    _hwint126:
       cli
       push  dword 0
       push  dword 126
       jmp   _int_common_stub
   
 
-    _int127:
+    _hwint127:
       cli
       push  dword 0
       push  dword 127
       jmp   _int_common_stub
   
 
-    _int128:
+    _hwint128:
       cli
       push  dword 0
       push  dword 128
@@ -943,135 +943,135 @@ _int_restore_regs:
 
 ; vector table
 [section .data]
-[global  _intv]
+[global  _hwint]
 
-_intv:
-  dd _int0
-  dd _int1
-  dd _int2
-  dd _int3
-  dd _int4
-  dd _int5
-  dd _int6
-  dd _int7
-  dd _int8
-  dd _int9
-  dd _int10
-  dd _int11
-  dd _int12
-  dd _int13
-  dd _int14
-  dd _int15
-  dd _int16
-  dd _int17
-  dd _int18
-  dd _int19
-  dd _int20
-  dd _int21
-  dd _int22
-  dd _int23
-  dd _int24
-  dd _int25
-  dd _int26
-  dd _int27
-  dd _int28
-  dd _int29
-  dd _int30
-  dd _int31
-  dd _int32
-  dd _int33
-  dd _int34
-  dd _int35
-  dd _int36
-  dd _int37
-  dd _int38
-  dd _int39
-  dd _int40
-  dd _int41
-  dd _int42
-  dd _int43
-  dd _int44
-  dd _int45
-  dd _int46
-  dd _int47
-  dd _int48
-  dd _int49
-  dd _int50
-  dd _int51
-  dd _int52
-  dd _int53
-  dd _int54
-  dd _int55
-  dd _int56
-  dd _int57
-  dd _int58
-  dd _int59
-  dd _int60
-  dd _int61
-  dd _int62
-  dd _int63
-  dd _int64
-  dd _int65
-  dd _int66
-  dd _int67
-  dd _int68
-  dd _int69
-  dd _int70
-  dd _int71
-  dd _int72
-  dd _int73
-  dd _int74
-  dd _int75
-  dd _int76
-  dd _int77
-  dd _int78
-  dd _int79
-  dd _int80
-  dd _int81
-  dd _int82
-  dd _int83
-  dd _int84
-  dd _int85
-  dd _int86
-  dd _int87
-  dd _int88
-  dd _int89
-  dd _int90
-  dd _int91
-  dd _int92
-  dd _int93
-  dd _int94
-  dd _int95
-  dd _int96
-  dd _int97
-  dd _int98
-  dd _int99
-  dd _int100
-  dd _int101
-  dd _int102
-  dd _int103
-  dd _int104
-  dd _int105
-  dd _int106
-  dd _int107
-  dd _int108
-  dd _int109
-  dd _int110
-  dd _int111
-  dd _int112
-  dd _int113
-  dd _int114
-  dd _int115
-  dd _int116
-  dd _int117
-  dd _int118
-  dd _int119
-  dd _int120
-  dd _int121
-  dd _int122
-  dd _int123
-  dd _int124
-  dd _int125
-  dd _int126
-  dd _int127
-  dd _int128
+_hwint:
+  dd _hwint0
+  dd _hwint1
+  dd _hwint2
+  dd _hwint3
+  dd _hwint4
+  dd _hwint5
+  dd _hwint6
+  dd _hwint7
+  dd _hwint8
+  dd _hwint9
+  dd _hwint10
+  dd _hwint11
+  dd _hwint12
+  dd _hwint13
+  dd _hwint14
+  dd _hwint15
+  dd _hwint16
+  dd _hwint17
+  dd _hwint18
+  dd _hwint19
+  dd _hwint20
+  dd _hwint21
+  dd _hwint22
+  dd _hwint23
+  dd _hwint24
+  dd _hwint25
+  dd _hwint26
+  dd _hwint27
+  dd _hwint28
+  dd _hwint29
+  dd _hwint30
+  dd _hwint31
+  dd _hwint32
+  dd _hwint33
+  dd _hwint34
+  dd _hwint35
+  dd _hwint36
+  dd _hwint37
+  dd _hwint38
+  dd _hwint39
+  dd _hwint40
+  dd _hwint41
+  dd _hwint42
+  dd _hwint43
+  dd _hwint44
+  dd _hwint45
+  dd _hwint46
+  dd _hwint47
+  dd _hwint48
+  dd _hwint49
+  dd _hwint50
+  dd _hwint51
+  dd _hwint52
+  dd _hwint53
+  dd _hwint54
+  dd _hwint55
+  dd _hwint56
+  dd _hwint57
+  dd _hwint58
+  dd _hwint59
+  dd _hwint60
+  dd _hwint61
+  dd _hwint62
+  dd _hwint63
+  dd _hwint64
+  dd _hwint65
+  dd _hwint66
+  dd _hwint67
+  dd _hwint68
+  dd _hwint69
+  dd _hwint70
+  dd _hwint71
+  dd _hwint72
+  dd _hwint73
+  dd _hwint74
+  dd _hwint75
+  dd _hwint76
+  dd _hwint77
+  dd _hwint78
+  dd _hwint79
+  dd _hwint80
+  dd _hwint81
+  dd _hwint82
+  dd _hwint83
+  dd _hwint84
+  dd _hwint85
+  dd _hwint86
+  dd _hwint87
+  dd _hwint88
+  dd _hwint89
+  dd _hwint90
+  dd _hwint91
+  dd _hwint92
+  dd _hwint93
+  dd _hwint94
+  dd _hwint95
+  dd _hwint96
+  dd _hwint97
+  dd _hwint98
+  dd _hwint99
+  dd _hwint100
+  dd _hwint101
+  dd _hwint102
+  dd _hwint103
+  dd _hwint104
+  dd _hwint105
+  dd _hwint106
+  dd _hwint107
+  dd _hwint108
+  dd _hwint109
+  dd _hwint110
+  dd _hwint111
+  dd _hwint112
+  dd _hwint113
+  dd _hwint114
+  dd _hwint115
+  dd _hwint116
+  dd _hwint117
+  dd _hwint118
+  dd _hwint119
+  dd _hwint120
+  dd _hwint121
+  dd _hwint122
+  dd _hwint123
+  dd _hwint124
+  dd _hwint125
+  dd _hwint126
+  dd _hwint127
+  dd _hwint128
