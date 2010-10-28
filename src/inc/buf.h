@@ -1,5 +1,9 @@
-
 /* */
+
+struct devno {
+    uchar           minor;
+    uchar           major;
+};
 
 struct buf {
     uint            b_flag;
@@ -14,7 +18,7 @@ struct buf {
     uint            b_wcount;
     char            b_error;
     uint            b_resid;
-}
+};
 
 extern struct buf   buf[NBUF];
 
@@ -36,7 +40,7 @@ struct devtab {
     struct buf      *b_tail;            /* last  buf for this dev */
     struct buf      *av_head;           /* head of IO queue */
     struct buf      *av_tail;           /* tail of IO queue */
-}
+};
 
 /*
  * This is the head of the freelist.

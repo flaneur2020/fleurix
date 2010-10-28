@@ -1,8 +1,4 @@
-
-struct devno {
-    uchar           minor;
-    uchar           major;
-};
+/* */
 
 struct bdevsw {
     int             (*d_open)(); 
@@ -11,7 +7,7 @@ struct bdevsw {
     struct devtab    *d_tab;
 };
 
-extern struct bdevsw    *bdevsw;   
+extern struct bdevsw    bdevsw[];   
 
 int nblkdev;
 
@@ -23,4 +19,5 @@ struct cdevsw {
     int             (*d_sgtty)();
 };
 
-extern struct cdevsw    *cdevsw;
+extern struct cdevsw    cdevsw[];
+

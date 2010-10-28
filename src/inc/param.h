@@ -21,7 +21,7 @@ typedef unsigned int    uint;
 #define PSIZE 0x1000
 #define NFRAME ((HI_MEM-LO_MEM)/PSIZE)
 
-#define NBUF 512;
+#define NBUF 512
 
 
 #define KERN_CS 0x08

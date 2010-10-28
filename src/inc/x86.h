@@ -228,7 +228,7 @@ static inline void lldt(uint n){
  * Tricks needed, *Sucks*.
  * */
 static inline void ljmp(ushort seg, uint offset){
-    struct{ uint offset, seg } _tmp;
+    struct{ uint offset, seg; } _tmp;
     _tmp.offset = offset;
     _tmp.seg    = seg;
     asm volatile(
@@ -238,7 +238,7 @@ static inline void ljmp(ushort seg, uint offset){
 }
 
 static inline void lcall(ushort seg, uint offset){
-    struct{ uint offset, seg } _tmp;
+    struct{ uint offset, seg; } _tmp;
     _tmp.offset = offset;
     _tmp.seg    = seg;
     asm volatile(

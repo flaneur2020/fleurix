@@ -52,6 +52,11 @@ void    ltr(uint n);
 void    lldt(uint n);
 void    ljmp(ushort seg, uint offset);
 
+// bio.c
+int     nodev();
+int     nulldev();
+
+
 #define panic(str)  \
     do {            \
         printf("PANIC %s:%d: %s\n", __FILE__, __LINE__, str);\
