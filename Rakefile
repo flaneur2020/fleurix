@@ -67,7 +67,7 @@ cfiles = [
   #
   'src/kern/bio.c',
   'src/kern/conf.c',
-  'src/kern/hdrw.c',
+  'src/kern/hd.c',
   #
   'src/kern/main.c'
 ]

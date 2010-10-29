@@ -21,3 +21,7 @@ struct cdevsw {
 
 extern struct cdevsw    cdevsw[];
 
+#define MAJOR(num) ((char)((num>>8)&0xFF))
+#define MINOR(num) ((char)((num)&0xFF))
+
+#define DEVNO(major, minor) ((short)(((char)major<<8) + (char)minor))

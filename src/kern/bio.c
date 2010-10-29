@@ -30,7 +30,7 @@ void brelse(struct buf *bp){
 }
 
 /* */
-int incore(struct devno devno, uint blkno){
+int incore(ushort devno, uint blkno){
 }
 
 /**********************************************/
@@ -55,8 +55,7 @@ void buf_init() {
     bfreelist.av_prev = bfreelist.av_next = &bfreelist;
     for(i=0; i<NBUF; i++){
         bp = &buf[i];
-        bp->b_dev.major = 0;
-        bp->b_dev.minor = 0;
+        bp->b_dev = 0;
         bp->b_addr = buffers[i];
         bp->b_next = bfreelist.b_next;
         bfreelist.b_next->b_prev = bp;

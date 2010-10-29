@@ -3,15 +3,15 @@
 ; do not edit
 
 [section .text]
-[global _int_restore_regs]
-[extern  int_common_handler]
+[global _hwint_restore_regs]
+[extern hwint_common]
 
 ;; 
 ;; this routine is called on each isr & irq is raised. store the current cpu state on the kernel stack.
 ;; kernel stack is pointed by the esp0 field inside tss.
 ;; 
 ;; the routine _int_restore_regs is just called from *swtch*. 
-_int_common_stub:
+_hwint_common_stub:
     pusha
     push dword ds
     push dword es
@@ -24,10 +24,10 @@ _int_common_stub:
     mov gs, ax
     mov eax, esp
     push eax                        ; esp is just the pointer to struct regs *.
-    mov eax, int_common_handler
+    mov eax, hwint_common
     call eax
     pop eax                         ; esp ignored
-_int_restore_regs:
+_hwint_restore_regs:
     pop dword gs
     pop dword fs
     pop dword es
@@ -42,903 +42,903 @@ _int_restore_regs:
       cli
       push  dword 0
       push  dword 0
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint1:
       cli
       push  dword 0
       push  dword 1
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint2:
       cli
       push  dword 0
       push  dword 2
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint3:
       cli
       push  dword 0
       push  dword 3
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint4:
       cli
       push  dword 0
       push  dword 4
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint5:
       cli
       push  dword 0
       push  dword 5
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint6:
       cli
       push  dword 0
       push  dword 6
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint7:
       cli
       push  dword 0
       push  dword 7
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint8:
       cli
       
       push  dword 8
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint9:
       cli
       
       push  dword 9
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint10:
       cli
       
       push  dword 10
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint11:
       cli
       
       push  dword 11
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint12:
       cli
       
       push  dword 12
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint13:
       cli
       
       push  dword 13
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint14:
       cli
       
       push  dword 14
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint15:
       cli
       push  dword 0
       push  dword 15
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint16:
       cli
       push  dword 0
       push  dword 16
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint17:
       cli
       
       push  dword 17
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint18:
       cli
       push  dword 0
       push  dword 18
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint19:
       cli
       push  dword 0
       push  dword 19
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint20:
       cli
       push  dword 0
       push  dword 20
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint21:
       cli
       push  dword 0
       push  dword 21
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint22:
       cli
       push  dword 0
       push  dword 22
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint23:
       cli
       push  dword 0
       push  dword 23
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint24:
       cli
       push  dword 0
       push  dword 24
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint25:
       cli
       push  dword 0
       push  dword 25
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint26:
       cli
       push  dword 0
       push  dword 26
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint27:
       cli
       push  dword 0
       push  dword 27
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint28:
       cli
       push  dword 0
       push  dword 28
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint29:
       cli
       push  dword 0
       push  dword 29
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint30:
       cli
       push  dword 0
       push  dword 30
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint31:
       cli
       push  dword 0
       push  dword 31
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint32:
       cli
       push  dword 0
       push  dword 32
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint33:
       cli
       push  dword 0
       push  dword 33
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint34:
       cli
       push  dword 0
       push  dword 34
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint35:
       cli
       push  dword 0
       push  dword 35
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint36:
       cli
       push  dword 0
       push  dword 36
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint37:
       cli
       push  dword 0
       push  dword 37
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint38:
       cli
       push  dword 0
       push  dword 38
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint39:
       cli
       push  dword 0
       push  dword 39
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint40:
       cli
       push  dword 0
       push  dword 40
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint41:
       cli
       push  dword 0
       push  dword 41
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint42:
       cli
       push  dword 0
       push  dword 42
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint43:
       cli
       push  dword 0
       push  dword 43
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint44:
       cli
       push  dword 0
       push  dword 44
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint45:
       cli
       push  dword 0
       push  dword 45
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint46:
       cli
       push  dword 0
       push  dword 46
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint47:
       cli
       push  dword 0
       push  dword 47
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint48:
       cli
       push  dword 0
       push  dword 48
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint49:
       cli
       push  dword 0
       push  dword 49
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint50:
       cli
       push  dword 0
       push  dword 50
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint51:
       cli
       push  dword 0
       push  dword 51
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint52:
       cli
       push  dword 0
       push  dword 52
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint53:
       cli
       push  dword 0
       push  dword 53
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint54:
       cli
       push  dword 0
       push  dword 54
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint55:
       cli
       push  dword 0
       push  dword 55
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint56:
       cli
       push  dword 0
       push  dword 56
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint57:
       cli
       push  dword 0
       push  dword 57
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint58:
       cli
       push  dword 0
       push  dword 58
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint59:
       cli
       push  dword 0
       push  dword 59
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint60:
       cli
       push  dword 0
       push  dword 60
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint61:
       cli
       push  dword 0
       push  dword 61
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint62:
       cli
       push  dword 0
       push  dword 62
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint63:
       cli
       push  dword 0
       push  dword 63
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint64:
       cli
       push  dword 0
       push  dword 64
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint65:
       cli
       push  dword 0
       push  dword 65
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint66:
       cli
       push  dword 0
       push  dword 66
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint67:
       cli
       push  dword 0
       push  dword 67
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint68:
       cli
       push  dword 0
       push  dword 68
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint69:
       cli
       push  dword 0
       push  dword 69
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint70:
       cli
       push  dword 0
       push  dword 70
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint71:
       cli
       push  dword 0
       push  dword 71
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint72:
       cli
       push  dword 0
       push  dword 72
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint73:
       cli
       push  dword 0
       push  dword 73
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint74:
       cli
       push  dword 0
       push  dword 74
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint75:
       cli
       push  dword 0
       push  dword 75
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint76:
       cli
       push  dword 0
       push  dword 76
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint77:
       cli
       push  dword 0
       push  dword 77
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint78:
       cli
       push  dword 0
       push  dword 78
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint79:
       cli
       push  dword 0
       push  dword 79
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint80:
       cli
       push  dword 0
       push  dword 80
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint81:
       cli
       push  dword 0
       push  dword 81
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint82:
       cli
       push  dword 0
       push  dword 82
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint83:
       cli
       push  dword 0
       push  dword 83
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint84:
       cli
       push  dword 0
       push  dword 84
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint85:
       cli
       push  dword 0
       push  dword 85
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint86:
       cli
       push  dword 0
       push  dword 86
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint87:
       cli
       push  dword 0
       push  dword 87
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint88:
       cli
       push  dword 0
       push  dword 88
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint89:
       cli
       push  dword 0
       push  dword 89
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint90:
       cli
       push  dword 0
       push  dword 90
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint91:
       cli
       push  dword 0
       push  dword 91
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint92:
       cli
       push  dword 0
       push  dword 92
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint93:
       cli
       push  dword 0
       push  dword 93
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint94:
       cli
       push  dword 0
       push  dword 94
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint95:
       cli
       push  dword 0
       push  dword 95
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint96:
       cli
       push  dword 0
       push  dword 96
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint97:
       cli
       push  dword 0
       push  dword 97
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint98:
       cli
       push  dword 0
       push  dword 98
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint99:
       cli
       push  dword 0
       push  dword 99
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint100:
       cli
       push  dword 0
       push  dword 100
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint101:
       cli
       push  dword 0
       push  dword 101
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint102:
       cli
       push  dword 0
       push  dword 102
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint103:
       cli
       push  dword 0
       push  dword 103
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint104:
       cli
       push  dword 0
       push  dword 104
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint105:
       cli
       push  dword 0
       push  dword 105
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint106:
       cli
       push  dword 0
       push  dword 106
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint107:
       cli
       push  dword 0
       push  dword 107
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint108:
       cli
       push  dword 0
       push  dword 108
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint109:
       cli
       push  dword 0
       push  dword 109
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint110:
       cli
       push  dword 0
       push  dword 110
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint111:
       cli
       push  dword 0
       push  dword 111
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint112:
       cli
       push  dword 0
       push  dword 112
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint113:
       cli
       push  dword 0
       push  dword 113
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint114:
       cli
       push  dword 0
       push  dword 114
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint115:
       cli
       push  dword 0
       push  dword 115
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint116:
       cli
       push  dword 0
       push  dword 116
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint117:
       cli
       push  dword 0
       push  dword 117
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint118:
       cli
       push  dword 0
       push  dword 118
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint119:
       cli
       push  dword 0
       push  dword 119
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint120:
       cli
       push  dword 0
       push  dword 120
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint121:
       cli
       push  dword 0
       push  dword 121
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint122:
       cli
       push  dword 0
       push  dword 122
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint123:
       cli
       push  dword 0
       push  dword 123
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint124:
       cli
       push  dword 0
       push  dword 124
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint125:
       cli
       push  dword 0
       push  dword 125
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint126:
       cli
       push  dword 0
       push  dword 126
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint127:
       cli
       push  dword 0
       push  dword 127
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
     _hwint128:
       cli
       push  dword 0
       push  dword 128
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   
 
 ; vector table

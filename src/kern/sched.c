@@ -73,7 +73,7 @@ void swtch_to(struct proc *to){
     current = to;
     asm volatile(
         "mov    %%eax, %%esp;"
-        "jmp    _int_restore_regs;"
+        "jmp    _hwint_restore_regs;"
         ::"a"(to->p_trap));
 }
 

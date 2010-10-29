@@ -83,10 +83,8 @@ void hwint_init(){
     set_syst_gate(0x04, _hwint[0x04]); // overflow
     set_syst_gate(0x05, _hwint[0x05]); // bound
     set_syst_gate(0x80, _hwint[0x80]); // syscall
-    //set_hwint(IRQ0+1, NULL);        
-    //set_hwint(IRQ0+2, NULL);        
-    //set_hwint(IRQ0+3, NULL);        
-    set_hwint(0x80,   &do_syscall);      // in syscall.c
+    // Each handler handled in his file.  
+    set_hwint(0x80, &do_syscall);      // in syscall.c
 }
 
 void flush_idt(struct idt_desc idtd){
@@ -115,7 +113,7 @@ static void irq_remap(){
 
 /**********************************************************************/
 
-void int_common_handler(struct trap_frame *tf) {
+void hwint_common(struct trap_frame *tf) {
     void (*handler)(struct trap_frame *tf);
     handler = int_routines[tf->int_no]; 
     if (current!=NULL) {

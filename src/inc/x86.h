@@ -193,6 +193,7 @@ extern struct tss_desc tss;
 
 /*****************************************************************************************************/
 
+/* inb & outb */
 static inline uchar inb(ushort port){
     uchar ret;
     asm volatile( "inb %1, %0" : "=a" (ret) : "dN" (port));
@@ -203,6 +204,7 @@ static inline void outb(ushort port, uchar data){
     asm volatile( "outb %1, %0" :: "dN" (port), "a" (data));
 }
 
+/* inw & outw */
 static inline uchar inw(ushort port){
     ushort ret;
     asm volatile( "inw %1, %0" : "=a" (ret) : "dN" (port));
@@ -211,6 +213,38 @@ static inline uchar inw(ushort port){
 
 static inline void outw(ushort port, ushort data){
     asm volatile( "outw %1, %0" :: "dN" (port), "a" (data));
+}
+
+/* insb & outsb */
+static inline void insb(uint port, void *addr, int cnt) {
+	asm volatile(
+            "cld;" "repne;" "insb"
+			 :"=D" (addr), "=c" (cnt)
+			 :"d" (port), "0" (addr), "1" (cnt)
+			 :"memory", "cc");
+}
+
+static inline void outsb(uint port, void *addr, int cnt) {
+	asm volatile("cld;" "repne;" "outsb"
+			 :"=S" (addr), "=c" (cnt)
+			 :"d" (port), "0" (addr), "1" (cnt)
+			 :"cc");
+}
+
+/* insl & outsl */
+static inline void insl(uint port, void *addr, int cnt) {
+	asm volatile(
+            "cld;" "repne;" "insl"
+			 :"=D" (addr), "=c" (cnt)
+			 :"d" (port), "0" (addr), "1" (cnt)
+			 :"memory", "cc");
+}
+
+static inline void outsl(uint port, void *addr, int cnt) {
+	asm volatile("cld;" "repne;" "outsl"
+			 :"=S" (addr), "=c" (cnt)
+			 :"d" (port), "0" (addr), "1" (cnt)
+			 :"cc");
 }
 
 /* load TSS into tr */

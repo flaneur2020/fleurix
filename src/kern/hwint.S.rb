@@ -3,15 +3,15 @@ puts %{
 ; do not edit
 
 [section .text]
-[global _int_restore_regs]
-[extern  int_common_handler]
+[global _hwint_restore_regs]
+[extern hwint_common]
 
 ;; 
 ;; this routine is called on each isr & irq is raised. store the current cpu state on the kernel stack.
 ;; kernel stack is pointed by the esp0 field inside tss.
 ;; 
 ;; the routine _int_restore_regs is just called from *swtch*. 
-_int_common_stub:
+_hwint_common_stub:
     pusha
     push dword ds
     push dword es
@@ -24,10 +24,10 @@ _int_common_stub:
     mov gs, ax
     mov eax, esp
     push eax                        ; esp is just the pointer to struct regs *.
-    mov eax, int_common_handler
+    mov eax, hwint_common
     call eax
     pop eax                         ; esp ignored
-_int_restore_regs:
+_hwint_restore_regs:
     pop dword gs
     pop dword fs
     pop dword es
@@ -46,7 +46,7 @@ NINT = 128
       cli
       #{'push  dword 0' if i!=17 and (i<8 or i>14)}
       push  dword #{i}
-      jmp   _int_common_stub
+      jmp   _hwint_common_stub
   }
 end
 

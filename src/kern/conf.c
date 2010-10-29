@@ -5,7 +5,7 @@
 
 #include <buf.h>
 #include <conf.h>
-#include <hdrw.h>
+#include <hd.h>
 
 struct bdevsw   bdevsw[] = {
     { &nulldev, &nulldev, &hd_req, &hdtab }

@@ -4,13 +4,29 @@
 #include <proc.h>
 #include <unistd.h>
 
+#include <buf.h>
+#include <conf.h>
+#include <hd.h>
+
+
 void main(){
     tty_init();         puts("* init tty\n");
     gdt_init();         puts("* init gdt\n");
     idt_init();         puts("* init idt\n");
     page_init();        puts("* init paging\n");
+    hd_init();          puts("* init hd\n");
     timer_init();       puts("* init timer\n");
     sched_init();       puts("* init sched\n");
+    
+    // debug hd here?
+
+    struct buf b;
+    b.b_blkno = 0;
+    b.b_flag |= B_READ;
+    hd_req(&b);
+
+    for(;;);
+
     // proc[0] arises now
     puts("* init user mode\n");
     asm volatile("sti;");
