@@ -2,39 +2,14 @@
 #include <x86.h>
 #include <kern.h>
 
-/**
- *  0x1000000   |---------------------------------------------- 16mb
- *              | 
- *              | Remapped physical memory, 
- *              | 
- *              | now HI_MEM, for user proc 
- *  0x100000    |---------------------------------------------- 1mb
- *              |
- *              | VGA, BIOS ROM and blah~
- *  0xa0000     |---------------------------------------------- 640kb
- *              | 
- *              |
- *              | kenel loads here
- *  0x10000     |---------------------------------------------- 64kb 
- *              |
- *              | boot.bin here. not used yet
- *  0x7c00      |---------------------------------------------- 31kb
- *              | 
- *              | page_dir and 4 page_tables, 20kb needed
- *  0x0000      |---------------------------------------------- 0
- *
- *
- *
- *
- * */
-
 uint la2pa(uint la);
 
-// there might be a TODO here... 16mb is so poor boy~
-// the ONLY page directory, 
-// which indicates the linear address space of 4GB
-// each proc have a address space of 64MB, which starts at pid*64mb
-uint *pdir = (uint *) 0x00000;
+/*
+ * the ONLY page directory, 
+ * which indicates the linear address space of 4GB
+ * each proc have a address space of 64MB, which starts at pid*64mb
+ * */
+uint *pgdir = (uint *) 0x00000;
 
 uchar frmmap[NFRAME] = {0, };
 
@@ -61,13 +36,13 @@ void do_wp_page(struct trap_frame *r){
  * Debugging this is a horrible memory. What a fuck.
  * */
 int put_page(uint la, uint pa, uint flag){
-    uint pde = pdir[PDX(la)];
+    uint pde = pgdir[PDX(la)];
     if (!(pde & PTE_P)){
         pde = palloc();
         if (pde==0){
             panic("no availible frame");
         }
-        pdir[PDX(la)] = pde | PTE_P | PTE_W | PTE_U;
+        pgdir[PDX(la)] = pde | PTE_P | PTE_W | PTE_U;
     }
     uint *ptab = (uint *)PTE_ADDR(pde);
     ptab[PTX(la)] = pa | flag;
@@ -88,7 +63,7 @@ int copy_ptab(uint src, uint dst, uint limit){
         pa = la2pa(src+off);
         put_page(dst+off, pa, PTE_P | PTE_W | PTE_U);
     }
-    flush_cr3(pdir);
+    flush_cr3(pgdir);
     return 0;
 }
 
@@ -99,7 +74,7 @@ int copy_ptab(uint src, uint dst, uint limit){
 
 // traverse a linear address to physical address
 uint la2pa(uint la){
-    uint pde = pdir[PDX(la)];
+    uint pde = pgdir[PDX(la)];
     if(!(pde & PTE_P)){
         printf("%x: ", la);
         panic("invalid pde\n");
@@ -167,7 +142,7 @@ void page_init(){
 	uint addr = 0; 
     for(i=0; i<4; i++){
         ptab = 0x1000 + 0x1000*i;
-        pdir[i] = (uint)ptab | PTE_P | PTE_W | PTE_U;
+        pgdir[i] = (uint)ptab | PTE_P | PTE_W | PTE_U;
         for(j=0; j<1024; j++) {
             ptab[j] = addr | PTE_P | PTE_W | PTE_U; 
             addr += 4096; // 4096 = 4kb
@@ -177,14 +152,14 @@ void page_init(){
 	// fill the rest of the page directory
     // attribute set to: supervisor level, read/write, not present(010 in binary)
 	for(i=4; i<1024; i++) {
-		pdir[i] = 0 | PTE_W | PTE_U; 
+		pgdir[i] = 0 | PTE_W | PTE_U; 
 	};
 
     // int handler
-    int_set_handler(0x0E, do_page_fault);
+    set_hwint(0x0E, do_page_fault);
 
     // write page directory to cr3 and enable PE on cr0
-    flush_cr3(pdir);
+    flush_cr3(pgdir);
     page_enable();
 }
 

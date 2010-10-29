@@ -1,26 +1,38 @@
+#include <param.h>
+#include <x86.h>
+#include <kern.h>
+#include <proc.h>
+
+#include <buf.h>
+#include <conf.h>
+#include <hdrw.h>
+
 /*
  * hdrw.c
  * This file implies the driver for hard disk.
  * */
 
-#include <param.h>
-#include <x86.h>
-#include <kern.h>
-#include <proc.h>
-#include <buf.h>
-
 struct devtab hdtab = { 0 , };
 
-int hdreq(){
+/*
+ * Send a request for the hard disk drive.
+ * */
+int hd_req(struct buf *bp){
 }
 
-int hdrw() {
+int do_hd_intr(){
 }
 
-int hdcmd(int c, int h, int s, int ns, uint addr) {
+int hd_cmd(uint drv, uint lba, uint cmd) {
 }
 
-int hdinit(){
+void hd_wait_ready(){
+}
+
+void hd_init(){
+    // Allow the hard disk controller invoking interrupts.
+    outb(0x21, inb(0x21) & 0xFB);
+    outb(0xA1, inb(0xA1) & 0xBF);
 }
 
 /******************************************************/
@@ -32,3 +44,4 @@ int nulldev(){
 /* it should raise an ENODEV error when being called.*/
 int nodev(){
 }
+

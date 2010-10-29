@@ -72,7 +72,7 @@ struct seg_desc {
 struct gdt_desc {
     ushort      limit;
     uint        base;
-} __attribute__((packed));     
+} __attribute__((packed));
 
 // on Paging
 
@@ -213,7 +213,7 @@ static inline void outw(ushort port, ushort data){
     asm volatile( "outw %1, %0" :: "dN" (port), "a" (data));
 }
 
-// load each proc's TSS into tr
+/* load TSS into tr */
 static inline void ltr(uint n){
     asm volatile("ltr %%ax"::"a"(n));
 }

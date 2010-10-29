@@ -75,8 +75,10 @@ uint get_seg_base(struct seg_desc *seg){
 
 /******************************************************************/
 
-// refill the gdt
-// each proc have one idt
+/* 
+ * refill the gdt(the ex-gdt initialized in boot/boot.S)
+ * each proc have one ldt, and shared one tss.
+ */
 void gdt_init(){
     set_seg(&gdt[1], 0, 0xffffffff, 0, STA_X | STA_R);
     set_seg(&gdt[2], 0, 0xffffffff, 0, STA_W);

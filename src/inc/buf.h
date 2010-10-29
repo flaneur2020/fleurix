@@ -14,10 +14,8 @@ struct buf {
     struct devno    b_dev;
     uint            b_blkno;
     uint            b_addr;
-    uint            b_xmem;
     uint            b_wcount;
     char            b_error;
-    uint            b_resid;
 };
 
 extern struct buf   buf[NBUF];

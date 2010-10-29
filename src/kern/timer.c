@@ -13,11 +13,12 @@ void do_timer(struct regs *r){
     }
 }
 
+/* Initialize PIC */
 void timer_init(){
     uint di = 1193180/HZ;
     outb(0x43, 0x36);
     outb(0x40, (uchar)(di&0xff));
     outb(0x40, (uchar)(di>>8));
     outb(0x21, inb(0x21)&0xfe);
+    set_hwint(IRQ0+0, &do_timer);
 }
-

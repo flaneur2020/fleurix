@@ -18,4 +18,5 @@ SECTIONS {
         . = ALIGN(4096);
     }
     __end__ = .;
+    buffers = 0x100000;
 }

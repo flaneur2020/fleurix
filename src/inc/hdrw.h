@@ -2,7 +2,7 @@
 
 extern struct devtab hdtab;
 
-int hdreq();
+int hd_req();
 
 int nulldev();
 int nodev();

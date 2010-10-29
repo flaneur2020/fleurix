@@ -54,25 +54,25 @@ static char *fault_messages[] = {
 
 /****************************************************************************/
 
-void idt_set_gate(uint num, uint base, ushort sel, uchar type, uchar dpl) {
-    idt[num].base_lo    = (base & 0xFFFF);
-    idt[num].base_hi    = (base >> 16) & 0xFFFF;
-    idt[num].sel        = sel;
-    idt[num].dpl        = dpl;
-    idt[num].type       = type;
-    idt[num].always0    = 0;
-    idt[num].p          = 1;
-    idt[num].sys        = 0;
+void idt_set_gate(uint nr, uint base, ushort sel, uchar type, uchar dpl) {
+    idt[nr].base_lo    = (base & 0xFFFF);
+    idt[nr].base_hi    = (base >> 16) & 0xFFFF;
+    idt[nr].sel        = sel;
+    idt[nr].dpl        = dpl;
+    idt[nr].type       = type;
+    idt[nr].always0    = 0;
+    idt[nr].p          = 1;
+    idt[nr].sys        = 0;
 }
 
-void set_syst_gate(uint num, uint base){
-    idt_set_gate(num, base, KERN_CS, STS_TRG, 3);
+static inline void set_syst_gate(uint nr, uint base){
+    idt_set_gate(nr, base, KERN_CS, STS_TRG, 3);
 }
-void set_intr_gate(uint num, uint base){
-    idt_set_gate(num, base, KERN_CS, STS_IG, 0);
+static inline void set_intr_gate(uint nr, uint base){
+    idt_set_gate(nr, base, KERN_CS, STS_IG, 0);
 }
-void set_trap_gate(uint num, uint base){
-    idt_set_gate(num, base, KERN_CS, STS_TRG, 0);
+static inline void set_trap_gate(uint nr, uint base){
+    idt_set_gate(nr, base, KERN_CS, STS_TRG, 0);
 }
 
 void hwint_init(){
@@ -83,11 +83,10 @@ void hwint_init(){
     set_syst_gate(0x04, _hwint[0x04]); // overflow
     set_syst_gate(0x05, _hwint[0x05]); // bound
     set_syst_gate(0x80, _hwint[0x80]); // syscall
-    int_set_handler(IRQ0+0, &do_timer);        // in timer.c
-    //int_set_handler(IRQ0+1, NULL);        
-    //int_set_handler(IRQ0+2, NULL);        
-    //int_set_handler(IRQ0+3, NULL);        
-    int_set_handler(0x80,   &do_syscall);      // in syscall.c
+    //set_hwint(IRQ0+1, NULL);        
+    //set_hwint(IRQ0+2, NULL);        
+    //set_hwint(IRQ0+3, NULL);        
+    set_hwint(0x80,   &do_syscall);      // in syscall.c
 }
 
 void flush_idt(struct idt_desc idtd){
@@ -148,8 +147,8 @@ void int_common_handler(struct trap_frame *tf) {
     }
 }
 
-void int_set_handler(int num, void (*handler)(struct trap_frame *tf)){
-    int_routines[num] = handler;
+void set_hwint(int nr, void (*handler)(struct trap_frame *tf)){
+    int_routines[nr] = handler;
 }
 
 /***********************************************************************************/

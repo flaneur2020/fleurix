@@ -21,9 +21,6 @@ typedef unsigned int    uint;
 #define PSIZE 0x1000
 #define NFRAME ((HI_MEM-LO_MEM)/PSIZE)
 
-#define NBUF 512
-
-
 #define KERN_CS 0x08
 #define KERN_DS 0x10
 #define USER_CS (0x08|3)
@@ -38,5 +35,7 @@ typedef unsigned int    uint;
 // main Mem(which procs live in) is 16mb, locates in LO_MEM~HI_MEM 
 #define LO_MEM 0x100000
 #define HI_MEM 0x1000000
+
+#define NBUF ((HI_MEM-LO_MEM)/512)
 
 #endif
