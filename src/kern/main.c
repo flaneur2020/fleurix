@@ -22,12 +22,7 @@ void main(){
     asm volatile("sti;");
     
     // debug hd here?
-    struct buf b;
-    b.b_blkno = 0;
-    b.b_flag |= B_READ;
-    hd_request(&b);
 
-    for(;;); 
     umode_init();
 
     if(fork()){

@@ -66,18 +66,18 @@ static char *fault_messages[] = {
 #define IRQ_SLAVE 2
 
 /*
- * If you do not remap irq, a Double Fault comes along with every interrupt.
- * 0  -> 32, 15 -> 47
+ * Remap the irq and initialize the IRQ mask. 
  *
- * 0x21 and 0xA1 are registers for irq mask. Which irq the bit is 0 are enabled.
+ * note:If you do not remap irq, a Double Fault comes along with every interrupt.
+ * Register 0xA1 and 0x21 are the hi/lo bytes of irq mask, respectively. 
  * */
-static void irq_remap(){
+static void irq_init(){
     outb(0x20, 0x11);
     outb(0xA0, 0x11);
-    outb(0x21, 0x20);
-    outb(0xA1, 0x28);
-    outb(0x21, 0x04);
-    outb(0xA1, 0x02);
+    outb(0x21, 0x20); // offset 1
+    outb(0xA1, 0x28); // offset 2
+    outb(0x21, 4); 
+    outb(0xA1, 2);
     outb(0x21, 0x01);
     outb(0xA1, 0x01);
     /* Initialize IRQ mask has interrupt 2 enabled. */
@@ -87,7 +87,7 @@ static void irq_remap(){
 }
 
 void irq_enable(uchar irq){
-    ushort irq_mask = inb(PIC2+1)<<8 + inb(PIC1+1);
+    ushort irq_mask = (inb(PIC2+1)<<8) + inb(PIC1+1);
     irq_mask &= ~(1<<irq);
     outb(PIC1+1, irq_mask);
     outb(PIC2+1, irq_mask >> 8);
@@ -196,7 +196,7 @@ void idt_init(){
     idt_desc.limit = (sizeof (struct gate_desc) * 256) - 1;
     idt_desc.base = &idt;
     // init irq
-    irq_remap();
+    irq_init();
     // load intr vectors and lidt 
     hwint_init();
     flush_idt(idt_desc);

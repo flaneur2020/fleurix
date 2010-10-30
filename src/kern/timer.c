@@ -20,6 +20,6 @@ void timer_init(){
     outb(0x40, (uchar)(di&0xff));
     outb(0x40, (uchar)(di>>8));
     //outb(0x21, inb(0x21)&0xfe);
-    //irq_enable(0);
+    irq_enable(0);
     set_hwint(IRQ0+0, &do_timer);
 }
