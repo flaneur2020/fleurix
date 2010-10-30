@@ -12,7 +12,7 @@ struct idt_desc    idt_desc;
 
 // handlers to each int_no
 // which inited as 0
-static uint int_routines[256] = {0, }; 
+static uint hwint_routines[256] = {0, }; 
 
 static char *fault_messages[] = {
     "Division By Zero",
@@ -51,6 +51,47 @@ static char *fault_messages[] = {
     "Reserved",
     "Reserved"
 };
+
+
+/**********************************************************************/
+
+#define PIC1 0x20
+#define PIC2 0xA0
+
+#define PIC1_CMD PIC1
+#define PIC2_CMD PIC2
+#define PIC1_DATA (PIC1+1)
+#define PIC2_DATA (PIC2+1)
+
+#define IRQ_SLAVE 2
+
+/*
+ * If you do not remap irq, a Double Fault comes along with every interrupt.
+ * 0  -> 32, 15 -> 47
+ *
+ * 0x21 and 0xA1 are registers for irq mask. Which irq the bit is 0 are enabled.
+ * */
+static void irq_remap(){
+    outb(0x20, 0x11);
+    outb(0xA0, 0x11);
+    outb(0x21, 0x20);
+    outb(0xA1, 0x28);
+    outb(0x21, 0x04);
+    outb(0xA1, 0x02);
+    outb(0x21, 0x01);
+    outb(0xA1, 0x01);
+    /* Initialize IRQ mask has interrupt 2 enabled. */
+    outb(PIC1+1, 0xFF);
+    outb(PIC2+1, 0xFF);
+    irq_enable(2);
+}
+
+void irq_enable(uchar irq){
+    ushort irq_mask = inb(PIC2+1)<<8 + inb(PIC1+1);
+    irq_mask &= ~(1<<irq);
+    outb(PIC1+1, irq_mask);
+    outb(PIC2+1, irq_mask >> 8);
+}
 
 /****************************************************************************/
 
@@ -95,27 +136,9 @@ void flush_idt(struct idt_desc idtd){
 
 /**********************************************************************/
 
-// if you do not remap irq, a Double Fault comes along with every intrupt
-// 0  -> 32
-// 15 -> 47
-static void irq_remap(){
-    outb(0x20, 0x11);
-    outb(0xA0, 0x11);
-    outb(0x21, 0x20);
-    outb(0xA1, 0x28);
-    outb(0x21, 0x04);
-    outb(0xA1, 0x02);
-    outb(0x21, 0x01);
-    outb(0xA1, 0x01);
-    outb(0x21, 0x0);
-    outb(0xA1, 0x0);
-}
-
-/**********************************************************************/
-
 void hwint_common(struct trap_frame *tf) {
     void (*handler)(struct trap_frame *tf);
-    handler = int_routines[tf->int_no]; 
+    handler = hwint_routines[tf->int_no]; 
     if (current!=NULL) {
         current->p_trap = tf;
     }
@@ -123,14 +146,15 @@ void hwint_common(struct trap_frame *tf) {
     if (tf->int_no < 32) {
         if (handler){
             handler(tf);
-            return;
         }
-        printf("Exception: %s \n", fault_messages[tf->int_no]);
-        debug_regs(tf);
-        for(;;);
+        else {
+            printf("hwint_common: unhandled exception: %s \n", fault_messages[tf->int_no]);
+            debug_regs(tf);
+            for(;;);
+        }
     }
     // irq, syscall and blah~
-    if (tf->int_no >= 32) {
+    else {
         if (tf->int_no >= 40) {
             outb(0xA0, 0x20);
         }
@@ -146,7 +170,7 @@ void hwint_common(struct trap_frame *tf) {
 }
 
 void set_hwint(int nr, void (*handler)(struct trap_frame *tf)){
-    int_routines[nr] = handler;
+    hwint_routines[nr] = handler;
 }
 
 /***********************************************************************************/

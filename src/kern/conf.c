@@ -8,6 +8,6 @@
 #include <hd.h>
 
 struct bdevsw   bdevsw[] = {
-    { &nulldev, &nulldev, &hd_req, &hdtab }
+    { &nulldev, &nulldev, &hd_request, &hdtab }
 };
 
