@@ -74,8 +74,8 @@ static char *fault_messages[] = {
 static void irq_init(){
     outb(0x20, 0x11);
     outb(0xA0, 0x11);
-    outb(0x21, 0x20); // offset 1
-    outb(0xA1, 0x28); // offset 2
+    outb(0x21, IRQ0); // offset 1, 0-7
+    outb(0xA1, IRQ0+8); // offset 2, 7-15
     outb(0x21, 4); 
     outb(0xA1, 2);
     outb(0x21, 0x01);

@@ -140,8 +140,6 @@ struct page_desc {
  * idt and trap frame
  */
 
-#define IRQ0 32
-
 struct gate_desc {
     uint        base_lo :16;        // low address
     uint        sel     :16;        // selector

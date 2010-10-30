@@ -1,5 +1,4 @@
 /**
- *
  * Constants and blah~
  *
  * _Fleurer<me.ssword@gmail.com>
@@ -25,6 +24,8 @@ typedef unsigned int    uint;
 #define KERN_DS 0x10
 #define USER_CS (0x08|3)
 #define USER_DS (0x10|3)
+
+#define IRQ0 32
 
 #define TSS0 5
 #define _TSS (TSS0<<3)
