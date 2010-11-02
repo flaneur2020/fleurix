@@ -62,6 +62,5 @@ void buf_init() {
         bp->b_flag = B_BUSY;
         brelse(bp);
     }
-    
 }
 

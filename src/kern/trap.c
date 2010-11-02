@@ -143,7 +143,7 @@ void flush_idt(struct idt_desc idtd){
 
 /*
  * The comman handler for all IRQ request as a dispatcher. Each irq 
- * handler were held inside *hwint_routines*.
+ * handler were held inside the array *hwint_routines*.
  *
  * note: While an IRQ were recieved, we have to notice the 8259 chip
  * that End of Interrupt via a PIC_EOI. If the IRQ came from the Master 
