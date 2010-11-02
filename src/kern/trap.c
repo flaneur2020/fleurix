@@ -63,24 +63,29 @@ static char *fault_messages[] = {
 #define PIC1_DATA (PIC1+1)
 #define PIC2_DATA (PIC2+1)
 
+#define PIC_EOI 0x20
+
 #define IRQ_SLAVE 2
 
 /*
  * Remap the irq and initialize the IRQ mask. 
  *
- * note:If you do not remap irq, a Double Fault comes along with every interrupt.
- * Register 0xA1 and 0x21 are the hi/lo bytes of irq mask, respectively. 
+ * note:If you do not remap irq, a Double Fault comes 
+ * along with every interrupt.
+ * After initialization, register 0xA1 and 0x21 are the 
+ * hi/lo bytes of irq mask, respectively. 
  * */
 static void irq_init(){
-    outb(0x20, 0x11);
-    outb(0xA0, 0x11);
-    outb(0x21, IRQ0); // offset 1, 0-7
-    outb(0xA1, IRQ0+8); // offset 2, 7-15
-    outb(0x21, 4); 
-    outb(0xA1, 2);
-    outb(0x21, 0x01);
-    outb(0xA1, 0x01);
-    /* Initialize IRQ mask has interrupt 2 enabled. */
+    // hard coded, don't touch.
+    outb(PIC1, 0x11);
+    outb(PIC2, 0x11);
+    outb(PIC1+1, IRQ0); // offset 1, 0-7
+    outb(PIC2+1, IRQ0+8); // offset 2, 7-15
+    outb(PIC1+1, 4); 
+    outb(PIC2+1, 2);
+    outb(PIC1+1, 0x01);
+    outb(PIC2+1, 0x01);
+    // Initialize IRQ mask has interrupt 2 enabled.
     outb(PIC1+1, 0xFF);
     outb(PIC2+1, 0xFF);
     irq_enable(2);
@@ -136,6 +141,16 @@ void flush_idt(struct idt_desc idtd){
 
 /**********************************************************************/
 
+/*
+ * The comman handler for all IRQ request as a dispatcher. Each irq 
+ * handler were held inside *hwint_routines*.
+ *
+ * note: While an IRQ were recieved, we have to notice the 8259 chip
+ * that End of Interrupt via a PIC_EOI. If the IRQ came from the Master 
+ * PIC, it is sufficient to issue this command only to the Master PIC; 
+ * however if the IRQ came from the Slave PIC, it is necessary to issue 
+ * the command to both PIC chips.
+ * */
 void hwint_common(struct trap_frame *tf) {
     void (*handler)(struct trap_frame *tf);
     handler = hwint_routines[tf->int_no]; 
@@ -155,10 +170,10 @@ void hwint_common(struct trap_frame *tf) {
     }
     // irq, syscall and blah~
     else {
+        outb(PIC1, PIC_EOI);
         if (tf->int_no >= 40) {
-            outb(0xA0, 0x20);
+            outb(PIC2, PIC_EOI);
         }
-        outb(0x20, 0x20);
         if (handler){
             handler(tf);
         }
