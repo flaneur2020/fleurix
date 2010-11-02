@@ -9,6 +9,7 @@
 
 /*
  * hd.c - driver for the hard disk.
+ * Ingore the second ide drive right now.
  * 
  * Many constants, refered from http://wiki.osdev.org/IDE.
  * Thanks buddy.
@@ -76,6 +77,7 @@ int hd_request(struct buf *bp){
     }
 }
 
+/* Interrupt handler of the hard disk drive. */
 int do_hd_intr(struct trap_frame *tf){
     puts("do_hd_intr: got data\n");
 }
