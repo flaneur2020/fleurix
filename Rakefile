@@ -65,9 +65,9 @@ cfiles = [
   'src/kern/page.c',
   'src/kern/timer.c',
   #
-  'src/kern/bio.c',
-  'src/kern/conf.c',
-  'src/kern/hd.c',
+  'src/fs/buf.c',
+  'src/fs/conf.c',
+  'src/fs/hd.c',
   #
   'src/kern/main.c'
 ]
