@@ -3,13 +3,13 @@
 struct bdevsw {
     int             (*d_open)(); 
     int             (*d_close)();
-    int             (*d_req)();
+    int             (*d_request)();
     struct devtab    *d_tab;
 };
 
 extern struct bdevsw    bdevsw[];   
 
-int nblkdev;
+extern int nblkdev;
 
 struct cdevsw {
     int             (*d_open)();

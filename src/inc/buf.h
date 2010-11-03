@@ -6,10 +6,9 @@ struct buf {
     struct buf      *b_prev;
     struct buf      *av_next;
     struct buf      *av_prev;
-    ushort          b_dev;
+    int             b_dev;
     uint            b_blkno;
     uint            b_addr;
-    uint            b_wcount;
     char            b_error;
 };
 
@@ -25,14 +24,17 @@ extern struct buf   buf[NBUF];
  * of the IO queue for the device.
  * Various routines in bio.c look at b_head/b_tail
  * but the rest is private to each device driver. 
+ *
+ * note: Little trick here, devtab's header can be also 
+ * visited via a struct buf *.
  * */
 struct devtab {
-    char            d_active;           /* busy flags */
-    char            d_errcnt;           /* error count (for recovery) */
+    uint            d_flag;             /* busy flags */
     struct buf      *b_head;            /* first buf for this dev */
     struct buf      *b_tail;            /* last  buf for this dev */
     struct buf      *av_head;           /* head of IO queue */
     struct buf      *av_tail;           /* tail of IO queue */
+    uint            d_errcnt;           /* error count (for recovery) */
 };
 
 /*
