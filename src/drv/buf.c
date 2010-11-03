@@ -72,6 +72,8 @@ void bwrite(struct buf *bp) {
 /*
  * initialize the buffer IO system by freeing all buffers
  * and setting all device buffer lists to empty.
+ *
+ * TODO: buf seems overflowed...
  * */
 void buf_init() {
     uint i=0;
@@ -82,16 +84,18 @@ void buf_init() {
     bfreelist.b_prev = bfreelist.b_next = &bfreelist;
     bfreelist.av_prev = bfreelist.av_next = &bfreelist;
     for(i=0; i<NBUF; i++){
-        bp = &buf[i];
+        bp = &buf[i]; 
         bp->b_dev = 0;
         bp->b_addr = buffers[i];
+        printf("%x\n", bp);
+        /*
         bp->b_next = bfreelist.b_next;
         bfreelist.b_next->b_prev = bp;
         bp->b_flag = B_BUSY;
-        brelse(bp);
+        brelse(bp); */
     }
 
-    panic("");
+    for(;;);
     return;
     nblkdev = 0;
     for(bsp=&bdevsw[0]; bsp->d_open!=0; bsp++){
