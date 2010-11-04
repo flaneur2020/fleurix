@@ -1,11 +1,3 @@
-/**
- *
- * just misc right now
- *
- * _Fleurer<me.ssword@gmail.com>
- *
- * */ 
-
 #ifndef PROC_H
 #define PROC_H
 
@@ -27,7 +19,9 @@ struct proc {
     struct trap_frame  *p_trap;
 };
 
-extern struct proc      *current;
+extern struct proc *proc[NPROC];
+
+extern struct proc *current;
 
 // stat codes
 #define SSLEEP      1           // sleeping on high priority

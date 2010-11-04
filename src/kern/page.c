@@ -11,7 +11,7 @@ uint la2pa(uint la);
  * */
 uint *pgdir = (uint *) 0x00000;
 
-uchar frmmap[NFRAME] = {0, };
+uchar frmmap[NPAGE] = {0, };
 
 /**************************************************************/
 
@@ -94,7 +94,7 @@ uint la2pa(uint la){
 // if no frame availible, return 0
 uint palloc(){
     int i;
-    for(i=0; i<NFRAME; i++){
+    for(i=0; i<NPAGE; i++){
         if(frmmap[i]==0){
             frmmap[i] = 1;
             return LO_MEM + i*4096;

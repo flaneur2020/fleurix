@@ -87,16 +87,12 @@ void buf_init() {
         bp = &buf[i]; 
         bp->b_dev = 0;
         bp->b_addr = buffers[i];
-        printf("%x\n", bp);
-        /*
         bp->b_next = bfreelist.b_next;
         bfreelist.b_next->b_prev = bp;
         bp->b_flag = B_BUSY;
-        brelse(bp); */
+        brelse(bp);
     }
 
-    for(;;);
-    return;
     nblkdev = 0;
     for(bsp=&bdevsw[0]; bsp->d_open!=0; bsp++){
         dtp = bsp->d_tab;
@@ -106,6 +102,5 @@ void buf_init() {
         dtp->av_tail = (struct buf *) dtp;
         nblkdev++;
     }
-    printf("buf_init(): nblkdev=\n", nblkdev);
 }
 
