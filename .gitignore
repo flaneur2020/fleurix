@@ -4,5 +4,5 @@
 bin/*
 src/intv.S
 .bochsout
-main.nmtab
+main.symtab
 tags
