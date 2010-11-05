@@ -23,6 +23,11 @@ task :clean do
   sh "rm -rf bin/* src/kern/hwint.S .bochsout"
 end
 
+## helpers ##
+task :todo do 
+  sh "grep -r -n 'TODO' ./src --color"
+end
+
 #######################################################################
 # => kernel.img
 #######################################################################

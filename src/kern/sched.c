@@ -4,11 +4,11 @@
 #include <proc.h>
 
 // one page size, stores some info on proc[0] and its kernel stack
-// NOTE: inialized as 0!
-uchar           kstack0[1024] = {0, };
+// note: inialized as 0.
+uchar kstack0[1024] = {0, };
 
-struct proc     *proc[NPROC] = {NULL, };
-struct proc     *current = NULL;
+struct proc *proc[NPROC] = {NULL, };
+struct proc *current = NULL;
 
 struct tss_desc tss;
 
@@ -64,6 +64,8 @@ _do_find:
  * switch the kernel task, and do a IRET. We assume that every task switching just occured in a trap routine,
  * and all the state stuff have been pushed in right place. Note that when a IRQ raised, CPU fetch the cs & 
  * eip from IDT, while ss0 & esp0 from the current TSS.
+ *
+ * TODO: bug here.
  * */
 void swtch_to(struct proc *to){
     // printf("from: %x, to: %x\n", current, to);
