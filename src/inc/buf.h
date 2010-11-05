@@ -30,10 +30,10 @@ extern struct buf   buf[NBUF];
  * */
 struct devtab {
     uint            d_flag;             /* busy flags */
-    struct buf      *b_head;            /* first buf for this dev */
-    struct buf      *b_tail;            /* last  buf for this dev */
-    struct buf      *av_head;           /* head of IO queue */
-    struct buf      *av_tail;           /* tail of IO queue */
+    struct buf      *b_next;            /* first buf for this dev */
+    struct buf      *b_prev;            /* last  buf for this dev */
+    struct buf      *av_next;           /* head of IO queue */
+    struct buf      *av_prev;           /* tail of IO queue */
     uint            d_errcnt;           /* error count (for recovery) */
 };
 

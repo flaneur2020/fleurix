@@ -19,25 +19,98 @@ int nblkdev = 0;
 
 /**********************************************/
 
-/* TODO: here. */
-struct buf* getblk(ushort devno, uint blkno){
+/* See if the block is associated with some buffer. */
+struct buf* incore(ushort dev, uint blkno){
+    struct devtab *dp;
+    struct buf *bp;
+
+    dp = bdevsw[MAJOR(dev)].d_tab;
+    for (bp=dp->b_next; bp!=(struct buf*)dp; bp = bp->b_next){
+        if (bp->b_dev==dev && bp->b_blkno==blkno) {
+            return bp;
+        }
+    }
+    return NULL;
 }
 
-/* buffer release */
+/* TODO: ignored the DELWRI scenary. */
+struct buf* getblk(int dev, uint blkno){
+    struct buf *bp;
+    struct devtab *dp;
+
+    if (MAJOR(dev) >= nblkdev) {
+        panic("error devno.");
+    }
+
+_loop: 
+    if (dev < 0){
+        dp = (struct devtab*) &bfreelist;
+    }
+    else {
+        dp = bdevsw[MAJOR(dev)].d_tab;
+        if (dp==NULL){
+            panic("error devtab.");
+        }
+        // 1. found in the dev's cache list
+        if (bp=incore(dev, blkno)) {
+            // 2. found in the dev's cache list but busy
+            if (bp->b_flag &= B_BUSY) {
+                bp->b_flag |= B_WANTED;
+                sleep(bp);
+                goto _loop;
+            } 
+            notavail(bp);
+            return bp;
+        }
+    }
+    // 3. not found in the dev's cache list, and free list is empty
+    if (bfreelist.av_next==&bfreelist) {
+        bfreelist.b_flag |= B_WANTED;
+        sleep(&bfreelist);
+        goto _loop;
+    }
+    // 4. feel free to take something from the free list.
+    notavail(bp = bfreelist.av_next);
+    // take it from the dev's cache list and 
+    bp->b_prev->b_next = bp->b_next;
+    bp->b_next->b_prev = bp->b_prev;
+    bp->b_next = dp->b_next;
+    bp->b_prev = (struct buf *)dp;
+    // insert it into the target dev's cache list's head.
+    dp->b_next = bp;
+    dp->b_next->b_prev = bp;
+    bp->b_dev = dev;
+    bp->b_blkno = blkno;
+    return bp;
+}
+
+/* Release the buffer, with no IO implied.
+ * Aka put the buffer back into the freelist.
+ * */
 void brelse(struct buf *bp){
+    struct buf *tmp;
+
     if (bp->b_flag & B_WANTED) {
         wakeup(bp);
     }
     if (bfreelist.b_flag & B_WANTED) {
         bfreelist.b_flag &= ~B_WANTED;
+        wakeup(&bfreelist);
     }
-}
-
-/* */
-int incore(ushort devno, uint blkno){
+    bp->b_flag &= ~(B_WANTED|B_BUSY|B_ASYNC);
+    bp->av_next = &bfreelist;
+    bp->av_prev = bfreelist.av_prev;
+    bp->av_prev->av_next = bp;
 }
 
 /**********************************************/
+
+/* Unlink a buffer from the free list and mark it busy.*/
+void notavail(struct buf *bp){
+    bp->av_prev->av_next = bp->av_prev;
+    bp->av_next->av_prev = bp->av_next;
+    bp->b_flag |= B_BUSY;
+}
 
 void iowait(struct buf *bp){
     sleep(bp);
@@ -73,7 +146,6 @@ void bwrite(struct buf *bp) {
  * initialize the buffer IO system by freeing all buffers
  * and setting all device buffer lists to empty.
  *
- * TODO: buf seems overflowed...
  * */
 void buf_init() {
     uint i=0;
@@ -85,10 +157,8 @@ void buf_init() {
     bfreelist.av_prev = bfreelist.av_next = &bfreelist;
     for(i=0; i<NBUF; i++){
         bp = &buf[i]; 
-        bp->b_dev = 0;
+        bp->b_dev = -1;
         bp->b_addr = buffers[i];
-        bp->b_next = bfreelist.b_next;
-        bfreelist.b_next->b_prev = bp;
         bp->b_flag = B_BUSY;
         brelse(bp);
     }
@@ -96,10 +166,8 @@ void buf_init() {
     nblkdev = 0;
     for(bsp=&bdevsw[0]; bsp->d_open!=0; bsp++){
         dtp = bsp->d_tab;
-        dtp->b_head = (struct buf *) dtp;
-        dtp->b_tail = (struct buf *) dtp;
-        dtp->av_head = (struct buf *) dtp;
-        dtp->av_tail = (struct buf *) dtp;
+        dtp->b_next  = dtp->b_prev  = (struct buf *) dtp;
+        dtp->av_next = dtp->av_prev = (struct buf *) dtp;
         nblkdev++;
     }
 }
