@@ -30,6 +30,6 @@ fullscreen: enabled=0
 screenmode: name="sample"
 keyboard_mapping: enabled=0, map=
 
-debug_symbols: file=main.symtab
+debug_symbols: file=main.sym
 
 #keyboard_type: at
