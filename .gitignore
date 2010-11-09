@@ -2,7 +2,7 @@
 *.img
 *.o
 bin/*
-src/intv.S
+src/kern/hwint.S
 .bochsout
 main.sym
 tags
