@@ -96,7 +96,7 @@ ofiles = (cfiles + sfiles).map{|fn| 'bin/'+File.basename(fn).ext('o') }
 cfiles.each do |fn_c|
   fn_o = 'bin/'+File.basename(fn_c).ext('o')
   file fn_o => [fn_c, *hfiles] do
-    sh "gcc #{cflag} #{cinc} -o #{fn_o} -c #{fn_c} 2>&1 | #{pgrep}"
+    sh "gcc #{cflag} #{cinc} -o #{fn_o} -c #{fn_c} 2>&1"
   end
 end
 
