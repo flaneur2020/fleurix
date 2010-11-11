@@ -1,5 +1,6 @@
 cinc   = '-Isrc/inc'
 cflag  = "-Wall -finline-functions -nostdinc -fno-builtin"
+pgrep  = "grep --color -e 'error' -e 'error' -e '^'"
 
 sh "mkdir bin" if not File.exists? 'bin'
 
@@ -53,11 +54,19 @@ end
 
 hfiles = [
   'src/inc/buf.h',
-  'src/inc/conf.h',
   'src/inc/kern.h',
   'src/inc/param.h',
   'src/inc/proc.h',
   'src/inc/unistd.h',
+  #
+  'src/inc/conf.h',
+  'src/inc/hd.h',
+  # 
+  'src/inc/idt.h',
+  'src/inc/gdt.h',
+  'src/inc/mmu.h',
+  'src/inc/tss.h',
+  'src/inc/asm.h',
   'src/inc/x86.h'
 ]
 
@@ -87,7 +96,7 @@ ofiles = (cfiles + sfiles).map{|fn| 'bin/'+File.basename(fn).ext('o') }
 cfiles.each do |fn_c|
   fn_o = 'bin/'+File.basename(fn_c).ext('o')
   file fn_o => [fn_c, *hfiles] do
-    sh "gcc #{cflag} #{cinc} -o #{fn_o} -c #{fn_c} 2>&1"
+    sh "gcc #{cflag} #{cinc} -o #{fn_o} -c #{fn_c} 2>&1 | #{pgrep}"
   end
 end
 
