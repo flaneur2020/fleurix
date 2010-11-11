@@ -1,6 +1,3 @@
-#ifndef PARAM_H
-#define PARAM_H
-
 #define NSYSC 64
 #define NPROC 64
 #define NSEG  (4+NPROC+1)
@@ -15,11 +12,11 @@
 #define PAGE 0x1000
 #define NPAGE ((HI_MEM-LO_MEM)/PAGE)
 
+/* clock intervals 1000/10 times per second*/
+#define HZ 10
 
 typedef unsigned char   uchar;
 typedef unsigned short  ushort;
 typedef unsigned int    uint;
 
 #define NULL ((void*)0)
-
-#endif

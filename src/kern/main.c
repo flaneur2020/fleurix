@@ -23,6 +23,8 @@ void main(){
     asm volatile("sti;");
     umode_init();
 
+    for(;;);
+
     if(fork()){
         while(1) asm("int $0x80"::"a"(1),"b"(0));
     }
