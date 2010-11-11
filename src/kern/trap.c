@@ -192,11 +192,11 @@ void set_hwint(int nr, void (*handler)(struct trap_frame *tf)){
 
 void debug_regs(struct trap_frame *tf){
     printf("gs = %x, fs = %x, es = %x, ds = %x\n", tf->gs, tf->fs, tf->es, tf->ds);
-    printf("edi = %x, esi = %x, ebp = %x, esp = %x \n",tf->edi, tf->esi, tf->ebp, tf->esp);
+    printf("edi = %x, esi = %x, ebp = %x \n",tf->edi, tf->esi, tf->ebp);
     printf("ebx = %x, edx = %x, ecx = %x, eax = %x \n",tf->ebx, tf->edx, tf->ecx, tf->eax);
     printf("int_no = %x, err_code = %x\n", tf->int_no, tf->err_code);
     printf("eip = %x, cs = %x, eflags = %x\n", tf->eip, tf->cs, tf->eflags);
-    printf("esp3 = %x, ss3 = %x \n", tf->esp3, tf->ss3);
+    printf("esp = %x, ss = %x \n", tf->esp, tf->ss);
     uint cr2, kern_ss;
     asm("mov %%cr2, %%eax":"=a"(cr2));
     printf("cr2 = %x, ", cr2);

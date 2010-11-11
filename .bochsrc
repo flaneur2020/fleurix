@@ -2,7 +2,7 @@
 # your pathname includes spaces.
 
 # vgaromimage: /usr/share/vgabios/vgabios.bin
-romimage: file=/usr/share/bochs/BIOS-bochs-latest, address=0xe0000
+romimage: file=/usr/share/bochs/BIOS-bochs-latest
 vgaromimage: file=/usr/share/bochs/VGABIOS-lgpl-latest
 megs: 32
 

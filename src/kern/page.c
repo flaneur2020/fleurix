@@ -57,7 +57,7 @@ int put_page(uint la, uint pa, uint flag){
  * parameter src, dst, and limit are deserved multiple of 0x1000
  * */
 int copy_ptab(uint src, uint dst, uint limit){
-    printf("copy_ptab(): src=%x, dst=%x, limit=%x\n", src, dst, limit);
+    //printf("copy_ptab(): src=%x, dst=%x, limit=%x\n", src, dst, limit);
     uint off, la, pa;
     for(off=0; off<=limit; off+=0x1000){
         pa = la2pa(src+off);

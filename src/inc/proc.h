@@ -1,6 +1,17 @@
 #ifndef PROC_H
 #define PROC_H
 
+struct contxt {
+    int eip;
+    int esp;
+    int ebx;
+    int ecx;
+    int edx;
+    int esi;
+    int edi;
+    int ebp;
+};
+
 /*
  * struct proc indicated some info on sched.
  * */
@@ -16,6 +27,7 @@ struct proc {
     uint                p_stack;
     uint                p_brk;
     struct seg_desc     p_ldt[3];
+    struct contxt       p_contxt;
     struct trap_frame  *p_trap;
 };
 

@@ -3,7 +3,7 @@ puts %{
 ; do not edit
 
 [section .text]
-[global _hwint_restore_regs]
+[global _hwint_ret]
 [extern hwint_common]
 
 ;; 
@@ -27,7 +27,7 @@ _hwint_common_stub:
     mov eax, hwint_common
     call eax
     pop eax                         ; esp ignored
-_hwint_restore_regs:
+_hwint_ret:
     pop dword gs
     pop dword fs
     pop dword es

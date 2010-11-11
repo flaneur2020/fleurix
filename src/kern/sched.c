@@ -7,6 +7,8 @@
 // note: inialized as 0.
 uchar kstack0[1024] = {0, };
 
+void _hwint_ret();
+
 struct proc *proc[NPROC] = {NULL, };
 struct proc *current = NULL;
 
@@ -51,32 +53,26 @@ _do_find:
         if ((p = proc[i]) == NULL) continue;
         if (p->p_stat == SRUN){
             swtch_to(p);
+            return;
         }
     }
     if (i==NPROC){
-        i = 0;
+        i=0;
         goto _do_find;
     }
 }
 
 /*
- * do the switch task! i still didn't catch the usage the TSS hardware stuff. software is better, people says.
- * switch the kernel task, and do a IRET. We assume that every task switching just occured in a trap routine,
- * and all the state stuff have been pushed in right place. Note that when a IRQ raised, CPU fetch the cs & 
- * eip from IDT, while ss0 & esp0 from the current TSS.
- *
- * TODO: bug here.
+ * do the switch task! In software.
  * */
 void swtch_to(struct proc *to){
-    // printf("from: %x, to: %x\n", current, to);
+    struct proc *from;
     // change ldt & tss
-    tss.esp0 = (uint)to + 0x1000;
+    tss.esp0 = (uint)to+0x1000;
     lldt(_LDT(to->p_pid));
+    from = current;
     current = to;
-    asm volatile(
-        "mov    %%eax, %%esp;"
-        "jmp    _hwint_restore_regs;"
-        ::"a"(to->p_trap));
+    _do_swtch(&(from->p_contxt), &(to->p_contxt));
 }
 
 /*******************************************************************************/
@@ -103,10 +99,6 @@ int copy_mem_to(struct proc *p){
     uint old_limit = get_seg_limit(&(current->p_ldt[1])); 
     uint old_base  = get_seg_base(&(current->p_ldt[1])); 
     uint new_base  = p->p_pid * 0x4000000;
-    printf("current->p_pid=%d\n", current->p_pid);
-    printf("p->p_pid=%d\n", p->p_pid);
-    printf("old_base=%x\n", old_base);
-    printf("new_base=%x\n", new_base);
     p->p_textp     = new_base;
     p->p_tsize     = old_limit;
     set_seg(&(p->p_ldt[1]), new_base, old_limit, 3, STA_X | STA_R);
@@ -125,6 +117,7 @@ int copy_mem_to(struct proc *p){
 int copy_proc(struct trap_frame *tf){
     uint nr; 
     struct proc *p;
+    struct trap_frame *ntf;
     
     nr = find_empty_pid();
     if (nr==0){
@@ -140,11 +133,14 @@ int copy_proc(struct trap_frame *tf){
     p->p_pid = nr;
     p->p_ppid = current->p_pid;
     p->p_flag = current->p_flag;
-    // init kernel stack
-    struct trap_frame *_tf = ((struct trap_frame *)(uint)p + 0x1000) - 1;
-    *_tf = *tf;
-    _tf->eax = 0;
-    p->p_trap = _tf;
+    // init the new proc's kernel stack
+    p->p_trap = ntf = ((struct trap_frame *)(uint)p + 0x1000) - 1;
+    *ntf = *tf;
+    ntf->eax = 0; // this is why fork() returns 0.
+    // init the new proc's contxt for the first swtch.
+    memset(&(p->p_contxt), 0, sizeof(struct contxt));
+    p->p_contxt.eip = &_hwint_ret;
+    p->p_contxt.esp = p->p_trap;
 
     set_ldt(&gdt[LDT0+p->p_pid], p->p_ldt);
     if (copy_mem_to(p) != 0){
