@@ -45,9 +45,6 @@ uint cmos_time(){
 }
 
 uint time(){
-    if (timestamp==0){
-        return timestamp=cmos_time();
-    }
     return timestamp;
 }
 
@@ -60,7 +57,7 @@ void do_timer(struct regs *r){
         current->p_cpu+=2;
     }
 
-    if (tick % 100==0){
+    if (tick % 60==0) {
         swtch();
     }
     if (tick % 100==0){
