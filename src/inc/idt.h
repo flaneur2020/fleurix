@@ -14,7 +14,7 @@ struct idt_desc {
     uint        base;
 } __attribute__((packed));     
 
-struct trap_frame {
+struct trap {
     uint        gs, fs, es, ds;                             /* pushed the segs last */
     uint        edi, esi, ebp, _esp, ebx, edx, ecx, eax;    /* pushed by 'pusha' */
     uint        int_no, err_code;                           /* our 'push byte #' and ecodes do this */

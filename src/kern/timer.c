@@ -1,6 +1,7 @@
 #include <param.h>
 #include <x86.h>
 #include <kern.h>
+#include <proc.h>
 #include <cmos.h>
 
 static volatile uint tick = 0;
@@ -54,7 +55,12 @@ uint time(){
 
 void do_timer(struct regs *r){
     tick++;
-    if (tick % 10==0){
+    // on shedule
+    if (current->p_cpu+2 <= 100) {
+        current->p_cpu+=2;
+    }
+
+    if (tick % 100==0){
         swtch();
     }
     if (tick % 100==0){

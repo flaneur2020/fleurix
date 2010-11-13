@@ -41,25 +41,52 @@ void setrun(struct proc *p){
     p->p_stat = SRUN;
 }
 
-/*
- * invoked by do_timer() in timer.c;
- * Round Robbin right now.
+/*******************************************************************/
+
+/* re-caculate the proc's p_pri */
+void setpri(struct proc *p){
+    int n;
+    n = p->p_cpu/4 + PUSER + p->p_nice/16;
+    if (n+1 >= 127){
+        n = 127;
+    }
+    p->p_pri = n;
+}
+
+/* find the next proc and switch it.
+ * note: when calling it, it ALWAYS hands out the CPU execution 
+ * to other proc.
  * */
 void swtch(){
-    struct proc *p;
-    uint i = current->p_pid + 1;
-_do_find:
-    for (; i<NPROC; i++){
-        if ((p = proc[i]) == NULL) continue;
-        if (p->p_stat == SRUN){
-            swtch_to(p);
-            return;
+    int i;
+    char n=127;
+    struct proc *p=NULL, *np=NULL;
+
+    // refresh all procs' p_pri
+    for(i=0;i<NPROC;i++){
+        if ((p=proc[i])) {
+            if (p->p_cpu-10 >= 0) {
+                p->p_cpu = p->p_cpu - 10;
+            } 
+            setpri(p);
         }
     }
-    if (i==NPROC){
-        i=0;
-        goto _do_find;
+
+    // find the proc
+    for(i=0;i<NPROC;i++){
+        if ((p=proc[i]) && (p->p_stat==SRUN)) {
+            if (p->p_pri < n){
+                n = p->p_pri;
+                np = p;
+            }   
+        }
     }
+    if (np==NULL){
+        np = proc[0];
+    }
+    printf("min n:%x\n", np->p_pid);
+    debug_proc_list();
+    swtch_to(np);
 }
 
 /*
@@ -114,10 +141,10 @@ int copy_mem_to(struct proc *p){
 /*
  * main part of sys_fork()
  * */
-int copy_proc(struct trap_frame *tf){
+int copy_proc(struct trap *tf){
     uint nr; 
     struct proc *p;
-    struct trap_frame *ntf;
+    struct trap *ntf;
     
     nr = find_empty_pid();
     if (nr==0){
@@ -133,8 +160,11 @@ int copy_proc(struct trap_frame *tf){
     p->p_pid = nr;
     p->p_ppid = current->p_pid;
     p->p_flag = current->p_flag;
+    p->p_cpu  = current->p_cpu;
+    p->p_pri  = current->p_pri;
+    p->p_nice = current->p_nice;
     // init the new proc's kernel stack
-    p->p_trap = ntf = ((struct trap_frame *)(uint)p + 0x1000) - 1;
+    p->p_trap = ntf = ((struct trap *)(uint)p + 0x1000) - 1;
     *ntf = *tf;
     ntf->eax = 0; // this is why fork() returns 0.
     // init the new proc's contxt for the first swtch.
@@ -165,6 +195,9 @@ void sched_init(){
     p->p_ppid = 0;
     p->p_stat = SRUN;
     p->p_flag = SLOAD;
+    // on shedule
+    p->p_cpu = 0;
+    p->p_pri = 0;
     // init tss
     tss.ss0  = KERN_DS;
     tss.esp0 = (uint)p + 0x1000;
@@ -214,7 +247,7 @@ void debug_proc_list(){
 
 void debug_proc(struct proc *p){
     printf("%s ", (p==current)? "-":" " );
-    printf("pid:%d stat:%d esp0:%x\n", p->p_pid, p->p_stat, (uint)p+0x1000);
+    printf("pid:%d pri:%d cpu:%d nice:%d stat:%d esp0:%x \n", p->p_pid, p->p_pri, p->p_cpu, p->p_nice, p->p_stat, (uint)p+0x1000);
 }
 
 

@@ -14,7 +14,7 @@ void main(){
     gdt_init();         puts("* init gdt\n");
     idt_init();         puts("* init idt\n");
     page_init();        puts("* init paging\n");
-    buf_init();         puts("* init buf\n;");
+    buf_init();         puts("* init buf\n");
     hd_init();          puts("* init hd\n");
     timer_init();       puts("* init timer\n");
     sched_init();       puts("* init sched\n");
@@ -23,16 +23,14 @@ void main(){
     asm volatile("sti;");
     umode_init();
 
-    for(;;);
-
     if(fork()){
-        while(1) asm("int $0x80"::"a"(1),"b"(0));
+        //while(1) asm("int $0x80"::"a"(1),"b"(0));
     }
     else if (fork()){
-        while(1) asm("int $0x80"::"a"(1),"b"(1));
+        //while(1) asm("int $0x80"::"a"(1),"b"(1));
     }
     else {
-        while(1) asm("int $0x80"::"a"(1),"b"(2));
+        //while(1) asm("int $0x80"::"a"(1),"b"(2));
     }
 
     for(;;);

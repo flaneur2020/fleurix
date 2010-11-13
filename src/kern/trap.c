@@ -151,8 +151,8 @@ void flush_idt(struct idt_desc idtd){
  * however if the IRQ came from the Slave PIC, it is necessary to issue 
  * the command to both PIC chips.
  * */
-void hwint_common(struct trap_frame *tf) {
-    void (*handler)(struct trap_frame *tf);
+void hwint_common(struct trap *tf) {
+    void (*handler)(struct trap *tf);
     handler = hwint_routines[tf->int_no]; 
     if (current!=NULL) {
         current->p_trap = tf;
@@ -184,13 +184,13 @@ void hwint_common(struct trap_frame *tf) {
     }
 }
 
-void set_hwint(int nr, void (*handler)(struct trap_frame *tf)){
+void set_hwint(int nr, void (*handler)(struct trap *tf)){
     hwint_routines[nr] = handler;
 }
 
 /***********************************************************************************/
 
-void debug_regs(struct trap_frame *tf){
+void debug_regs(struct trap *tf){
     printf("gs = %x, fs = %x, es = %x, ds = %x\n", tf->gs, tf->fs, tf->es, tf->ds);
     printf("edi = %x, esi = %x, ebp = %x \n",tf->edi, tf->esi, tf->ebp);
     printf("ebx = %x, edx = %x, ecx = %x, eax = %x \n",tf->ebx, tf->edx, tf->ecx, tf->eax);

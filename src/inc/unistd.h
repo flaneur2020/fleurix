@@ -58,10 +58,16 @@
         return r;                               \
     }
 
+#define SYS_debug 0
+#define SYS_putn  1
+#define SYS_fork  2
+#define SYS_nice  3
+
 extern int errno;
 
-static inline _syscall0(0, int, debug); 
-static inline _syscall1(1, int, putn, int);
-static inline _syscall0(2, int, fork); 
+static inline _syscall0(SYS_debug,  int, debug); 
+static inline _syscall1(SYS_putn,   int, putn, int);
+static inline _syscall0(SYS_fork,   int, fork); 
+static inline _syscall1(SYS_nice,   int, nice, int); 
 
 #endif
