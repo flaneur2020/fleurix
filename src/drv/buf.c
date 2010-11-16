@@ -21,11 +21,11 @@ int nblkdev = 0;
 
 /* See if the block is associated with some buffer. */
 struct buf* incore(ushort dev, uint blkno){
-    struct devtab *dp;
+    struct devtab *dtp;
     struct buf *bp;
 
-    dp = bdevsw[MAJOR(dev)].d_tab;
-    for (bp=dp->b_next; bp!=(struct buf*)dp; bp = bp->b_next){
+    dtp = bdevsw[MAJOR(dev)].d_tab;
+    for (bp=dtp->b_next; bp!=(struct buf*)dtp; bp=bp->b_next){
         if (bp->b_dev==dev && bp->b_blkno==blkno) {
             return bp;
         }
@@ -36,7 +36,7 @@ struct buf* incore(ushort dev, uint blkno){
 /* TODO: ignored the DELWRI scenary. */
 struct buf* getblk(int dev, uint blkno){
     struct buf *bp;
-    struct devtab *dp;
+    struct devtab *dtp;
 
     if (MAJOR(dev) >= nblkdev) {
         panic("error devno.");
@@ -44,17 +44,17 @@ struct buf* getblk(int dev, uint blkno){
 
 _loop: 
     if (dev < 0){
-        dp = (struct devtab*) &bfreelist;
+        dtp = (struct devtab*) &bfreelist;
     }
     else {
-        dp = bdevsw[MAJOR(dev)].d_tab;
-        if (dp==NULL){
+        dtp = bdevsw[MAJOR(dev)].d_tab;
+        if (dtp==NULL){
             panic("error devtab.");
         }
         // 1. found in the dev's cache list
         if (bp=incore(dev, blkno)) {
             // 2. found in the dev's cache list but busy
-            if (bp->b_flag &= B_BUSY) {
+            if (bp->b_flag & B_BUSY) {
                 bp->b_flag |= B_WANTED;
                 sleep(bp);
                 goto _loop;
@@ -64,9 +64,7 @@ _loop:
         }
     }
     // 3. not found in the dev's cache list, and free list is empty
-    // TODO: who touched bfreelist?
     if (bfreelist.av_next==&bfreelist) {
-        printf("~~~~~~~~");
         bfreelist.b_flag |= B_WANTED;
         sleep(&bfreelist);
         goto _loop;
@@ -74,14 +72,18 @@ _loop:
     // 4. feel free to take something from the free list (head).
     bp = bfreelist.av_next;
     notavail(bp);
+    bp->b_flag = B_BUSY;
     // take it from the dev's cache list and 
     bp->b_prev->b_next = bp->b_next;
     bp->b_next->b_prev = bp->b_prev;
-    bp->b_next = dp->b_next;
-    bp->b_prev = (struct buf *)dp;
-    // insert it into the target dev's cache list's head.
-    dp->b_next = bp;
-    dp->b_next->b_prev = bp;
+    bp->b_next = dtp->b_next;
+    bp->b_prev = (struct buf *)dtp;
+    // prepend it into the target dev's cache list.
+    bp->b_prev = dtp;
+    bp->b_next = dtp->b_next;
+    dtp->b_next->av_prev = bp;
+    dtp->b_next = bp;
+    // 
     bp->b_dev = dev;
     bp->b_blkno = blkno;
     return bp;
@@ -100,7 +102,7 @@ void brelse(struct buf *bp){
         bfreelist.b_flag &= ~B_WANTED;
         wakeup(&bfreelist);
     }
-    bp->b_flag &= ~(B_WANTED|B_BUSY|B_ASYNC);
+    bp->b_flag &= ~(B_WANTED|B_BUSY);
     bp->av_next = &bfreelist;
     bp->av_prev = bfreelist.av_prev;
     bp->av_prev->av_next = bp;
@@ -124,6 +126,7 @@ void iowait(struct buf *bp){
 
 void iodone(struct buf *bp){
     bp->b_flag |= B_DONE;
+    brelse(bp);
     wakeup(bp);
 }
 
@@ -135,10 +138,10 @@ void iodone(struct buf *bp){
 struct buf* bread(int dev, uint blkno){
     struct buf *bp;
     bp = getblk(dev, blkno);
-    if (bp->b_flag & B_DONE) {
+    if (bp->b_flag & B_DONE) { 
         return bp;
     }
-    bp->b_flag != B_READ;
+    bp->b_flag |= B_READ;
     (*bdevsw[MAJOR(dev)].d_request)(bp);
     iowait(bp);
     return bp;

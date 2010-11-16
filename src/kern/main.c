@@ -42,8 +42,7 @@ void sys_setup(struct trap *tf){
         printf("%d", data[i]);
     }
     printf("ok\n");
-    bp=bread(dev, 1);
-    printf("***second read\n");
+    printf("second read\n");
     data = bp->b_addr;
     for(i=0; i<100; i++){
         printf("%d", data[i]);

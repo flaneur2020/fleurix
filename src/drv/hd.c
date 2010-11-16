@@ -57,12 +57,12 @@ int hd_wait_ready(){
  * now. 
  * */
 int hd_request(struct buf *bp){
-    // prepend
+    // prepend into the waiting list 
     bp->av_prev = &hdtab;
     bp->av_next = hdtab.av_next;
     hdtab.av_next->av_prev = bp;
     hdtab.av_next = bp;
-    // if not busy
+    // if the device's not busy
     if (hdtab.d_active == 0) {
         hd_start();
     }
@@ -109,7 +109,6 @@ int do_hd_intr(struct trap *tf){
     if (bp->b_flag & B_READ) {
         insl(0x1F0, bp->b_addr, 512/4);
     }
-    // cache it
     iodone(bp);
     hd_start();
 }

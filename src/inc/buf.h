@@ -47,15 +47,6 @@ extern struct buf   bfreelist;
 #define B_DONE      0x2
 #define B_ERROR     0x4
 #define B_BUSY      0x8
-#define B_PHYS      0x10
-
-#define B_MAP       0x20
-
-#define B_WANTED    0x40
-
-#define B_RELOC     0x80
-#define B_ASYNC     0x100
-
-#define B_DELWRI    0x200
+#define B_WANTED    0x10
 
 
