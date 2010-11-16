@@ -58,16 +58,33 @@
         return r;                               \
     }
 
-#define SYS_debug 0
+#define SYS_setup 0
 #define SYS_putn  1
 #define SYS_fork  2
 #define SYS_nice  3
+#define SYS_debug 4
 
 extern int errno;
 
-static inline _syscall0(SYS_debug,  int, debug); 
+static inline _syscall0(SYS_setup,  int, setup);
 static inline _syscall1(SYS_putn,   int, putn, int);
 static inline _syscall0(SYS_fork,   int, fork); 
 static inline _syscall1(SYS_nice,   int, nice, int); 
+static inline _syscall0(SYS_debug,  int, debug); 
+
+void sys_setup   (struct trap *);
+void sys_fork    (struct trap *);
+void sys_putn    (struct trap *);
+void sys_nice    (struct trap *);
+void sys_debug   (struct trap *);
+
+static uint sys_routines[NSYSC] = {
+    [SYS_setup] = &sys_setup,
+    [SYS_putn]  = &sys_putn,
+    [SYS_fork]  = &sys_fork,
+    [SYS_nice]  = &sys_nice,
+    [SYS_debug] = &sys_debug,
+    0,
+}; 
 
 #endif

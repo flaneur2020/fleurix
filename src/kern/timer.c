@@ -50,7 +50,7 @@ uint time(){
 
 /*****************************************************/
 
-void do_timer(struct regs *r){
+void do_timer(struct trap *tf){
     tick++;
     // on shedule
     if (current->p_cpu+2 <= 100) {
@@ -76,6 +76,6 @@ void timer_init(){
     //
     irq_enable(0);
     set_hwint(IRQ0+0, &do_timer);
-    printf("current cmos time: %d\n", cmos_time());
+    // printf("current cmos time: %d\n", cmos_time());
 }
 

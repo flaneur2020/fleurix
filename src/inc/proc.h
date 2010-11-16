@@ -33,7 +33,7 @@ struct proc {
     uint                p_error;        /* return error code */
     struct seg_desc     p_ldt[3];
     struct contxt       p_contxt;
-    struct trap_frame  *p_trap;         /* the current trap on the task switch. */
+    struct trap        *p_trap;         /* the current trap on the task switch. */
 };
 
 extern struct proc *proc[NPROC];
@@ -58,13 +58,13 @@ extern struct proc *current;
 /* priorities
  * probably should not be altered too much.
  */
-#define	PSWP	-100
-#define	PINOD	-90
-#define	PRIBIO	-50
-#define	PPIPE	1
-#define	PWAIT	40
-#define	PSLEP	90
-#define	PUSER	100
+#define	PSWP	  (-100)
+#define	PINOD	  (-90)
+#define	PRIBIO	(-50)
+#define	PPIPE	  1
+#define	PWAIT	  40
+#define	PSLEP	  90
+#define	PUSER	  100
 
 // error code
 

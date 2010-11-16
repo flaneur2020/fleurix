@@ -2,14 +2,14 @@
 
 struct buf {
     uint            b_flag;
-    struct buf      *b_next;
-    struct buf      *b_prev;
-    struct buf      *av_next;
-    struct buf      *av_prev;
+    struct buf     *b_next;
+    struct buf     *b_prev;
+    struct buf     *av_next;
+    struct buf     *av_prev;
     int             b_dev;
     uint            b_blkno;
-    uint            b_addr;
-    char            b_error;
+    char           *b_addr;
+    int             b_error;
 };
 
 extern struct buf   buf[NBUF];
@@ -29,7 +29,7 @@ extern struct buf   buf[NBUF];
  * visited via a struct buf *.
  * */
 struct devtab {
-    uint            d_flag;             /* busy flags */
+    uint            d_active;             /* busy flags */
     struct buf      *b_next;            /* first buf for this dev */
     struct buf      *b_prev;            /* last  buf for this dev */
     struct buf      *av_next;           /* head of IO queue */

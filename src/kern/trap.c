@@ -154,9 +154,7 @@ void flush_idt(struct idt_desc idtd){
 void hwint_common(struct trap *tf) {
     void (*handler)(struct trap *tf);
     handler = hwint_routines[tf->int_no]; 
-    if (current!=NULL) {
-        current->p_trap = tf;
-    }
+    current->p_trap = tf;
     // trap
     if (tf->int_no < 32) {
         if (handler){
@@ -177,10 +175,6 @@ void hwint_common(struct trap *tf) {
         if (handler){
             handler(tf);
         }
-    }
-    // restore the trap frame
-    if (current!=NULL) {
-        current->p_trap = tf;
     }
 }
 

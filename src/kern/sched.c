@@ -84,8 +84,7 @@ void swtch(){
     if (np==NULL){
         np = proc[0];
     }
-    printf("min n:%x\n", np->p_pid);
-    debug_proc_list();
+    //debug_proc_list();
     swtch_to(np);
 }
 
@@ -211,11 +210,12 @@ void sched_init(){
     lldt(_LDT(p->p_pid));
 }
 
-/*
- * Move into user space(ring3) by iret.
+/* move into user space(ring3) via an IRET and 
+ * enable intrrupt.
  * */
 void umode_init(){
     asm volatile( 
+        "sti;" 
         "mov $0x17, %ax;"
         "mov %ax, %ds;" 
         "mov %ax, %es;" 
@@ -247,7 +247,7 @@ void debug_proc_list(){
 
 void debug_proc(struct proc *p){
     printf("%s ", (p==current)? "-":" " );
-    printf("pid:%d pri:%d cpu:%d nice:%d stat:%d esp0:%x \n", p->p_pid, p->p_pri, p->p_cpu, p->p_nice, p->p_stat, (uint)p+0x1000);
+    printf("pid:%d pri:%d cpu:%d nice:%d stat:%d esp0:%x eip:%x \n", p->p_pid, p->p_pri, p->p_cpu, p->p_nice, p->p_stat, p->p_contxt.esp, p->p_trap->eip);
 }
 
 

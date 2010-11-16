@@ -2,6 +2,7 @@
 #include <x86.h>
 #include <kern.h>
 #include <proc.h>
+
 #include <unistd.h>
 
 int errno = 0;
@@ -24,26 +25,18 @@ void sys_nice(struct trap *tf){
 }
 
 void sys_putn(struct trap *tf){
-    printf("%x", tf->ebx);
+    printf("%d", tf->ebx);
 }
 
 /***********************************************************/
 
-static uint sys_routines[NSYSC] = {
-    [SYS_debug] = &sys_debug,
-    [SYS_putn]  = &sys_putn,
-    [SYS_fork]  = &sys_fork,
-    [SYS_nice]  = &sys_nice,
-    0,
-}; 
-
 void do_syscall(struct trap *r){
     //printf("do_syscall();\n");
-    void (*handler)(struct trap *r);
-    handler = sys_routines[r->eax];
+    void (*fn)(struct trap *r);
+    fn = sys_routines[r->eax];
     
-    if(handler){
-        handler(r);
+    if(fn){
+        (*fn)(r);
     }
 }
 

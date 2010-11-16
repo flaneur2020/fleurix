@@ -15,19 +15,6 @@
  * Thanks buddy.
  * */
 
-#define HD_STAT 0x1F7
-#define HD_CMD  0x1F7
-
-/* commands for HD_CMD */
-#define HD_CMD_READ    0x20
-#define HD_CMD_WRITE   0x30
-
-/* flags for HD_STAT */
-#define HD_BSY	    0x80 
-#define HD_DRDY	    0x40 //Device Ready
-#define HD_DF		0x20 //Device Fault
-#define HD_ERR		0x01
-
 struct devtab hdtab = { 0 , };
 
 /* 
@@ -65,8 +52,34 @@ int hd_wait_ready(){
     return i;
 }
 
-/* Send a request for the hard disk drive. */
+/* prepend it into devtab's waiting list(via av_prev, av_next),
+ * if it's not active, send a request for the hard disk drive right
+ * now. 
+ * */
 int hd_request(struct buf *bp){
+    // prepend
+    bp->av_prev = &hdtab;
+    bp->av_next = hdtab.av_next;
+    hdtab.av_next->av_prev = bp;
+    hdtab.av_next = bp;
+    // if not busy
+    if (hdtab.d_active == 0) {
+        hd_start();
+    }
+}
+
+/* if waiting list is not empty, then take the tail, send a request 
+ * for the hard disk drive and mark it active.
+ * */
+void hd_start(){
+    struct buf *bp;
+    // if waiting list is empty
+    if (hdtab.av_next == &hdtab) {
+        return;
+    }
+    // take the tail
+    bp = hdtab.av_prev; 
+    hdtab.d_active = 1;
     // read or write.
     if (bp->b_flag & B_READ) {
         hd_cmd(0, HD_CMD_READ, bp->b_blkno, 1);
@@ -77,9 +90,28 @@ int hd_request(struct buf *bp){
     }
 }
 
-/* Interrupt handler of the hard disk drive. */
-int do_hd_intr(struct trap_frame *tf){
-    puts("do_hd_intr: got data\n");
+/* interrupt handler of the hard disk drive, triggered on got 
+ * data from the hard disk. get and remove the tail from the 
+ * waiting list, if there's still something inside it, hd_start()
+ * again.
+ * */
+int do_hd_intr(struct trap *tf){
+    struct buf *bp;
+
+    if (hdtab.d_active == 0) {
+        return;
+    } 
+    hdtab.d_active = 0;
+    bp = hdtab.av_prev;
+    bp->av_prev->av_next = bp->av_next;
+    bp->av_next->av_prev = bp->av_prev;
+    // read data if needed
+    if (bp->b_flag & B_READ) {
+        insl(0x1F0, bp->b_addr, 512/4);
+    }
+    // cache it
+    iodone(bp);
+    hd_start();
 }
 
 /*

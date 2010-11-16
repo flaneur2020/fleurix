@@ -64,13 +64,16 @@ _loop:
         }
     }
     // 3. not found in the dev's cache list, and free list is empty
+    // TODO: who touched bfreelist?
     if (bfreelist.av_next==&bfreelist) {
+        printf("~~~~~~~~");
         bfreelist.b_flag |= B_WANTED;
         sleep(&bfreelist);
         goto _loop;
     }
-    // 4. feel free to take something from the free list.
-    notavail(bp = bfreelist.av_next);
+    // 4. feel free to take something from the free list (head).
+    bp = bfreelist.av_next;
+    notavail(bp);
     // take it from the dev's cache list and 
     bp->b_prev->b_next = bp->b_next;
     bp->b_next->b_prev = bp->b_prev;
@@ -85,7 +88,7 @@ _loop:
 }
 
 /* Release the buffer, with no IO implied.
- * Aka put the buffer back into the freelist.
+ * Aka put the buffer back (append) into the freelist.
  * */
 void brelse(struct buf *bp){
     struct buf *tmp;
@@ -101,22 +104,26 @@ void brelse(struct buf *bp){
     bp->av_next = &bfreelist;
     bp->av_prev = bfreelist.av_prev;
     bp->av_prev->av_next = bp;
+    bp->av_next->av_prev = bp;
 }
 
 /**********************************************/
 
 /* Unlink a buffer from the free list and mark it busy.*/
 void notavail(struct buf *bp){
-    bp->av_prev->av_next = bp->av_prev;
-    bp->av_next->av_prev = bp->av_next;
+    bp->av_prev->av_next = bp->av_next;
+    bp->av_next->av_prev = bp->av_prev;
     bp->b_flag |= B_BUSY;
 }
 
 void iowait(struct buf *bp){
-    sleep(bp);
+    while((bp->b_flag&B_DONE)==0){
+        sleep(bp);
+    }
 }
 
 void iodone(struct buf *bp){
+    bp->b_flag |= B_DONE;
     wakeup(bp);
 }
 
@@ -160,6 +167,7 @@ void buf_init() {
         bp->b_dev = -1;
         bp->b_addr = buffers[i];
         bp->b_flag = B_BUSY;
+        bp->b_next = bp->b_prev = bp;
         brelse(bp);
     }
 

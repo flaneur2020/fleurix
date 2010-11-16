@@ -53,7 +53,7 @@ int put_page(uint la, uint pa, uint flag){
 /*
  * copy page tables, as a helper of copy_proc()
  * it do NOT copy the data inside a frame, just remap it
- * TODO: and mark it READONLY. 
+ * TODO: and mark it READONLY.  note: the wired syscall bug may from this. 
  * parameter src, dst, and limit are deserved multiple of 0x1000
  * */
 int copy_ptab(uint src, uint dst, uint limit){

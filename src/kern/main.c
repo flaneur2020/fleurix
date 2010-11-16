@@ -8,7 +8,6 @@
 #include <conf.h>
 #include <hd.h>
 
-
 void main(){
     tty_init();         puts("* init tty\n");
     gdt_init();         puts("* init gdt\n");
@@ -20,57 +19,34 @@ void main(){
     sched_init();       puts("* init sched\n");
     // proc[0] arises now
     puts("* init user mode\n");
-    asm volatile("sti;");
     umode_init();
 
-    if(fork()){
-        //while(1) asm("int $0x80"::"a"(1),"b"(0));
-    }
-    else if (fork()){
-        //while(1) asm("int $0x80"::"a"(1),"b"(1));
-    }
-    else {
-        //while(1) asm("int $0x80"::"a"(1),"b"(2));
+    // in proc1
+    if(fork()==0){
+        // setup
+        asm volatile("int $0x80"::"a"(0));
     }
 
     for(;;);
 }
 
-// on Memory
-void* memcpy(void *dest, void *src, uint count) {
-    char *sp = (char *)src;
-    char *dp = (char *)dest;
+/* TODO: just for debug right now.
+ * we need two procs at least.
+ * */
+void sys_setup(struct trap *tf){
+    int dev = DEVNO(0, 0);
+    struct buf *bp= bread(dev, 2);
+    char* data = bp->b_addr;
     int i;
-    for (i=0; i<count; i++){
-        *dp++ = *sp++;
+    for(i=0; i<100; i++){
+        printf("%d", data[i]);
     }
-    return dest;
-}
-
-void* memset(void *dest, char val, uint count){
-    char *dp = (char *)dest;
-    int i;
-    for(i=0; i<count; i++){
-        *dp++ = val;
+    printf("ok\n");
+    bp=bread(dev, 1);
+    printf("***second read\n");
+    data = bp->b_addr;
+    for(i=0; i<100; i++){
+        printf("%d", data[i]);
     }
-    return dest;
 }
-
-short* memsetw(short *dest, short val, uint count){
-    short *dp = (short *)dest;
-    int i;
-    for(i=0; i<count; i++){
-        *dp++ = val;
-    }
-    return dest;
-}
-
-// on str
-uint strlen(char *str){
-    char* sp;
-    for(sp=str; *sp!='\0'; sp++);
-    return sp-str;
-}
-
-
 

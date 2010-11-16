@@ -83,6 +83,8 @@ cfiles = [
   'src/drv/conf.c',
   'src/drv/hd.c',
   #
+  'src/lib/str.c',
+  #
   'src/kern/main.c'
 ]
 
