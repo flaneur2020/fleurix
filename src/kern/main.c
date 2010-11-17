@@ -35,17 +35,12 @@ void main(){
  * */
 void sys_setup(struct trap *tf){
     int dev = DEVNO(0, 0);
-    struct buf *bp= bread(dev, 2);
+    struct buf *bp= bread(dev, 0);
     char* data = bp->b_addr;
     int i;
     for(i=0; i<100; i++){
         printf("%d", data[i]);
     }
     printf("ok\n");
-    printf("second read\n");
-    data = bp->b_addr;
-    for(i=0; i<100; i++){
-        printf("%d", data[i]);
-    }
 }
 

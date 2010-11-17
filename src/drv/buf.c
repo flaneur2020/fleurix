@@ -73,7 +73,7 @@ _loop:
     bp = bfreelist.av_next;
     notavail(bp);
     bp->b_flag = B_BUSY;
-    // take it from the dev's cache list and 
+    // take it from the old dev's cache list and 
     bp->b_prev->b_next = bp->b_next;
     bp->b_next->b_prev = bp->b_prev;
     bp->b_next = dtp->b_next;
@@ -81,7 +81,7 @@ _loop:
     // prepend it into the target dev's cache list.
     bp->b_prev = dtp;
     bp->b_next = dtp->b_next;
-    dtp->b_next->av_prev = bp;
+    dtp->b_next->b_prev = bp;
     dtp->b_next = bp;
     // 
     bp->b_dev = dev;

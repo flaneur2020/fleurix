@@ -12,9 +12,6 @@
 #define PAGE 0x1000
 #define NPAGE ((HI_MEM-LO_MEM)/PAGE)
 
-/* clock intervals 1000/10 times per second*/
-#define HZ 10
-
 typedef unsigned char   uchar;
 typedef unsigned short  ushort;
 typedef unsigned int    uint;

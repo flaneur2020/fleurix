@@ -6,8 +6,8 @@
  *
  * */
 
-#ifndef SYSC_H
-#define SYSC_H
+#ifndef UNISTD_H
+#define UNISTD_H
 
 
 #define _syscall0(NR, T0, FN)                   \

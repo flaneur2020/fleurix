@@ -4,6 +4,8 @@
 #include <proc.h>
 #include <cmos.h>
 
+#define HZ 100
+
 static volatile uint tick = 0;
 static volatile uint timestamp = 0;
 
@@ -60,7 +62,8 @@ void do_timer(struct trap *tf){
     if (tick % 60==0) {
         swtch();
     }
-    if (tick % 100==0){
+
+    if (tick % HZ ==0){
         timestamp++;
     }
 }
