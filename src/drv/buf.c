@@ -33,7 +33,7 @@ struct buf* incore(ushort dev, uint blkno){
     return NULL;
 }
 
-/* TODO: ignored the DELWRI scenary. */
+/* TODO: ignored the DIRTY scenary. */
 struct buf* getblk(int dev, uint blkno){
     struct buf *bp;
     struct devtab *dtp;
@@ -111,7 +111,7 @@ void brelse(struct buf *bp){
 
 /**********************************************/
 
-/* Unlink a buffer from the free list and mark it busy.*/
+/* unlink a buffer from the free list and mark it busy.*/
 void notavail(struct buf *bp){
     bp->av_prev->av_next = bp->av_next;
     bp->av_next->av_prev = bp->av_prev;
@@ -126,6 +126,7 @@ void iowait(struct buf *bp){
 
 void iodone(struct buf *bp){
     bp->b_flag |= B_DONE;
+    bp->b_flag &= ~B_WANTED; 
     brelse(bp);
     wakeup(bp);
 }
@@ -147,7 +148,15 @@ struct buf* bread(int dev, uint blkno){
     return bp;
 }
 
+/* Write the buffer, waiting for completion.
+ * Then release the buffer.
+ * TODO: write though right now. make it write back later.
+ */
 void bwrite(struct buf *bp) {
+	bp->b_flag &= ~(B_READ | B_DONE | B_ERROR | B_DIRTY);
+    (*bdevsw[MAJOR(bp->b_dev)].d_request)(bp);
+    iowait(bp);
+    brelse(bp);
 }
 
 /**********************************************/

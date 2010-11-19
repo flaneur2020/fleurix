@@ -9,8 +9,9 @@ puts %{
 ;;
 [extern main]
     jmp main
-_spin;
+_spin:
     jmp _spin
+
 ;;
 ;; on task switch
 ;; _do_swtch(struct contxt *old, struct contxt *new);

@@ -48,5 +48,6 @@ extern struct buf   bfreelist;
 #define B_ERROR     0x4
 #define B_BUSY      0x8
 #define B_WANTED    0x10
+#define B_DIRTY     0x20
 
 
