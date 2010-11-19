@@ -46,14 +46,31 @@ void setrun(struct proc *p){
 /* re-caculate the proc's p_pri */
 void setpri(struct proc *p){
     int n;
-    n = p->p_cpu/4 + PUSER + p->p_nice/16;
-    if (n+1 >= 127){
-        n = 127;
-    }
+    n = p->p_cpu/16 + PUSER + p->p_nice;
+    if (n >= 127) n=127;
+    if (n <= -126) n=-126;
     p->p_pri = n;
 }
 
-/* find the next proc and switch it.
+/* called once per second, re-caculate all the procs' p_pri 
+ * TODO: stil didn't catch the idea of traditional Unix's scheduling.
+ * choose linus's approach instead later.
+ * */
+void sched_cpu(){
+    struct proc *p;
+    int i;
+    for(i=0;i<NPROC;i++){
+        if ((p=proc[i])) {
+            if (p->p_cpu-10 >= 0) {
+                p->p_cpu-=10;
+            } 
+            setpri(p);
+        }
+    }
+}
+
+/* 
+ * find the next proc and switch it.
  * note: when calling it, it ALWAYS hands out the CPU execution 
  * to other proc.
  * */
@@ -61,16 +78,6 @@ void swtch(){
     int i;
     char n=127;
     struct proc *p=NULL, *np=NULL;
-
-    // refresh all procs' p_pri
-    for(i=0;i<NPROC;i++){
-        if ((p=proc[i])) {
-            if (p->p_cpu-10 >= 0) {
-                p->p_cpu = p->p_cpu - 10;
-            } 
-            setpri(p);
-        }
-    }
 
     // find the proc
     for(i=0;i<NPROC;i++){
@@ -197,6 +204,7 @@ void sched_init(){
     // on shedule
     p->p_cpu = 0;
     p->p_pri = 0;
+    p->p_nice = 0;
     // init tss
     tss.ss0  = KERN_DS;
     tss.esp0 = (uint)p + 0x1000;

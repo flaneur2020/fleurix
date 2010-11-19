@@ -21,6 +21,17 @@ void main(){
     puts("* init user mode\n");
     umode_init();
 
+    if (fork()){
+        while(1) asm volatile("int $0x80"::"a"(1),"b"(0));
+    }
+    else if(fork()){
+        while(1) asm volatile("int $0x80"::"a"(1),"b"(1));
+    }
+    else {
+        while(1) asm volatile("int $0x80"::"a"(1),"b"(2));
+    }
+    for(;;);
+
     // in proc1
     if(fork()==0){
         // setup

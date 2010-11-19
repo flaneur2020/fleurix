@@ -21,7 +21,9 @@ void sys_fork(struct trap *tf){
 }
 
 void sys_nice(struct trap *tf){
-    current->p_nice = tf->ebx & 0xff;
+    int n = tf->ebx & 0xff;
+    if (n > 20) n = 20;
+    if (n<-19) n=-19;
 }
 
 void sys_putn(struct trap *tf){

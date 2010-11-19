@@ -19,8 +19,8 @@ struct contxt {
 struct proc {
     char                p_stat;
     char                p_flag;
-    char                p_pri;          /* on shedule */
-    char                p_cpu;          /* - */
+    int                 p_pri;          /* on shedule */
+    int                 p_cpu;          /* - */
     int                 p_nice;         /* - */
     int                 p_time;         /* on swap */
     uint                p_pid;          
@@ -60,7 +60,7 @@ extern struct proc *current;
  */
 #define	PSWP	  (-100)
 #define	PINOD	  (-90)
-#define	PRIBIO	(-50)
+#define	PRIBIO	  (-50)
 #define	PPIPE	  1
 #define	PWAIT	  40
 #define	PSLEP	  90
