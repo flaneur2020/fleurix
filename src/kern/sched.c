@@ -61,23 +61,25 @@ void sched_cpu(){
     int i;
     for(i=0;i<NPROC;i++){
         if ((p=proc[i])) {
-            if (p->p_cpu-10 >= 0) {
-                p->p_cpu-=10;
-            } 
-            setpri(p);
+            p->p_cpu /= 2;
+            if (p->p_pri>PUSER) {
+                setpri(p);
+            }
         }
     }
 }
 
 /* 
  * find the next proc and switch it.
- * note: when calling it, it ALWAYS hands out the CPU execution 
- * to other proc.
+ * re-caculate the current proc's p_pri on the end of time quatum.
  * */
 void swtch(){
     int i;
     char n=127;
     struct proc *p=NULL, *np=NULL;
+
+    // re-caculate current's p_pri
+    setpri(current);
 
     // find the proc
     for(i=0;i<NPROC;i++){
@@ -204,7 +206,7 @@ void sched_init(){
     // on shedule
     p->p_cpu = 0;
     p->p_pri = 0;
-    p->p_nice = 0;
+    p->p_nice = 20;
     // init tss
     tss.ss0  = KERN_DS;
     tss.esp0 = (uint)p + 0x1000;

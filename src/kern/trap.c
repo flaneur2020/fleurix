@@ -14,7 +14,7 @@ struct idt_desc    idt_desc;
 // which inited as 0
 static uint hwint_routines[256] = {0, }; 
 
-static char *fault_messages[] = {
+static char *fault_str[] = {
     "Division By Zero",
     "Debug",
     "Non Maskable Interrupt",
@@ -52,20 +52,7 @@ static char *fault_messages[] = {
     "Reserved"
 };
 
-
 /**********************************************************************/
-
-#define PIC1 0x20
-#define PIC2 0xA0
-
-#define PIC1_CMD PIC1
-#define PIC2_CMD PIC2
-#define PIC1_DATA (PIC1+1)
-#define PIC2_DATA (PIC2+1)
-
-#define PIC_EOI 0x20
-
-#define IRQ_SLAVE 2
 
 /*
  * Remap the irq and initialize the IRQ mask. 
@@ -75,7 +62,7 @@ static char *fault_messages[] = {
  * After initialization, register 0xA1 and 0x21 are the 
  * hi/lo bytes of irq mask, respectively. 
  * */
-static void irq_init(){
+void irq_init(){
     // hard coded, don't touch.
     outb(PIC1, 0x11);
     outb(PIC2, 0x11);
@@ -89,6 +76,13 @@ static void irq_init(){
     outb(PIC1+1, 0xFF);
     outb(PIC2+1, 0xFF);
     irq_enable(2);
+}
+
+void irq_eoi(int nr){
+    outb(PIC1, PIC_EOI);
+    if (nr >= 40) {
+        outb(PIC2, PIC_EOI);
+    }
 }
 
 void irq_enable(uchar irq){
@@ -133,7 +127,8 @@ void hwint_init(){
     set_hwint(0x80, &do_syscall);      // in syscall.c
 }
 
-void flush_idt(struct idt_desc idtd){
+void flush_idt(struct idt_desc idtd){    set_syst_gate(0x03, _hwint[0x03]); // int3
+
     asm volatile(
         "lidt %0"
         :: "m"(idtd));
@@ -161,21 +156,19 @@ void hwint_common(struct trap *tf) {
             handler(tf);
         }
         else {
-            printf("hwint_common: unhandled exception: %s \n", fault_messages[tf->int_no]);
+            printf("hwint_common: unhandled exception: %s \n", fault_str[tf->int_no]);
             debug_regs(tf);
             for(;;);
         }
     }
     // irq, syscall and blah~
     else {
-        outb(PIC1, PIC_EOI);
-        if (tf->int_no >= 40) {
-            outb(PIC2, PIC_EOI);
-        }
+        irq_eoi(tf->int_no);
         if (handler){
             handler(tf);
         }
     }
+    setpri(current);
 }
 
 void set_hwint(int nr, void (*handler)(struct trap *tf)){
@@ -202,7 +195,7 @@ void debug_regs(struct trap *tf){
 
 void idt_init(){
     // init idt_desc
-    idt_desc.limit = (sizeof (struct gate_desc) * 256) - 1;
+    idt_desc.limit = (sizeof(struct gate_desc) * 256) - 1;
     idt_desc.base = &idt;
     // init irq
     irq_init();
