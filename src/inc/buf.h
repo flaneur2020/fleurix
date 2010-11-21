@@ -6,7 +6,7 @@ struct buf {
     struct buf     *b_prev;
     struct buf     *av_next;
     struct buf     *av_prev;
-    int             b_dev;
+    short           b_dev;
     uint            b_blkno;
     char           *b_addr;
     int             b_error;

@@ -1,5 +1,7 @@
 /* */
 
+extern struct devtab hdtab;
+
 #define HD_STAT 0x1F7
 #define HD_CMD  0x1F7
 
@@ -13,9 +15,7 @@
 #define HD_DF		  0x20 //Device Fault
 #define HD_ERR		0x01
 
-extern struct devtab hdtab;
 
 int hd_request();
-
 int nulldev();
 int nodev();
