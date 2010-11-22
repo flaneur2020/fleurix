@@ -51,7 +51,7 @@ void main(){
  * we need two procs at least.
  * */
 void sys_setup(struct trap *tf) {
-    int dev = DEVNO(0, 0);
+    int dev = DEVNO(1, 0);
     struct buf *bp;
     struct super *sp;
 

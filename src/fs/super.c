@@ -9,14 +9,16 @@
 #include <inode.h>
 #include <fs.h>
 
+struct super    mnt[NMOUNT];
+
 /* search the mount table.
  * note: super block is meaningless until the device is mounted 
  * */
 struct super* get_super(short dev){
-    struct mount *mp;
-    for (mp=&mnt[0]; mp<&mnt[NMOUNT]; mp++){
-        if (dev==mp->m_dev) {
-            return &(mp->m_super);
+    struct super *sp;
+    for (sp=&mnt[0]; sp<&mnt[NMOUNT]; sp++){
+        if (dev==sp->s_dev) {
+            return sp;
         }
     }
     return NULL;

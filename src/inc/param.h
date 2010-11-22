@@ -9,6 +9,7 @@
 #define NBUF    (0x200000/BLK/BSIZE)
 
 /* on fs */
+#define NDEV 2
 #define NMOUNT  16
 
 /* kernel locates in 0~LO_MEM */

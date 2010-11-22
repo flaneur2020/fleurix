@@ -34,5 +34,6 @@ struct super {
     uchar           s_dirty;
 };
 
+extern struct super     mnt[NMOUNT];
 
 #define SB_MAGIC 0x138F

@@ -38,7 +38,7 @@ struct buf* incore(ushort dev, uint blkno){
  * noet: getblk *ALWAYS* returns a B_BUSY block, so the other processes
  * can not access this. so never forget brelse it after a getblk, just 
  * as malloc/free.
- * so code like
+ * so codes like
  *      bp = bread(dev, 1);
  *      bp = bread(dev, 1); 
  * may sleep forever.
@@ -198,7 +198,7 @@ void buf_init() {
     }
 
     nblkdev = 0;
-    for(bsp=&bdevsw[0]; bsp->d_open!=0; bsp++){
+    for(bsp=&bdevsw[0]; bsp<&bdevsw[NDEV]; bsp++){
         dtp = bsp->d_tab;
         dtp->b_next  = dtp->b_prev  = (struct buf *) dtp;
         dtp->av_next = dtp->av_prev = (struct buf *) dtp;
