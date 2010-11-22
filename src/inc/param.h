@@ -6,7 +6,6 @@
 /* buffers take 2mb */
 #define BLK     512
 #define BSIZE   2 // (*512)
-#define LBLK    (BLK*BSIZE)
 #define NBUF    (0x200000/BLK/BSIZE)
 
 /* on fs */

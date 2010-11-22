@@ -9,6 +9,8 @@
 #include <hd.h>
 
 #include <super.h>
+#include <inode.h>
+#include <fs.h>
 
 void main(){
     tty_init();         puts("* init tty\n");
@@ -53,16 +55,7 @@ void sys_setup(struct trap *tf) {
     struct buf *bp;
     struct super *sp;
 
-    mount_root(dev);
-    sp = get_super(dev);
-    printf("max_inode:%d\n", sp->s_max_inode);
-    printf("max_zone:%d\n", sp->s_max_zone);
-    printf("s_nimap_blk:%d\n", sp->s_nimap_blk);
-    printf("s_nzmap_blk:%d\n", sp->s_nzmap_blk);
-    printf("zone0:%d\n", sp->s_zone0);
-    printf("log_zone:%d\n", sp->s_log_zone);
-    printf("s_max_size:%d\n", sp->s_max_size);
-    printf("s_nzone:%d\n", sp->s_nzone);
-    printf("magic:%x\n", sp->s_magic);
+    sp = mount_root(dev);
+    dump_super(sp);
 }
 
