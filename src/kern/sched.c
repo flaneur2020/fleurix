@@ -1,6 +1,6 @@
 #include <param.h>
 #include <x86.h>
-#include <kern.h>
+#include <proto.h>
 #include <proc.h>
 
 // one page size, stores some info on proc[0] and its kernel stack

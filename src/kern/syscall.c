@@ -1,6 +1,6 @@
 #include <param.h>
 #include <x86.h>
-#include <kern.h>
+#include <proto.h>
 #include <proc.h>
 
 #include <unistd.h>

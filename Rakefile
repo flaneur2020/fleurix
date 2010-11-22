@@ -54,13 +54,16 @@ end
 
 hfiles = [
   'src/inc/buf.h',
-  'src/inc/kern.h',
+  'src/inc/proto.h',
   'src/inc/param.h',
   'src/inc/proc.h',
   'src/inc/unistd.h',
   #
   'src/inc/conf.h',
   'src/inc/hd.h',
+  #
+  'src/inc/super.h',
+  'src/inc/fs.h',
   # 
   'src/inc/idt.h',
   'src/inc/gdt.h',
@@ -82,6 +85,9 @@ cfiles = [
   'src/drv/buf.c',
   'src/drv/conf.c',
   'src/drv/hd.c',
+  #
+  'src/fs/super.c',
+  'src/fs/fs.c',
   #
   'src/lib/str.c',
   #

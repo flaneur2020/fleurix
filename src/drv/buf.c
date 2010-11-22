@@ -33,7 +33,18 @@ struct buf* incore(ushort dev, uint blkno){
     return NULL;
 }
 
-/* TODO: ignored the DIRTY scenary. */
+/* allocate a block.
+ *
+ * noet: getblk *ALWAYS* returns a B_BUSY block, so the other processes
+ * can not access this. so never forget brelse it after a getblk, just 
+ * as malloc/free.
+ * so code like
+ *      bp = bread(dev, 1);
+ *      bp = bread(dev, 1); 
+ * may sleep forever.
+ *
+ * TODO: ignored the DIRTY scenary.
+ * */
 struct buf* getblk(int dev, uint blkno){
     struct buf *bp;
     struct devtab *dtp;
@@ -91,6 +102,8 @@ _loop:
 
 /* Release the buffer, with no IO implied.
  * Aka put the buffer back (append) into the freelist.
+ * note: brelse is not a user-transparency routine, remember
+ * calling this after a getblk.
  * */
 void brelse(struct buf *bp){
     struct buf *tmp;
@@ -127,14 +140,15 @@ void iowait(struct buf *bp){
 void iodone(struct buf *bp){
     bp->b_flag |= B_DONE;
     bp->b_flag &= ~B_WANTED; 
-    brelse(bp);
+    //brelse(bp);
     wakeup(bp);
 }
 
 /**********************************************/
 
 /*
- * Read in (if necessary) the block and return a buffer pointer
+ * Read in (if necessary) the block and return a buffer pointer.
+ * note: 
  * */
 struct buf* bread(int dev, uint blkno){
     struct buf *bp;

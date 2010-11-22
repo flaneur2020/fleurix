@@ -1,7 +1,4 @@
 /** */ 
-#ifndef KERN_H
-#define KERN_H
-
 // tty.c
 void    tty_init();
 void    cls();
@@ -42,4 +39,3 @@ int     nulldev();
         asm volatile("hlt");\
     } while(0)
 
-#endif
