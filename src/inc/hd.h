@@ -2,6 +2,17 @@
 
 extern struct devtab hdtab;
 
+/* TODO: add partition support
+ * note: the first entry is the whole device
+ * */
+struct hd_minor {
+    uint    m_hd;
+    uint    m_start;
+    uint    m_limit;
+};
+
+extern struct hd_minor hd_minor[16];
+
 #define HD_STAT 0x1F7
 #define HD_CMD  0x1F7
 

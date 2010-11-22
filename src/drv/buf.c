@@ -6,7 +6,7 @@
 #include <conf.h>
 
 /* buf bodies. Make it start at 0x100000 alright!  */
-extern char buffers[NBUF][BSIZE*BLK];
+extern char buffers[NBUF][BLK];
 
 /* buf heads */
 struct buf   buf[NBUF];
@@ -43,7 +43,7 @@ struct buf* incore(ushort dev, uint blkno){
  *      bp = bread(dev, 1); 
  * may sleep forever.
  *
- * TODO: ignored the DIRTY scenary.
+ * TODO: ignored the DELWRI scenary.
  * */
 struct buf* getblk(int dev, uint blkno){
     struct buf *bp;
@@ -67,7 +67,7 @@ _loop:
             // 2. found in the dev's cache list but busy
             if (bp->b_flag & B_BUSY) {
                 bp->b_flag |= B_WANTED;
-                sleep(bp);
+                sleep(bp, PRIBIO);
                 goto _loop;
             } 
             notavail(bp);
@@ -77,7 +77,7 @@ _loop:
     // 3. not found in the dev's cache list, and free list is empty
     if (bfreelist.av_next==&bfreelist) {
         bfreelist.b_flag |= B_WANTED;
-        sleep(&bfreelist);
+        sleep(&bfreelist, PRIBIO);
         goto _loop;
     }
     // 4. feel free to take something from the free list (head).
@@ -104,6 +104,7 @@ _loop:
  * Aka put the buffer back (append) into the freelist.
  * note: brelse is not a user-transparency routine, remember
  * calling this after a getblk.
+ * TODO: consider B_ERROR
  * */
 void brelse(struct buf *bp){
     struct buf *tmp;
@@ -114,6 +115,9 @@ void brelse(struct buf *bp){
     if (bfreelist.b_flag & B_WANTED) {
         bfreelist.b_flag &= ~B_WANTED;
         wakeup(&bfreelist);
+    }
+    if (bp->b_flag & B_ERROR) {
+        bp->b_dev = NODEV;
     }
     bp->b_flag &= ~(B_WANTED|B_BUSY);
     bp->av_next = &bfreelist;
@@ -133,7 +137,7 @@ void notavail(struct buf *bp){
 
 void iowait(struct buf *bp){
     while((bp->b_flag&B_DONE)==0){
-        sleep(bp);
+        sleep(bp, PRIBIO);
     }
 }
 
@@ -190,7 +194,7 @@ void buf_init() {
     bfreelist.av_prev = bfreelist.av_next = &bfreelist;
     for(i=0; i<NBUF; i++){
         bp = &buf[i]; 
-        bp->b_dev = -1;
+        bp->b_dev = NODEV;
         bp->b_addr = buffers[i];
         bp->b_flag = B_BUSY;
         bp->b_next = bp->b_prev = bp;
@@ -198,7 +202,7 @@ void buf_init() {
     }
 
     nblkdev = 0;
-    for(bsp=&bdevsw[0]; bsp<&bdevsw[NDEV]; bsp++){
+    for(bsp=&bdevsw[0]; bsp<&bdevsw[NBLKDEV]; bsp++){
         dtp = bsp->d_tab;
         dtp->b_next  = dtp->b_prev  = (struct buf *) dtp;
         dtp->av_next = dtp->av_prev = (struct buf *) dtp;

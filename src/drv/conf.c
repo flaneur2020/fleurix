@@ -8,9 +8,8 @@
 #include <hd.h>
 
 /* TODO: leave the first entry zero, hence NODEV may equals 0 */
-struct bdevsw   bdevsw[NDEV] = {
+struct bdevsw   bdevsw[NBLKDEV] = {
     { 0, },
-    { &nulldev, &nulldev, &hd_request, &hdtab },
-    { 0, },
+    { &nulldev, &nulldev, &hd_request, &hdtab }
 };
 

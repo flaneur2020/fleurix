@@ -11,7 +11,7 @@
 
 /* root lies on mnt[0].
  * */
-struct super* mount_root(short dev){
+struct super* mount_root(ushort dev){
     struct buf *bp;
     struct super *sp;
 
@@ -20,7 +20,7 @@ struct super* mount_root(short dev){
     memcpy(sp, bp->b_addr, sizeof(struct d_super));
     brelse(bp);
     sp->s_dev = dev;
-    if (sp->s_magic!=SB_MAGIC) {
+    if (sp->s_magic!=S_MAGIC) {
         panic("not an availible dev");
         return NULL;
     }

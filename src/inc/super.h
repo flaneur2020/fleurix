@@ -29,11 +29,14 @@ struct super {
     short           s_dev;
     struct inode   *s_iroot;
     struct inode   *s_imnt;
-    uchar           s_lock;
-    uchar           s_rd_only;
-    uchar           s_dirty;
+    uint            s_flag;
 };
 
 extern struct super     mnt[NMOUNT];
 
-#define SB_MAGIC 0x138F
+#define S_MAGIC 0x138F
+
+/* flags */
+#define S_LOCK      0x1
+#define S_RDONLY    0x2
+#define S_DIRTY     0x4

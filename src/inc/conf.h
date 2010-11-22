@@ -7,7 +7,7 @@ struct bdevsw {
     struct devtab    *d_tab;
 };
 
-extern struct bdevsw    bdevsw[NDEV];   
+extern struct bdevsw    bdevsw[NBLKDEV];   
 
 struct cdevsw {
     int             (*d_open)();
@@ -17,11 +17,11 @@ struct cdevsw {
     int             (*d_sgtty)();
 };
 
-extern struct cdevsw    cdevsw[NDEV];
+extern struct cdevsw    cdevsw[];
 
-#define MAJOR(num) ((char)((num>>8)&0xFF))
-#define MINOR(num) ((char)((num)&0xFF))
+#define MAJOR(num) ((uchar)((num>>8)&0xFF))
+#define MINOR(num) ((uchar)((num)&0xFF))
 
-#define DEVNO(major, minor) ((short)(((char)major<<8) + (char)minor))
+#define DEVNO(major, minor) ((ushort)(((uchar)major<<8) + (uchar)minor))
 
 #define NODEV (DEVNO(0,0))

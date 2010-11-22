@@ -87,6 +87,7 @@ cfiles = [
   'src/drv/hd.c',
   #
   'src/fs/super.c',
+  'src/fs/inode.c',
   'src/fs/fs.c',
   #
   'src/lib/str.c',

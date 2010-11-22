@@ -18,9 +18,12 @@ struct tss_desc tss;
 
 /*******************************************************************************/
 
-/* TODO: priority should be considered later. */
-void sleep(uint chan){
+/* mark a proccess SWAIT, commonly used on waiting a resource.
+ * TODO: race condition should consider later.
+ * */
+void sleep(uint chan, int pri){
     current->p_chan = chan;
+    current->p_pri  = pri;
     current->p_stat = SWAIT;
     swtch();
 }
