@@ -68,6 +68,7 @@ _found:
     if (ip==NULL) panic("error root inode"); 
     ip->i_flag &= ~I_LOCK; // note that we do not puti.
     sp->s_iroot = ip;
+    sp->s_imnt = NULL;
     return sp;
 }
 

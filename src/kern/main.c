@@ -56,7 +56,7 @@ void sys_setup(struct trap *tf) {
     struct super *sp;
     struct inode *ip;
 
-    sp = do_mount(rootdev);
+    sp = mount_root(rootdev);
     dump_super(sp);
     ip = iget(dev, 1);
     dump_inode(ip);
