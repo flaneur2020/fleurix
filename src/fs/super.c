@@ -9,7 +9,7 @@
 #include <inode.h>
 #include <fs.h>
 
-struct super    mnt[NMOUNT];
+struct super    mnt[NMOUNT] = {0, };
 
 /* search the mount table.
  * note: super block is meaningless until the device is mounted 
@@ -17,12 +17,72 @@ struct super    mnt[NMOUNT];
 struct super* get_super(ushort dev){
     struct super *sp;
     for (sp=&mnt[0]; sp<&mnt[NMOUNT]; sp++){
-        if (dev==sp->s_dev) {
+        if (dev == sp->s_dev) {
             return sp;
         }
     }
+    panic("no fs");
     return NULL;
 }
+
+/*****************************************************************/
+
+/* read a super block from disk into the mount table.
+ * if did not got any free slot, just simply raise an error instead
+ * of sleep until somebody frees like what getblk does.
+ *
+ * called on mounting. leave an inode in-core. (reference count remains
+ * but unlocked)
+ * */
+struct super* read_super(ushort dev){
+    struct super *sp, *tsp;
+    struct buf *bp;
+    struct inode *ip;
+
+    for(sp=&mnt[0]; sp<&mnt[NMOUNT]; sp++){
+        // found in cache
+        if (sp->s_dev == dev) {
+            sp->s_flag |= S_LOCK;
+            return sp;
+        }
+    }
+    for(sp=&mnt[0]; sp<&mnt[NMOUNT]; sp++){
+        if (sp->s_dev == NODEV) {
+            goto _found;
+        }
+    }
+    // not found
+    panic("no free mount slot");
+    return NULL;
+_found:
+    // read and check.
+    bp = bread(dev, 1);
+    memcpy(sp, bp->b_addr, sizeof(struct d_super));
+    brelse(bp);
+    if (sp->s_magic!=S_MAGIC) {
+        panic("not an availible dev");
+        return NULL;
+    }
+    sp->s_dev = dev;
+    ip = iget(dev, ROOTINO); 
+    if (ip==NULL) panic("error root inode"); 
+    ip->i_flag &= ~I_LOCK; // note that we do not puti.
+    sp->s_iroot = ip;
+    return sp;
+}
+
+void write_super(struct super *sp){
+}
+
+/*****************************************************************/
+
+/* remember calling this at a end of syscall.
+ * */
+void unlock_super(struct super *sp){
+    sp->s_flag &= ~S_LOCK;
+}
+
+/******************************************************************/
 
 /* write in-core super block to disk. */
 void put_super(struct super *sp){

@@ -21,17 +21,24 @@ struct inode inode[NINODE];
 
 /* get an (locked) inode via an number 
  * if the inode is in cache, return it right now.
+ * return NULL on error.
  *
- * note: you may compare this code with getblk, the idea here
+ * note1: you may compare this code with getblk, the idea here
  * is common used among everywhere on resource allocation.
  * it returns ONLY locked inode just as B_BUSY in getblk, just 
- * to prevent other processes' accessing.
+ * to prevent other processes' accessing within one syscall.
  *
- * TODO: didn't consider mount yet.
+ * note2: though there is still some differences between getblk,
+ * put an eye on *reference count*, lock won't stays long(within 
+ * one syscall, like the open routine, which unlock the inode at
+ * last), though *reference count* ramains set between syscalls
+ * to prevent the kernel from reallocating active in-core inode.
+ *
  * */
 void iget(ushort dev, uint num){
     struct buf *bp;
     struct inode *ip;
+    struct super *sp;
 
 _loop:
     for(ip=&inode[0]; ip<&inode[NINODE]; ip++){
@@ -42,13 +49,27 @@ _loop:
                 sleep(ip, PINOD);
                 goto _loop;
             }
-            // TODO: consider mountint.
+            // if this is an mount point, redirect to the mount
+            // target's root inode.
+            if (ip->i_flag & I_MOUNT) {
+                for (sp=&mnt[0]; sp<&mnt[NMOUNT]; sp++){
+                    if (ip == sp->s_imnt){
+                        // iget(sp->s_dev, ROOTINO);
+                        dev = sp->s_dev;
+                        num = ROOTINO;
+                        goto _loop;
+                    }
+                }
+            }
             // if found straightly
             ip->i_count++;
             ip->i_flag |= I_LOCK;
             return ip;
         }
-        // if not on target, but got a free slot. time to read disk
+    }
+    // not caced, so seek one free slot
+    for(ip=&inode[0]; ip<&inode[NINODE]; ip++){
+        // time to read disk
         if (ip->i_count==0) {
             ip->i_dev = dev;
             ip->i_num = num;
@@ -78,9 +99,10 @@ void readi(struct inode *ip){
     if (sp==NULL){
         panic("error on reading a super");
     }
+    // get the blk number where this inode lies in.
     lba = 2 + (sp->s_nimap_blk) + (sp->s_nzmap_blk) + (ip->i_num-1)/NINO_PER_BLK;
     bp = bread(ip->i_dev, lba);
-    if (bp==NULL) {
+    if (bp->b_flag & B_ERROR) {
         panic("error on reading an inode");
     }
     tip = (struct inode*)bp->b_addr;
@@ -90,11 +112,11 @@ void readi(struct inode *ip){
 void writei(){
 }
 
-/* lock/unlock */
-void lock_inode(){
-}
+/*************************************************************/
 
-void unlock_inode(){
+/* remember this just free with malloc. */
+void unlock_inode(struct inode *ip){
+    ip->i_flag &= ~I_LOCK;
 }
 
 void dump_inode(struct inode *ip){

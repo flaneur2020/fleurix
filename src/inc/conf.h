@@ -25,3 +25,6 @@ extern struct cdevsw    cdevsw[];
 #define DEVNO(major, minor) ((ushort)(((uchar)major<<8) + (uchar)minor))
 
 #define NODEV (DEVNO(0,0))
+
+extern ushort rootdev;
+extern ushort swapdev;

@@ -18,7 +18,7 @@ task :debug => :build do
   sh "bochs-dbg -q -f .bochsrc"
 end
   
-task :build => 'bin/kernel.img'
+task :build => ['bin/kernel.img', :ctags]
 
 task :clean do
   sh "rm -rf bin/* src/kern/entry.S .bochsout"
@@ -27,6 +27,10 @@ end
 ## helpers ##
 task :todo do 
   sh "grep -r -n 'TODO' ./src --color"
+end
+
+task :ctags do
+  sh "ctags -R"
 end
 
 #######################################################################
@@ -63,7 +67,7 @@ hfiles = [
   'src/inc/hd.h',
   #
   'src/inc/super.h',
-  'src/inc/fs.h',
+  'src/inc/inode.h',
   # 
   'src/inc/idt.h',
   'src/inc/gdt.h',
@@ -88,7 +92,7 @@ cfiles = [
   #
   'src/fs/super.c',
   'src/fs/inode.c',
-  'src/fs/fs.c',
+  'src/fs/mnt.c',
   #
   'src/lib/str.c',
   #

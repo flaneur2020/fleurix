@@ -25,10 +25,10 @@ struct super {
     uint    s_max_size;     // the max size of one file (in bytes)
     ushort  s_magic;        // 0x138F
     ushort  s_nzone;        // number of zones in used.
-    /* the rest fields only lie in-core */
+    /* the rest fields only lie in-core, for mount */
     short           s_dev;
-    struct inode   *s_iroot;
-    struct inode   *s_imnt;
+    struct inode   *s_iroot; // the root inode of this super block
+    struct inode   *s_imnt;  // the mount point, like /mnt/dir
     uint            s_flag;
 };
 

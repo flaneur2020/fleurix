@@ -5,6 +5,7 @@
 #define PAGE    0x1000
 #define LO_MEM  (0x300000)  /* kernel locates in 0~LO_MEM */
 #define HI_MEM  0x1000000
+#define ROOTINO 1
 
 #define NSYSC   64
 #define NPROC   64
