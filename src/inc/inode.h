@@ -1,12 +1,15 @@
+/* 
+ * the Minix v1 fs, you could build one via mkfs.minix under linux.
+ * */
 
 struct d_inode {
-	ushort  i_mode;
+	ushort  i_mode;     /* file type, protection, etc. */
 	ushort  i_uid;
-	uint    i_size;
+	uint    i_size;     /* current file size in bytes */
 	uint    i_time;
 	uchar   i_gid;
-	uchar   i_nlinks;
-	ushort  i_zone[9];
+	uchar   i_nlinks;   /* how many links to this file. */
+	ushort  i_zone[9];  /* zones number for direct, indirect and double indirect. */
 };
 
 struct inode {

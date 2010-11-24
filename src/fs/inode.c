@@ -101,11 +101,41 @@ void iput(struct inode *ip){
 /***************************************************/
 
 /*
- * translate logical block number in the file to the physical block numbler, 
- * maybe one of the most important role played by inode. 
- * */
-int bmap(struct inode *ip, uint offset) {
-    
+ * Given an inode and a position within the corresponding file, locate the
+ * block (not zone) number in which that position is to be found and return it.
+ * TODO: make it cleaner.
+ */
+int bmap(struct inode *ip, ushort nr) {
+    struct buf *bp, *bp2;
+    short *zp;
+    ushort ret;
+
+    if ((nr>7+512+512*512) || (nr > (ip->i_size / BLK))) {
+        panic("blk nr too big.");
+    }
+    if (nr<7){
+        return ip->i_zone[nr];
+    }
+    nr -= 7;
+    if (nr<512){
+        if (ip->i_zone[7]==0) return 0;
+        bp = bread(ip->i_dev, ip->i_zone[7]);
+        zp = (short *)bp->b_addr;
+        ret = zp[nr];
+        brelse(bp);
+        return ret;
+    }
+    nr -= 512;
+    if (ip->i_zone[8]==0) return 0;
+    bp = bread(ip->i_dev, ip->i_zone[8]);
+    zp = (short *)bp->b_addr;
+    if (zp==NULL) return 0;
+    bp2 = bread(ip->i_dev, zp[nr/512]);
+    brelse(bp);
+    zp = (short*)bp2->b_addr;
+    ret = zp[nr%512];
+    brelse(bp2);
+    return ret;
 }
 
 /*
