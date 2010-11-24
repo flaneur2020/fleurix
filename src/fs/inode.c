@@ -101,11 +101,17 @@ void iput(struct inode *ip){
 /***************************************************/
 
 /*
- * translate a file offset to the logical block numbler, maybe 
- * the most important role of inode. 
+ * translate logical block number in the file to the physical block numbler, 
+ * maybe one of the most important role played by inode. 
  * */
-uint bmap(struct inode *ip, uint offset) {
+int bmap(struct inode *ip, uint offset) {
     
+}
+
+/*
+ * find the inode via a path string.
+ * */
+struct inode* namei(char *path){
 }
 
 /***************************************************/
