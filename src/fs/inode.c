@@ -35,7 +35,7 @@ struct inode inode[NINODE];
  * to prevent the kernel from reallocating active in-core inode.
  *
  * */
-void iget(ushort dev, uint num){
+struct inode* iget(ushort dev, uint num){
     struct buf *bp;
     struct inode *ip;
     struct super *sp;
@@ -75,7 +75,7 @@ _loop:
             ip->i_num = num;
             ip->i_flag = I_LOCK;
             ip->i_count++;
-            readi(ip);
+            read_inode(ip);
             return ip;
         }
     }
@@ -85,11 +85,11 @@ _loop:
 }
 
 /* release an inode */
-void iput(){
+void iput(struct inode *ip){
 }
 
 /* read/write a inode from disk */
-void readi(struct inode *ip){
+int read_inode(struct inode *ip){
     struct super *sp;
     struct inode *tip;
     struct buf *bp;
@@ -107,9 +107,10 @@ void readi(struct inode *ip){
     }
     tip = (struct inode*)bp->b_addr;
     memcpy(ip, &tip[(ip->i_num-1)%NINO_PER_BLK], sizeof(struct d_inode));
+    return 0;
 }
 
-void writei(){
+void write_inode(){
 }
 
 /*************************************************************/
@@ -117,6 +118,7 @@ void writei(){
 /* remember this just free with malloc. */
 void unlock_inode(struct inode *ip){
     ip->i_flag &= ~I_LOCK;
+    wakeup(ip);
 }
 
 void dump_inode(struct inode *ip){

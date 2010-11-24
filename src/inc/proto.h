@@ -36,6 +36,6 @@ int     nulldev();
     do {            \
         printf("PANIC %s:%d: %s\n", __FILE__, __LINE__, str);\
         asm volatile("cli");\
-        asm volatile("hlt");\
+        for(;;);\
     } while(0)
 

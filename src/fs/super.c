@@ -27,49 +27,35 @@ struct super* get_super(ushort dev){
 
 /*****************************************************************/
 
-/* read a super block from disk into the mount table.
- * if did not got any free slot, just simply raise an error instead
- * of sleep until somebody frees like what getblk does.
- *
- * called on mounting. leave an inode in-core. (reference count remains
+/* read a super block from disk.
+ * only called on mounting, an inode in-core. (reference count remains
  * but unlocked)
  * */
-struct super* read_super(ushort dev){
-    struct super *sp, *tsp;
+int read_super(struct super *sp){
     struct buf *bp;
     struct inode *ip;
 
-    for(sp=&mnt[0]; sp<&mnt[NMOUNT]; sp++){
-        // found in cache
-        if (sp->s_dev == dev) {
-            sp->s_flag |= S_LOCK;
-            return sp;
-        }
-    }
-    for(sp=&mnt[0]; sp<&mnt[NMOUNT]; sp++){
-        if (sp->s_dev == NODEV) {
-            goto _found;
-        }
-    }
-    // not found
-    panic("no free mount slot");
-    return NULL;
-_found:
     // read and check.
-    bp = bread(dev, 1);
+    bp = bread(sp->s_dev, 1);
+    if ((bp->b_flag & B_ERROR)!=0){
+        panic("disk read error");
+        return -1;   
+    }
     memcpy(sp, bp->b_addr, sizeof(struct d_super));
     brelse(bp);
     if (sp->s_magic!=S_MAGIC) {
-        panic("not an availible dev");
-        return NULL;
+        panic("not an availible s_dev");
+        return -1;
     }
-    sp->s_dev = dev;
-    ip = iget(dev, ROOTINO); 
-    if (ip==NULL) panic("error root inode"); 
-    ip->i_flag &= ~I_LOCK; // note that we do not puti.
+    ip = iget(sp->s_dev, ROOTINO); 
+    if (ip==NULL) { 
+        panic("error root inode");
+        return -1;
+    }
+    ip->i_flag &= ~I_LOCK; // note that we do not iput.
     sp->s_iroot = ip;
     sp->s_imnt = NULL;
-    return sp;
+    return 0;
 }
 
 void write_super(struct super *sp){
@@ -81,12 +67,14 @@ void write_super(struct super *sp){
  * */
 void unlock_super(struct super *sp){
     sp->s_flag &= ~S_LOCK;
+    wakeup(sp);
 }
 
 /******************************************************************/
 
 /* write in-core super block to disk. */
 void put_super(struct super *sp){
+    unlock_super(sp);
 }
 
 /* called on create a new file. 

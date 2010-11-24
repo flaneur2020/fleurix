@@ -9,17 +9,41 @@
 #include <inode.h>
 
 /* load a super block in-core. and associate with an in-core inode.
+ *
+ * if did not got any free slot, just simply raise an error instead
+ * of sleep until somebody frees like what getblk does.
  * */
-struct super* do_mount(ushort dev, struct inode *ip){
+int do_mount(ushort dev, struct inode *ip){
     struct buf *bp;
     struct super *sp;
-    if ((ip==NULL) || ((ip->i_mode & S_IFMT)!=S_IFDIR)){
-        panic("not an availible inode");
+
+    for(sp=&mnt[0]; sp<&mnt[NMOUNT]; sp++){
+        // found in cache
+        if (sp->s_dev == dev) {
+            sp->s_flag |= S_LOCK;
+            goto _found;
+        }
     }
-    sp = read_super(dev);
-    if (sp==NULL) panic("not a availible device");
+    // not in cache, seek an free slot
+    for(sp=&mnt[0]; sp<&mnt[NMOUNT]; sp++){
+        if (sp->s_dev == NODEV) {
+            sp->s_dev = dev;
+            read_super(sp);
+            goto _found;
+        }
+    }
+    // not found
+    printf("no free mount slot");
+    return -1;
+_found:
+    // if the inode as mount point is not a directory
+    if ((ip!=NULL) && (ip->i_mode & S_IFMT)!=S_IFDIR){
+        put_super(sp);
+        return -1;
+    }
     sp->s_imnt = ip;
-    return sp;
+    put_super(sp);
+    return 0;
 }
 
 /* root lies on mnt[0], called early than any other mount, feel free 
@@ -27,7 +51,7 @@ struct super* do_mount(ushort dev, struct inode *ip){
  * note: root may be changed on the execution of initialzation.
  * returns a locked super block.
  * */
-struct super* mount_root(ushort dev){
+int mount_root(ushort dev){
     struct buf *bp;
     struct super *sp;
 
