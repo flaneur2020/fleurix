@@ -1,6 +1,7 @@
 #include <param.h>
 #include <x86.h>
 #include <proto.h>
+#include <proc.h>
 // 
 #include <buf.h>
 #include <conf.h>
@@ -18,6 +19,9 @@ struct super* get_super(ushort dev){
     struct super *sp;
     for (sp=&mnt[0]; sp<&mnt[NMOUNT]; sp++){
         if (dev == sp->s_dev) {
+            if (sp->s_flag & S_LOCK) {
+                sleep(sp, PINOD);
+            }
             return sp;
         }
     }
@@ -29,7 +33,7 @@ struct super* get_super(ushort dev){
 
 /* read a super block from disk.
  * only called on mounting, an inode in-core. (reference count remains
- * but unlocked)
+ * but unlocked, it's released at sys_umount)
  * */
 int read_super(struct super *sp){
     struct buf *bp;
@@ -63,16 +67,19 @@ void write_super(struct super *sp){
 
 /*****************************************************************/
 
-/* remember calling this at a end of syscall.
+/*
  * */
 void unlock_super(struct super *sp){
-    sp->s_flag &= ~S_LOCK;
+    sp->s_flag &= ~(S_LOCK);
     wakeup(sp);
 }
 
 /******************************************************************/
 
-/* write in-core super block to disk. */
+/* 
+ * remember calling this at a end of syscall. 
+ * TODO: write in-core super block to disk if S_DIRTY. 
+ * */
 void put_super(struct super *sp){
     unlock_super(sp);
 }

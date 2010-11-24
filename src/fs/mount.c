@@ -1,6 +1,7 @@
 #include <param.h>
 #include <x86.h>
 #include <proto.h>
+#include <proc.h>
 //
 #include <buf.h>
 #include <conf.h>
@@ -8,7 +9,7 @@
 #include <super.h>
 #include <inode.h>
 
-/* load a super block in-core. and associate with an in-core inode.
+/* load a super block in-core. and associate with an in-core inode (locked).
  *
  * if did not got any free slot, just simply raise an error instead
  * of sleep until somebody frees like what getblk does.
@@ -24,7 +25,7 @@ int do_mount(ushort dev, struct inode *ip){
             goto _found;
         }
     }
-    // not in cache, seek an free slot
+    // not in cache, seek an free slot and read the disk.
     for(sp=&mnt[0]; sp<&mnt[NMOUNT]; sp++){
         if (sp->s_dev == NODEV) {
             sp->s_dev = dev;
@@ -46,17 +47,6 @@ _found:
     return 0;
 }
 
-/* root lies on mnt[0], called early than any other mount, feel free 
- * to panic.
- * note: root may be changed on the execution of initialzation.
- * returns a locked super block.
- * */
-int mount_root(ushort dev){
-    struct buf *bp;
-    struct super *sp;
+int do_umount(ushort dev){
 
-    sp = read_super(dev);
-    if (sp==NULL) panic("not a availible device");
-    sp->s_imnt = sp->s_iroot;
-    return sp;
 }

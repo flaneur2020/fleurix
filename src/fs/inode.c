@@ -84,9 +84,31 @@ _loop:
     return NULL;
 }
 
-/* release an inode */
+/* decrease the reference count, write updates to disk if
+ * nessary.
+ * release an inode */
 void iput(struct inode *ip){
+    ip->i_flag |= I_LOCK;
+    if (ip->i_count==1){
+        write_inode(ip);
+        ip->i_flag = 0;
+        ip->i_num = 0;
+    }
+    ip->i_count--;
+    unlock_inode(ip);
 }
+
+/***************************************************/
+
+/*
+ * translate a file offset to the logical block numbler, maybe 
+ * the most important role of inode. 
+ * */
+uint bmap(struct inode *ip, uint offset) {
+    
+}
+
+/***************************************************/
 
 /* read/write a inode from disk */
 int read_inode(struct inode *ip){
@@ -110,16 +132,18 @@ int read_inode(struct inode *ip){
     return 0;
 }
 
-void write_inode(){
+void write_inode(struct inode *ip){
 }
 
 /*************************************************************/
 
 /* remember this just free with malloc. */
 void unlock_inode(struct inode *ip){
-    ip->i_flag &= ~I_LOCK;
+    ip->i_flag &= ~(I_LOCK | I_WANTED);
     wakeup(ip);
 }
+
+/*************************************************************/
 
 void dump_inode(struct inode *ip){
     printf("i_mode:%x\n", ip->i_mode);

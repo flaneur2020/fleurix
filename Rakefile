@@ -92,7 +92,7 @@ cfiles = [
   #
   'src/fs/super.c',
   'src/fs/inode.c',
-  'src/fs/mnt.c',
+  'src/fs/mount.c',
   #
   'src/lib/str.c',
   #
