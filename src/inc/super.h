@@ -38,5 +38,7 @@ extern struct super     mnt[NMOUNT];
 
 /* flags */
 #define S_LOCK      0x1
-#define S_RDONLY    0x2
-#define S_DIRTY     0x4
+#define S_WANTED    0x2
+#define S_RDONLY    0x4
+#define S_DIRTY     0x8
+

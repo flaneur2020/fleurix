@@ -89,7 +89,7 @@ void hd_start(){
     }
     else {
         hd_cmd(0, HD_CMD_WRITE, bp->b_blkno*BSIZE, BSIZE);
-        outsl(0x1F0, bp->b_addr, BLK/4);
+        outsl(0x1F0, bp->b_data, BLK/4);
     }
 }
 
@@ -110,7 +110,7 @@ int do_hd_intr(struct trap *tf){
     bp->av_next->av_prev = bp->av_prev;
     // read data if needed
     if (bp->b_flag & B_READ) {
-        insl(0x1F0, bp->b_addr, BLK/4);
+        insl(0x1F0, bp->b_data, BLK/4);
     }
     iodone(bp);
     hd_start();

@@ -103,11 +103,15 @@ void iput(struct inode *ip){
 /*
  * Given an inode and a position within the corresponding file, locate the
  * block (not zone) number in which that position is to be found and return it.
- * TODO: make it cleaner.
+ * returns 0 on error.
+ *
+ * note: 
+ * the first 7 entry of ip->zones[] are direct pointers, ip->zone[7] is an indirect 
+ * pointer to a zone map, while ip->zone[8] is an double indirect pointer to a zone map.
  */
 int bmap(struct inode *ip, ushort nr) {
     struct buf *bp, *bp2;
-    short *zp;
+    short *zmap, *zmap2;
     ushort ret;
 
     if ((nr>7+512+512*512) || (nr > (ip->i_size / BLK))) {
@@ -117,25 +121,38 @@ int bmap(struct inode *ip, ushort nr) {
         return ip->i_zone[nr];
     }
     nr -= 7;
+    // read the indirect zone map
     if (nr<512){
         if (ip->i_zone[7]==0) return 0;
         bp = bread(ip->i_dev, ip->i_zone[7]);
-        zp = (short *)bp->b_addr;
-        ret = zp[nr];
+        zmap = (short *)bp->b_data;
+        ret = zmap[nr];
         brelse(bp);
         return ret;
     }
     nr -= 512;
+    // the double indirect zone map.
+    // read the middle indirect zone map.
     if (ip->i_zone[8]==0) return 0;
     bp = bread(ip->i_dev, ip->i_zone[8]);
-    zp = (short *)bp->b_addr;
-    if (zp==NULL) return 0;
-    bp2 = bread(ip->i_dev, zp[nr/512]);
+    zmap = (short *)bp->b_data;
+    if (zmap[nr/512]==NULL) return 0;
+    // read the secondary indirect zone map.
+    bp2 = bread(ip->i_dev, zmap[nr/512]);
+    zmap2 = (short*)bp2->b_data;
+    ret = zmap2[nr%512];
     brelse(bp);
-    zp = (short*)bp2->b_addr;
-    ret = zp[nr%512];
     brelse(bp2);
     return ret;
+}
+
+/* 
+ * similar with bmap, but used on writing file. 
+ * allocate one block and map it onto file's logical block number, if 
+ * nessary.
+ * returns the device's physical block number.
+ * */
+int put_blk(struct inode *ip, ushort nr){
 }
 
 /*
@@ -163,7 +180,7 @@ int read_inode(struct inode *ip){
     if (bp->b_flag & B_ERROR) {
         panic("error on reading an inode");
     }
-    tip = (struct inode*)bp->b_addr;
+    tip = (struct inode*)bp->b_data;
     memcpy(ip, &tip[(ip->i_num-1)%NINO_PER_BLK], sizeof(struct d_inode));
     return 0;
 }
@@ -175,8 +192,10 @@ void write_inode(struct inode *ip){
 
 /* remember this just free with malloc. */
 void unlock_inode(struct inode *ip){
+    if (ip->i_flag & I_WANTED) {
+        wakeup(ip);
+    }
     ip->i_flag &= ~(I_LOCK | I_WANTED);
-    wakeup(ip);
 }
 
 /*************************************************************/

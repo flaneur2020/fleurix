@@ -20,6 +20,7 @@ struct super* get_super(ushort dev){
     for (sp=&mnt[0]; sp<&mnt[NMOUNT]; sp++){
         if (dev == sp->s_dev) {
             if (sp->s_flag & S_LOCK) {
+                sp->s_flag |= S_WANTED;
                 sleep(sp, PINOD);
             }
             return sp;
@@ -45,7 +46,7 @@ int read_super(struct super *sp){
         panic("disk read error");
         return -1;   
     }
-    memcpy(sp, bp->b_addr, sizeof(struct d_super));
+    memcpy(sp, bp->b_data, sizeof(struct d_super));
     brelse(bp);
     if (sp->s_magic!=S_MAGIC) {
         panic("not an availible s_dev");
@@ -70,8 +71,10 @@ void write_super(struct super *sp){
 /*
  * */
 void unlock_super(struct super *sp){
-    sp->s_flag &= ~(S_LOCK);
-    wakeup(sp);
+    if (sp->s_flag & S_WANTED) {
+        wakeup(sp);
+    }
+    sp->s_flag &= ~(S_LOCK | S_WANTED);
 }
 
 /******************************************************************/

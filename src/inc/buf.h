@@ -8,7 +8,7 @@ struct buf {
     struct buf     *av_prev;
     short           b_dev;
     uint            b_blkno;
-    char           *b_addr;
+    char           *b_data;
     int             b_error;
 };
 

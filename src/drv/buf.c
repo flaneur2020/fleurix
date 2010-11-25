@@ -152,7 +152,8 @@ void iodone(struct buf *bp){
 
 /*
  * Read in (if necessary) the block and return a buffer pointer.
- * note: 
+ * note: we assume all the bread() calls in kernel is correct, but the
+ * calls from a syscall is suspected.
  * */
 struct buf* bread(int dev, uint blkno){
     struct buf *bp;
@@ -174,7 +175,6 @@ void bwrite(struct buf *bp) {
 	bp->b_flag &= ~(B_READ | B_DONE | B_ERROR | B_DIRTY);
     (*bdevsw[MAJOR(bp->b_dev)].d_request)(bp);
     iowait(bp);
-    brelse(bp);
 }
 
 /**********************************************/
@@ -195,7 +195,7 @@ void buf_init() {
     for(i=0; i<NBUF; i++){
         bp = &buf[i]; 
         bp->b_dev = NODEV;
-        bp->b_addr = buffers[i];
+        bp->b_data = buffers[i];
         bp->b_flag = B_BUSY;
         bp->b_next = bp->b_prev = bp;
         brelse(bp);
