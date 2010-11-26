@@ -1,3 +1,7 @@
+#ifndef PROC_H
+#define PROC_H
+
+#include <inode.h>
 
 /* the regs saved in a task switch. */
 struct contxt {
@@ -29,9 +33,10 @@ struct proc {
     uint                p_brk;
     uint                p_chan;         /* the event channel which proc is awaiting */
     uint                p_error;        /* return error code */
-    struct seg_desc     p_ldt[3];
-    struct contxt       p_contxt;
-    struct trap        *p_trap;         /* the current trap on the task switch. */
+    struct inode       *p_cdir;         /* current working dir */
+    struct seg_desc     p_ldt[3];       /* on context swtch */
+    struct contxt       p_contxt;       /* - */
+    struct trap        *p_trap;         /* the initialize trap, initialized on fork */
 };
 
 extern struct proc *proc[NPROC];
@@ -107,3 +112,4 @@ extern struct proc *current;
 #define ENOSYS		38
 #define ENOTEMPTY	39
 
+#endif

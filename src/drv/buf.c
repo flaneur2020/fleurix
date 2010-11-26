@@ -210,3 +210,17 @@ void buf_init() {
     }
 }
 
+/**************************************************/
+
+void dump_buf(struct buf *bp){
+    int i, c;
+    for(i=0; i<512; i++){
+        c = bp->b_data[i];
+        if (c>31 && c<127){
+            printf("%c", c);
+        }
+        else {
+            printf("%x", c);
+        }
+    }
+}

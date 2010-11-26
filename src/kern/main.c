@@ -53,6 +53,7 @@ void main(){
 void sys_setup(struct trap *tf) {
     int dev = DEVNO(1, 0);
     struct buf *bp;
+    int i, nr;
     struct super *sp;
     struct inode *ip;
 
@@ -60,7 +61,11 @@ void sys_setup(struct trap *tf) {
     sp = get_super(rootdev);
     dump_super(sp);
     ip = iget(dev, 1);
-    dump_inode(ip);
+    nr = bmap(ip, 0);
+    bp = bread(ip->i_dev, nr);
+    printf("------ the first blk ---\n");
+    dump_buf(bp);
+    brelse(bp);
     unlock_super(sp);
 }
 

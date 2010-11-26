@@ -108,6 +108,7 @@ void iput(struct inode *ip){
  * note: 
  * the first 7 entry of ip->zones[] are direct pointers, ip->zone[7] is an indirect 
  * pointer to a zone map, while ip->zone[8] is an double indirect pointer to a zone map.
+ * TODO: debug it!.
  */
 int bmap(struct inode *ip, ushort nr) {
     struct buf *bp, *bp2;
@@ -147,18 +148,12 @@ int bmap(struct inode *ip, ushort nr) {
 }
 
 /* 
- * similar with bmap, but used on writing file. 
+ * TODO: similar with bmap, but used on writing file. 
  * allocate one block and map it onto file's logical block number, if 
  * nessary.
  * returns the device's physical block number.
  * */
 int put_blk(struct inode *ip, ushort nr){
-}
-
-/*
- * find the inode via a path string.
- * */
-struct inode* namei(char *path){
 }
 
 /***************************************************/
@@ -185,6 +180,7 @@ int read_inode(struct inode *ip){
     return 0;
 }
 
+/* TODO: fulfill it */
 void write_inode(struct inode *ip){
 }
 

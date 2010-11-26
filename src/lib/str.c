@@ -28,9 +28,48 @@ short* memsetw(short *dest, short val, uint count){
     return dest;
 }
 
+
 /* on str */
 int strlen(char *str){
     char* sp;
     for(sp=str; *sp!='\0'; sp++);
     return sp-str;
 }
+
+/* note that the terminating null character 
+ * is considered to be part of the string. 
+ * */
+char* strchr(const char *str, int c){
+    for(; *str!='\0'; str++) {
+        if (*str == (char)c) {
+            return str;
+        }
+    }
+    if (*str == (char)c) 
+        return str;
+    return NULL;
+}
+
+/* 
+ * TODO: debug all these.
+ * */
+int strcmp(char *s1, char *s2){
+    while (*s1 == *s2++)
+        if (*s1++ == 0)
+            return (0);
+    return (*(uchar*)s1 - *(uchar*)(s2-1));
+}
+
+int strncmp(char *s1, char* s2, uint n)
+{
+    if (n == 0)
+        return 0;
+    while(n-- != 0) {
+        if (*s1 != *s2++)
+            return (*(uchar*)s1 - *(uchar*)(s2-1));
+        if (*s1++ == 0)
+            break;
+    } 
+    return 0;
+}
+

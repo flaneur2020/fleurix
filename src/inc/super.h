@@ -32,7 +32,10 @@ struct super {
     uint            s_flag;
 };
 
+/* the mount table */
 extern struct super     mnt[NMOUNT];
+/* the root super block */
+extern struct super    *rootsp;
 
 #define S_MAGIC 0x138F
 

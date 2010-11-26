@@ -1,3 +1,6 @@
+#ifndef INODE_H
+#define INODE_H
+
 /* 
  * the Minix v1 fs, you could build one via mkfs.minix under linux.
  * */
@@ -30,6 +33,7 @@ struct inode {
 /* flags */
 #define I_LOCK   0x1    /* for synchronize */
 #define I_WANTED 0x2    /* - */
+
 #define I_DIRTY  0x4    /* this inode has been modified*/
 #define I_MOUNT  0x8    /* - */
 
@@ -46,3 +50,11 @@ struct inode {
 
 /* constants helper */
 #define NINO_PER_BLK (BLK/(sizeof(struct d_inode)))
+
+/* directory entry */
+struct dirent {
+    ushort  d_ino;
+    char    d_name[NAMELEN];
+};
+
+#endif

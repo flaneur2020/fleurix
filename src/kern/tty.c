@@ -27,7 +27,7 @@ void flush_csr(){
 void cls(){
     int i;
     for(i = 0; i < 25; i++) {
-        memsetw (vidmem + i * 80, VID_BLANK, 80);
+        memsetw(vidmem+i*80, VID_BLANK, 80);
     }
     csr_x = 0;
     csr_y = 0;
@@ -105,6 +105,9 @@ _loop:
     }
     if (c == 'o' || c == 'x'){
         printn(*adx, c=='o'? 8:16 );
+    }
+    if (c == 'c') {
+        putch(*adx);
     }
     if (c == 's'){
         puts(*adx);

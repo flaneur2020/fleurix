@@ -9,10 +9,13 @@
 #include <super.h>
 #include <inode.h>
 
+struct super *rootsp = NULL;
+
 /* load a super block in-core. and associate with an in-core inode (locked).
  *
  * if did not got any free slot, just simply raise an error instead
  * of sleep until somebody frees like what getblk does.
+ * if dev==rootdev, set a pointer rootsp for a quicker access.
  * */
 int do_mount(ushort dev, struct inode *ip){
     struct buf *bp;
@@ -42,11 +45,19 @@ _found:
         put_super(sp);
         return -1;
     }
+    if (dev==rootdev) {
+        rootsp = sp;
+    }
     sp->s_imnt = ip;
     put_super(sp);
     return 0;
 }
 
+
+/*
+ * TODO: umount();
+ * unmount an device.
+ * */
 int do_umount(ushort dev){
 
 }
