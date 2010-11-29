@@ -53,19 +53,27 @@ void main(){
 void sys_setup(struct trap *tf) {
     int dev = DEVNO(1, 0);
     struct buf *bp;
-    int i, nr;
+    int i, ino, nr;
     struct super *sp;
-    struct inode *ip;
+    struct inode *ip, *rip;
+    char *str, *path;
 
     do_mount(rootdev, NULL);
-    sp = get_super(rootdev);
-    dump_super(sp);
-    ip = iget(dev, 1);
-    nr = bmap(ip, 0);
-    bp = bread(ip->i_dev, nr);
-    printf("------ the first blk ---\n");
-    dump_buf(bp);
-    brelse(bp);
+
+    ip = iget(rootdev, 5);
+    dump_inode(ip);
+    iput(ip);
+
+    // debug namei
+    path = "/dir/d";
+    rip = do_namei(path);
+    if (rip==NULL) {
+        printf("%s : inode not found", path);
+    }
+    else {
+        printf("path = %s\n ino = %d\n", path, rip->i_num);
+    }
+    iput(ip);
     unlock_super(sp);
 }
 

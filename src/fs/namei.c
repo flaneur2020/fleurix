@@ -10,63 +10,76 @@
 #include <inode.h>
 #include <fs.h>
 
-/*
- * TODO: find the inode via a path string.
+
+/* 
+ * fetch an inode number from a single directory file (via a locked inode). 
  * */
-int namei(struct inode *ip, char *path){
-    struct inode *ip, *nip;
-    struct buf *bp;
-    uint ino, r;
-    char *tmp;
-
-    tmp = strchr(path, '/');
-    if (tmp==NULL) {
-        ino = find_entry(ip, path, strlen(path));   
-        return ino;
-    }
-    else {
-        ino = find_entry(ip, path, (uint)(tmp-path));   
-        nip = iget(ip->i_dev, ino);
-        r = namei(nip, tmp+1);
-        iput(nip);
-        return r;
-    }
-}
-
-/* fetch an inode in a single directory file. */
 uint find_entry(struct inode* ip, char *name, uint len){
     struct inode *nip;
     struct buf *bp;
     struct dirent *dep;
-    int i, j, ino=0;
+    int i, j, bn=0, ino=0;
 
     if ((ip->i_mode & S_IFMT)!=S_IFDIR) {
         current->p_error = EFAULT;
         return 0;
     }
 
-    for(i=0; i<ip->i_size/BLK; i++){
+    for(i=0; i<ip->i_size/BLK+1; i++){
         bn = bmap(ip, i);
         bp = bread(ip->i_dev, bn);
-        dep = (struct dirent *)bp->b_addr;
-        for(j=0; j<BLK/(sizeof(struct dirent)); j++) {
-            if (0==strncmp(path, dep[j]->d_name, len)){
-                ino = dep[j]->d_ino;
+        dep = (struct dirent *)bp->b_data;
+        for(j=0; j<BLK/(sizeof(struct dirent))+1; j++) {
+            if (0==strncmp(name, dep[j].d_name, len)){
+                ino = dep[j].d_ino;
                 brelse(bp);
-                goto _found;
+                return ino;
             }
         }
         brelse(bp);
     }
-_found:
-    return ino;
+    return 0;
 }
 
 /*
- * TODO: this returns the inode of the directory of the specified name.
+ * returns a locked inode.
+ * take an eye on dead lock.
  * */
-struct inode* dir_namei(char *path){
-}
+struct inode* do_namei(char *path){
+    struct inode *wip=NULL, *cdp=NULL;
+    uint ino, offset;
+    char* tmp;
+    
+    // if path starts from root
+    if (*path == '/') {
+        wip = iget(rootdev, ROOTINO);
+        path++;
+    }
+    else {
+        cdp = current->p_cdir;;
+        wip = iget(cdp->i_dev, cdp->i_num);
+    }
 
-struct inode *find_entry(){
+    // while there is more path name with '/'
+    while (*path != '\0') {
+        if (*path=='/'){
+            path++;
+            continue;
+        }
+        // if working inode is root and componet is ".."
+        if ((wip->i_num==ROOTINO) && (strncmp(path, "..", 2)==0)) {
+            continue;
+        }
+        tmp = strchr(path, '/');
+        offset = (tmp==NULL) ? strlen(path): (tmp-path);
+        printf("path: %s, offset: %d --> %d\n", path, offset, wip->i_num);
+        ino = find_entry(wip, path, offset);
+        if (ino == 0){
+            return NULL;
+        }
+        iput(wip);
+        wip = iget(wip->i_dev, ino);
+        path += offset;
+    }
+    return wip;
 }

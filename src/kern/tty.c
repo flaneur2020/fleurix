@@ -15,7 +15,6 @@ static short *vidmem = (short *) 0xb8000;
 static int   csr_x = 0;
 static int   csr_y = 0;
 
-
 void flush_csr(){
     uint pos = csr_y * 80 + csr_x;
     outb(0x3D4, 14);

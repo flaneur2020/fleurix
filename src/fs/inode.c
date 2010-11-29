@@ -161,7 +161,7 @@ int put_blk(struct inode *ip, ushort nr){
 /* read/write a inode from disk */
 int read_inode(struct inode *ip){
     struct super *sp;
-    struct inode *tip;
+    struct inode *itab;
     struct buf *bp;
     uint lba;
 
@@ -175,8 +175,9 @@ int read_inode(struct inode *ip){
     if (bp->b_flag & B_ERROR) {
         panic("error on reading an inode");
     }
-    tip = (struct inode*)bp->b_data;
-    memcpy(ip, &tip[(ip->i_num-1)%NINO_PER_BLK], sizeof(struct d_inode));
+    itab = (struct inode*)bp->b_data;
+    memcpy(ip, &itab[(ip->i_num-1)%NINO_PER_BLK], sizeof(struct d_inode));
+    brelse(bp);
     return 0;
 }
 
@@ -207,4 +208,19 @@ void dump_inode(struct inode *ip){
     printf("i_dev:%x\n", ip->i_dev);
     printf("i_num:%x\n", ip->i_num);
     printf("i_flag:%x\n", ip->i_flag);
+    int i=0;
+    for(i=0;i<9;i++){
+        printf("i_zone[%d]: %x\n", i, ip->i_zone[i]);
+    }
+
+    /*
+    uint nr;
+    struct buf *bp;
+
+    nr = bmap(ip, 0);
+    printf("bmap: %d\n", nr);
+    bp = bread(rootdev, nr);
+    dump_buf(bp);
+    brelse(bp);
+    printf("\n"); */
 }

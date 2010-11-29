@@ -36,8 +36,9 @@ int strlen(char *str){
     return sp-str;
 }
 
-/* note that the terminating null character 
- * is considered to be part of the string. 
+/* 
+ * note that '\0' is considered to be part of the string. 
+ * returns not a number but a pointer.
  * */
 char* strchr(const char *str, int c){
     for(; *str!='\0'; str++) {

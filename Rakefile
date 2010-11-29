@@ -93,6 +93,7 @@ cfiles = [
   'src/fs/super.c',
   'src/fs/inode.c',
   'src/fs/mount.c',
+  'src/fs/namei.c',
   #
   'src/lib/str.c',
   #
