@@ -158,10 +158,11 @@ int put_blk(struct inode *ip, ushort nr){
 
 /***************************************************/
 
-/* read/write a inode from disk */
+/* read/write a inode from disk 
+ * */
 int read_inode(struct inode *ip){
     struct super *sp;
-    struct inode *itab;
+    struct d_inode *itab; /* note this is an d_inode, 32 bytes. */
     struct buf *bp;
     uint lba;
 
@@ -172,6 +173,7 @@ int read_inode(struct inode *ip){
     // get the blk number where this inode lies in.
     lba = 2 + (sp->s_nimap_blk) + (sp->s_nzmap_blk) + (ip->i_num-1)/NINO_PER_BLK;
     bp = bread(ip->i_dev, lba);
+    //dump_buf(bp);
     if (bp->b_flag & B_ERROR) {
         panic("error on reading an inode");
     }

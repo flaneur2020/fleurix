@@ -26,7 +26,7 @@ end
 
 ## helpers ##
 task :todo do 
-  sh "grep -r -n 'TODO' ./src --color"
+  sh "grep -r -n '\\(TODO\\|\\<bug\\>\\)' ./src --color"
 end
 
 task :ctags do

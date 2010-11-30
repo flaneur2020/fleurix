@@ -58,9 +58,17 @@ void sys_setup(struct trap *tf) {
     struct inode *ip, *rip;
     char *str, *path;
 
+    //
     do_mount(rootdev, NULL);
 
-    ip = iget(rootdev, 5);
+    // debug read_inode();
+    //
+    ip = iget(rootdev, 2);
+    read_inode(ip);
+    dump_inode(ip);
+    panic("~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+
+    ip = iget(rootdev, 2);
     dump_inode(ip);
     iput(ip);
 
