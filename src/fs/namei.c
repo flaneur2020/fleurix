@@ -49,14 +49,16 @@ struct inode* do_namei(char *path){
     struct inode *wip=NULL, *cdp=NULL;
     uint ino, offset;
     char* tmp;
-    
+
     // if path starts from root
+    // note if p_cdir==NULL, it's an early initialized process, 
+    // set it's root directory here.
     if (*path == '/') {
         wip = iget(rootdev, ROOTINO);
-        path++;
+        current->p_cdir = wip;
     }
     else {
-        cdp = current->p_cdir;;
+        cdp = current->p_cdir;
         wip = iget(cdp->i_dev, cdp->i_num);
     }
 
@@ -72,7 +74,6 @@ struct inode* do_namei(char *path){
         }
         tmp = strchr(path, '/');
         offset = (tmp==NULL) ? strlen(path): (tmp-path);
-        printf("path: %s, offset: %d --> %d\n", path, offset, wip->i_num);
         ino = find_entry(wip, path, offset);
         if (ino == 0){
             return NULL;

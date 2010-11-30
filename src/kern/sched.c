@@ -3,6 +3,8 @@
 #include <proto.h>
 #include <proc.h>
 
+#include <conf.h>
+
 // one page size, stores some info on proc[0] and its kernel stack
 // note: inialized as 0.
 uchar kstack0[1024] = {0, };
@@ -151,6 +153,7 @@ int copy_mem_to(struct proc *p){
 
 /*
  * main part of sys_fork()
+ * TODO: copy inodes.
  * */
 int copy_proc(struct trap *tf){
     uint nr; 
@@ -174,6 +177,9 @@ int copy_proc(struct trap *tf){
     p->p_cpu  = current->p_cpu;
     p->p_pri  = current->p_pri;
     p->p_nice = current->p_nice;
+    // copy inodes
+    p->p_cdir = current->p_cdir;
+    p->p_cdir->i_count++;
     // init the new proc's kernel stack
     p->p_trap = ntf = ((struct trap *)(uint)p + 0x1000) - 1;
     *ntf = *tf;
@@ -182,12 +188,10 @@ int copy_proc(struct trap *tf){
     memset(&(p->p_contxt), 0, sizeof(struct contxt));
     p->p_contxt.eip = &_hwint_ret;
     p->p_contxt.esp = p->p_trap;
-
     set_ldt(&gdt[LDT0+p->p_pid], p->p_ldt);
     if (copy_mem_to(p) != 0){
         panic("copy_proc(): error on copy mem.");
     }
-
     p->p_stat = SRUN;
     return nr;
 }

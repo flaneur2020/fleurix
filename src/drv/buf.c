@@ -60,7 +60,7 @@ _loop:
     else {
         dtp = bdevsw[MAJOR(dev)].d_tab;
         if (dtp==NULL){
-            panic("error devtab.");
+            panic("error devtab. ");
         }
         // 1. found in the dev's cache list
         if (bp=incore(dev, blkno)) {

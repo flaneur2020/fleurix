@@ -58,22 +58,22 @@ void sys_setup(struct trap *tf) {
     struct inode *ip, *rip;
     char *str, *path;
 
-    //
+    // mount the root dev and set the current workint dirctory
     do_mount(rootdev, NULL);
+    ip = iget(rootdev, ROOTINO);
+    current->p_cdir = ip; 
+    unlock_inode(ip);
 
     // debug read_inode();
     //
-    ip = iget(rootdev, 2);
-    read_inode(ip);
-    dump_inode(ip);
-    panic("~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
     ip = iget(rootdev, 2);
-    dump_inode(ip);
+    //dump_inode(ip);
     iput(ip);
 
     // debug namei
-    path = "/dir/d";
+    path = "/dir/d///";
+    printf("xxxx\n");
     rip = do_namei(path);
     if (rip==NULL) {
         printf("%s : inode not found", path);

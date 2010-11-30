@@ -173,11 +173,10 @@ int read_inode(struct inode *ip){
     // get the blk number where this inode lies in.
     lba = 2 + (sp->s_nimap_blk) + (sp->s_nzmap_blk) + (ip->i_num-1)/NINO_PER_BLK;
     bp = bread(ip->i_dev, lba);
-    //dump_buf(bp);
     if (bp->b_flag & B_ERROR) {
         panic("error on reading an inode");
     }
-    itab = (struct inode*)bp->b_data;
+    itab = (struct d_inode*)bp->b_data;
     memcpy(ip, &itab[(ip->i_num-1)%NINO_PER_BLK], sizeof(struct d_inode));
     brelse(bp);
     return 0;
