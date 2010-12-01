@@ -85,6 +85,19 @@ static inline void lldt(uint n){
 
 /**************************************************/
 
+
+/* load TSS into tr */
+static inline void cli(){
+    asm volatile("cli");
+}
+
+static inline void sti(){
+    asm volatile("sti");
+}
+
+/**************************************************/
+
+
 /*
  * ljmp seg, offset...Lovely little instruction.
  * But seg seems only availible for immediate value at compile time.

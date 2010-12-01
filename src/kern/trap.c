@@ -106,13 +106,13 @@ void idt_set_gate(uint nr, uint base, ushort sel, uchar type, uchar dpl) {
 }
 
 static inline void set_syst_gate(uint nr, uint base){
-    idt_set_gate(nr, base, KERN_CS, STS_TRG, 3);
+    idt_set_gate(nr, base, KERN_CS, STS_TRG, RING3);
 }
 static inline void set_intr_gate(uint nr, uint base){
-    idt_set_gate(nr, base, KERN_CS, STS_IG, 0);
+    idt_set_gate(nr, base, KERN_CS, STS_IG, RING0);
 }
 static inline void set_trap_gate(uint nr, uint base){
-    idt_set_gate(nr, base, KERN_CS, STS_TRG, 0);
+    idt_set_gate(nr, base, KERN_CS, STS_TRG, RING0);
 }
 
 void hwint_init(){
@@ -127,8 +127,7 @@ void hwint_init(){
     set_hwint(0x80, &do_syscall);      // in syscall.c
 }
 
-void flush_idt(struct idt_desc idtd){    set_syst_gate(0x03, _hwint[0x03]); // int3
-
+void flush_idt(struct idt_desc idtd){
     asm volatile(
         "lidt %0"
         :: "m"(idtd));
@@ -168,7 +167,13 @@ void hwint_common(struct trap *tf) {
             handler(tf);
         }
     }
+    // on sheduling 
     setpri(current);
+    // only swtch on returning to user mode,
+    // to keep the kernel nonpremtive.
+    if ((tf->cs & 3)==RING3) {
+        swtch();
+    }
 }
 
 void set_hwint(int nr, void (*handler)(struct trap *tf)){

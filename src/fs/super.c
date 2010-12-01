@@ -17,11 +17,14 @@ struct super    mnt[NMOUNT] = {0, };
  * */
 struct super* get_super(ushort dev){
     struct super *sp;
+
+_loop:
     for (sp=&mnt[0]; sp<&mnt[NMOUNT]; sp++){
         if (dev == sp->s_dev) {
             if (sp->s_flag & S_LOCK) {
                 sp->s_flag |= S_WANTED;
                 sleep(sp, PINOD);
+                goto _loop;
             }
             return sp;
         }

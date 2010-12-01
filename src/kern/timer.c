@@ -59,11 +59,6 @@ void do_timer(struct trap *tf){
         current->p_cpu++;
     }
 
-    // per time quatum
-    if (tick % (HZ/5)==0) {
-        swtch();
-    }
-
     // per second
     if (tick % HZ ==0){
         sched_cpu();

@@ -24,9 +24,11 @@ struct tss_desc tss;
  * TODO: race condition should consider later.
  * */
 void sleep(uint chan, int pri){
+    cli();
     current->p_chan = chan;
     current->p_pri  = pri;
     current->p_stat = SWAIT;
+    sti();
     swtch();
 }
 
@@ -99,7 +101,9 @@ void swtch(){
         np = proc[0];
     }
     //debug_proc_list();
-    swtch_to(np);
+    if (np!=current) {
+        swtch_to(np);
+    }
 }
 
 /*
@@ -171,13 +175,15 @@ int copy_proc(struct trap *tf){
     }
 
     proc[nr] = p;
+    *p = *current;
     p->p_pid = nr;
     p->p_ppid = current->p_pid;
+    // on sche
     p->p_flag = current->p_flag;
     p->p_cpu  = current->p_cpu;
     p->p_pri  = current->p_pri;
     p->p_nice = current->p_nice;
-    // copy inodes
+    // increase the reference count of inodes
     p->p_cdir = current->p_cdir;
     p->p_cdir->i_count++;
     // init the new proc's kernel stack
