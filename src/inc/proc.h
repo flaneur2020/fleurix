@@ -43,6 +43,9 @@ extern struct proc *proc[NPROC];
 
 extern struct proc *current;
 
+/* flag for re-scheduling */
+extern uint runrun; 
+
 /* stat codes */
 #define SSLEEP      1           // sleeping on high priority
 #define SWAIT       2           // sleeping on low  priority

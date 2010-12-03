@@ -16,6 +16,8 @@ struct proc *current = NULL;
 
 struct tss_desc tss;
 
+uint runrun = 0; 
+
 /*******************************************************************************/
 
 /*******************************************************************************/
@@ -50,12 +52,17 @@ void setrun(struct proc *p){
 
 /*******************************************************************/
 
-/* re-caculate the proc's p_pri */
+/* re-caculate the proc's p_pri
+ * if it's lower than the current proc's p_pri, set the re-schedule flag.
+ * */
 void setpri(struct proc *p){
     int n;
     n = p->p_cpu/16 + PUSER + p->p_nice;
     if (n >= 127) n=127;
     if (n <= -126) n=-126;
+    if (p->p_pri < current->p_pri){
+        runrun = 1;
+    }
     p->p_pri = n;
 }
 
@@ -84,6 +91,9 @@ void swtch(){
     int i;
     char n=127;
     struct proc *p=NULL, *np=NULL;
+
+    // clear the re-schedule flag
+    runrun = 0;
 
     // re-caculate current's p_pri
     setpri(current);

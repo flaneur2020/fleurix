@@ -168,10 +168,11 @@ void hwint_common(struct trap *tf) {
         }
     }
     // on sheduling 
+    // if the re-schedule flag is set, make an task swtch.
+    // and make sure only swtch on returning to user mode,
+    // thus to keep the kernel nonpremtive.
     setpri(current);
-    // only swtch on returning to user mode,
-    // to keep the kernel nonpremtive.
-    if ((tf->cs & 3)==RING3) {
+    if (runrun && (tf->cs & 3)==RING3) {
         swtch();
     }
 }
