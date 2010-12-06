@@ -1,10 +1,11 @@
 # You many now use double quotes around pathnames, in case
 # your pathname includes spaces.
 
-# vgaromimage: /usr/share/vgabios/vgabios.bin
 romimage: file=/usr/share/bochs/BIOS-bochs-latest
 vgaromimage: file=/usr/share/bochs/VGABIOS-lgpl-latest
-megs: 32
+
+# size of memory
+megs: 128
 
 # floppy image
 floppya: 1_44=bin/kernel.img, status=inserted

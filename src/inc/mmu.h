@@ -1,4 +1,4 @@
-struct page_desc {
+struct pte {
     uint        present  :1;        // Page present in memory
     uint        rw       :1;        // Read-only if clear, readwrite if set
     uint        user     :1;        // Supervisor level only if clear
@@ -8,15 +8,17 @@ struct page_desc {
     uint        offset   :20;       // Frame address (shifted right 12 bits)
 } __attribute__((packed));
 
-// A linear address 'la' has a three-part structure as follows:
-//
-// +--------10------+-------10-------+---------12----------+
-// | Page Directory |   Page Table   | Offset within Page  |
-// |      Index     |      Index     |                     |
-// +----------------+----------------+---------------------+
-//  \--- PDX(la) --/ \--- PTX(la) --/ \---- POFF(la) ----/
-//  \----------- PPN(la) -----------/
-//
+/* 
+ * A linear address 'la' has a three-part structure as follows:
+ *
+ * +--------10------+-------10-------+---------12----------+
+ * | Page Directory |   Page Table   | Offset within Page  |
+ * |      Index     |      Index     |                     |
+ * +----------------+----------------+---------------------+
+ *  \--- PDX(la) --/ \--- PTX(la) --/ \---- POFF(la) ----/
+ *  \----------- PPN(la) -----------/
+ **/
+
 #define PDX(la)  ((uint)((la>>22)&0x3FF))
 #define PTX(la)  ((uint)((la>>12)&0x3FF))
 #define POFF(la) ((uint)((la&0xFFF)))
@@ -34,6 +36,10 @@ struct page_desc {
 #define PTE_D		0x040	// Dirty
 #define PTE_PS		0x080	// Page Size
 #define PTE_MBZ		0x180	// Bits must be zero
+
+/* CR2 stores the virtual address on which raised the page fault. 
+ * error code stores inside the trap frame.
+ * */
 
 // Page Fault error code flags
 #define PFE_P       0x001   // Causing the fault was not a Present page

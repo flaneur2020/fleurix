@@ -149,14 +149,12 @@ int find_empty_pid(){
  * copy the current proc's address space into a new proc
  * return 0 on success
  * */
-int copy_mem_to(struct proc *p){
+int copy_mem_to(struct proc *to){
     uint old_limit = get_seg_limit(&(current->p_ldt[1])); 
     uint old_base  = get_seg_base(&(current->p_ldt[1])); 
-    uint new_base  = p->p_pid * 0x4000000;
-    p->p_textp     = new_base;
-    p->p_tsize     = old_limit;
-    set_seg(&(p->p_ldt[1]), new_base, old_limit, 3, STA_X | STA_R);
-    set_seg(&(p->p_ldt[2]), new_base, old_limit, 3, STA_W);
+    uint new_base  = to->p_pid * 0x4000000;
+    set_seg(&(to->p_ldt[1]), new_base, old_limit, RING3, STA_X | STA_R);
+    set_seg(&(to->p_ldt[2]), new_base, old_limit, RING3, STA_W);
     // copy page tables
     int ret = copy_ptab(old_base, new_base, old_limit);
     if (ret!=0){
@@ -167,7 +165,7 @@ int copy_mem_to(struct proc *p){
 
 /*
  * main part of sys_fork()
- * TODO: copy inodes.
+ * TODO: increment the reference count of inodes.
  * */
 int copy_proc(struct trap *tf){
     uint nr; 
@@ -179,7 +177,7 @@ int copy_proc(struct trap *tf){
         panic("copy_proc(): no pid availible.");
     }
 
-    p = (struct proc *) palloc(); 
+    p = (struct proc *) alloc_page(); 
     if (p==NULL){
         panic("copy_proc(): no page availible.");
     }
@@ -204,6 +202,7 @@ int copy_proc(struct trap *tf){
     memset(&(p->p_contxt), 0, sizeof(struct contxt));
     p->p_contxt.eip = &_hwint_ret;
     p->p_contxt.esp = p->p_trap;
+    // init ldt
     set_ldt(&gdt[LDT0+p->p_pid], p->p_ldt);
     if (copy_mem_to(p) != 0){
         panic("copy_proc(): error on copy mem.");

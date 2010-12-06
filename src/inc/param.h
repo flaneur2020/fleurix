@@ -3,8 +3,8 @@
 #define BSIZE   2   /* (*512) */
 #define BLK     (BSIZE*PHYBLK)
 #define PAGE    0x1000
-#define LO_MEM  (0x300000)  /* kernel locates in 0~LO_MEM */
-#define HI_MEM  0x1000000
+#define LO_MEM  0x300000  /* kernel resides in 0~LO_MEM */
+#define HI_MEM  0x1000000 /* total 128mb physical memory */
 #define ROOTINO 1
 #define NAMELEN 14
 
