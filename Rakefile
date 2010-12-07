@@ -83,8 +83,9 @@ cfiles = [
   'src/kern/sched.c',
   'src/kern/seg.c',
   'src/kern/trap.c',
-  'src/kern/page.c',
   'src/kern/timer.c',
+  #
+  'src/mm/page.c',
   #
   'src/drv/buf.c',
   'src/drv/conf.c',

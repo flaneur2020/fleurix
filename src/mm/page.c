@@ -1,5 +1,6 @@
 #include <param.h>
 #include <x86.h>
+#include <proc.h>
 #include <proto.h>
 
 uint la2pa(uint la);
@@ -18,7 +19,7 @@ uint* find_pte(uint la);
  *
  * This file is heavily associated with fork(). In the routine copy_mem_to(), it will copy 
  * the parent's page tables to the children, and mark each read-only, take an eye on the 
- * fact that *** the parent's page table is also marked read-only *** in routine copy_ptab().
+ * fact that *** the parent's page table is also marked read-only *** in routine copy_vm().
  * Hence each modification will raise an page fault, so do_wp_page() handled this and copy 
  * one page or just un-wp it(if it's the last one who does modify something).
  *
@@ -71,7 +72,7 @@ void do_wp_page(uint la, uint err){
     coremap[PPN(pa)]--;
     npa = alloc_page();
     memcpy(npa, pa, 0x1000);
-    put_page(la, npa, PTE_P | PTE_U | PTE_W);
+    put_page(npa, la, PTE_P | PTE_U | PTE_W);
     flush_cr3(pgdir);
 }
 
@@ -127,7 +128,7 @@ int free_page(uint addr){
 /*
  * map a linear address to physical address.  
  * */
-int put_page(uint la, uint pa, uint flag){
+int put_page(uint pa, uint la, uint flag){
     uint pde = pgdir[PDX(la)];
     if (!(pde & PTE_P)){
         pde = alloc_page();
@@ -145,20 +146,24 @@ int put_page(uint la, uint pa, uint flag){
 
 /*
  * copy page tables, as a helper of copy_proc().
- * note: this also mark the parent proc's page tables as read only.
+ * this also mark the parent proc's page tables as read only.
+ * note: *important*, but you should never mark the proc[0]'s page
+ * as read only.
  * note2: src, dst, and limit are deserved multiple of 0x1000
- *
  * */
-int copy_ptab(uint src, uint dst, uint limit){
+int copy_vm(uint src, uint dst, uint limit){
     uint off, la, pa, *pte;
     for(off=0; off<=limit; off+=0x1000){
         // find and mark the parent's page as read only.
-        pte = find_pte(src+off);
-        *pte &= ~PTE_W; 
+        // but not do this on proc0
+        if (src >= LO_MEM) {
+            pte = find_pte(src+off);
+            *pte &= ~PTE_W; 
+        }
         // increase the children's reference count.
         pa = la2pa(src+off);
         coremap[PPN(pa)]++;
-        put_page(dst+off, pa, PTE_P | PTE_U);
+        put_page(pa, dst+off, PTE_P | PTE_U);
     }
     flush_cr3(pgdir);
     return 0;

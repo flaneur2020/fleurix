@@ -31,8 +31,7 @@ void main(){
 
     /**/
     if (fork()){
-        putn(0);
-        while(1) putn(0);
+        while(1); // do nothing , don't pollute the stack.
     }
     else if(fork()){
         putn(1);
