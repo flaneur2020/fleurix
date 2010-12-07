@@ -4,6 +4,7 @@
 
 uint la2pa(uint la);
 uint alloc_page();
+uint* find_pte(uint la);
 
 /*
  * the ONLY page directory, 
@@ -24,11 +25,22 @@ void do_no_page(uint la, uint err){
  * TODO: 
  * */
 void do_wp_page(uint la, uint err){
-    uint pa, npa;
+    uint pa, npa, *pte;
+
     pa = la2pa(la);
+    // if the only 
+    if (coremap[PPN(pa)]==1) {
+        pte = find_pte(la);
+        *pte &= ~PTE_W;
+        flush_cr3(pgdir);
+        return;
+    }
+    // un_wp one page, decrease the reference count of the page frame.
+    coremap[PPN(pa)]--;
     npa = alloc_page();
-    memcpy(pa, npa, 0x1000);
+    memcpy(npa, pa, 0x1000);
     put_page(la, npa, PTE_P | PTE_U | PTE_W);
+    flush_cr3(pgdir);
 }
 
 void do_page_fault(struct trap *tf){
@@ -36,10 +48,9 @@ void do_page_fault(struct trap *tf){
     asm volatile("movl %%cr2, %0":"=a"(cr2));
     // write protection raised prior than valid.
     if (tf->err_code & PFE_W) {
-        //do_wp_page(cr2, tf->err_code);
+        do_wp_page(cr2, tf->err_code);
     }
-    debug_regs(tf);
-    for(;;);
+    //debug_regs(tf);
 }
 
 /**************************************************************/
@@ -53,7 +64,7 @@ uint alloc_page(){
     for(i=0; i<NPAGE; i++){
         if(coremap[i]==0){
             coremap[i] = 1;
-            return LO_MEM + i*0x1000;
+            return i*0x1000;
         }
     }
     panic("no availible page.\n");
@@ -64,17 +75,16 @@ uint alloc_page(){
  * free a physical page. decrease the target inside coremap. 
  */
 int free_page(uint addr){
-    int i;
-
-    i = (addr-LO_MEM)/0x1000;
-    if (i<0 || i>NPAGE) {
+    int n;
+    n = addr/0x1000;
+    if (n<(LO_MEM/0x1000) || n>NPAGE) {
         panic("error page.");
     }
-    if(coremap[i]==0){
+    if(coremap[n]==0){
         return 0;
     }
-    coremap[i]--;
-    return i;
+    coremap[n]--;
+    return n;
 }
 
 /****************************************************************/
@@ -89,7 +99,7 @@ int put_page(uint la, uint pa, uint flag){
         if (pde==0){
             panic("no availible frame");
         }
-        // it's a pde
+        // it's a pde, don't get confused.
         pgdir[PDX(la)] = pde | PTE_P | PTE_W | PTE_U;
     }
     uint *ptab = (uint *)PTE_ADDR(pde);
@@ -99,18 +109,22 @@ int put_page(uint la, uint pa, uint flag){
 }
 
 /*
- * copy page tables, as a helper of copy_proc()
- * it do NOT copy the data inside a frame, just remap it
- * note: src, dst, and limit are deserved multiple of 0x1000
+ * copy page tables, as a helper of copy_proc().
+ * note: this also mark the parent proc's page tables as read only.
+ * note2: src, dst, and limit are deserved multiple of 0x1000
  *
  * TODO: and mark it READONLY.  note: the wired syscall bug may from this. 
  * */
 int copy_ptab(uint src, uint dst, uint limit){
-    //printf("copy_ptab(): src=%x, dst=%x, limit=%x\n", src, dst, limit);
-    uint off, la, pa;
+    uint off, la, pa, *pte;
     for(off=0; off<=limit; off+=0x1000){
+        // find and mark the parent's page as read only.
+        pte = find_pte(src+off);
+        *pte &= ~PTE_W; 
+        // increase the children's reference count.
         pa = la2pa(src+off);
-        put_page(dst+off, pa, PTE_P | PTE_W | PTE_U);
+        coremap[PPN(pa)]++;
+        put_page(dst+off, pa, PTE_P | PTE_U);
     }
     flush_cr3(pgdir);
     return 0;
@@ -118,19 +132,22 @@ int copy_ptab(uint src, uint dst, uint limit){
 
 /**************************************************************/
 
-struct pte* find_pte(uint la){
+/* get the pointer to a pte. */
+uint* find_pte(uint la){
+    uint pde, *ptab, pte;
+    pde = pgdir[PDX(la)];
+    if (!(pde & PTE_P)) {
+        printf("%x: ", la);
+        panic("invalid pde\n");
+    }
+    ptab = (uint *)PTE_ADDR(pde);
+    return &ptab[PTX(la)];
 }
 
 /* translate a linear address to physical address
  */
 uint la2pa(uint la){
-    uint pde = pgdir[PDX(la)];
-    if(!(pde & PTE_P)){
-        printf("%x: ", la);
-        panic("invalid pde\n");
-    }
-    uint *ptab = (uint *)PTE_ADDR(pde);
-    uint pte = ptab[PTX(la)];
+    uint pte = *find_pte(la);
     if(!(pte & PTE_P)){
         panic("invalid pte\n");
     }
@@ -146,7 +163,7 @@ void flush_cr3(uint addr){
 void page_enable(){
     uint cr0;
     asm volatile("mov %%cr0, %0": "=r"(cr0));
-    cr0 |= 0x80000000; // Enable paging!
+    cr0 |= 0x80000000; // set the paging bit.
     asm volatile("mov %0, %%cr0":: "r"(cr0));
 }
 
@@ -176,6 +193,11 @@ void page_init(){
 	for(i=4; i<1024; i++) {
 		pgdir[i] = 0 | PTE_W | PTE_U; 
 	};
+
+    // init coremap
+    for(i=0; i<LO_MEM/0x1000; i++) {
+        coremap[i] = 100;
+    }
 
     // int handler
     set_hwint(0x0E, do_page_fault);

@@ -15,7 +15,7 @@
 #define NBLKDEV 2
 #define NINODE  128
 #define NMOUNT  16
-#define NPAGE   ((HI_MEM-LO_MEM)/PAGE)
+#define NPAGE   (HI_MEM/PAGE)
 
 typedef unsigned char   uchar;
 typedef unsigned short  ushort;
