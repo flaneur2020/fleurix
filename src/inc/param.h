@@ -3,6 +3,7 @@
 #define BSIZE   2   /* (*512) */
 #define BLK     (BSIZE*PHYBLK)
 #define PAGE    0x1000
+#define PROCSIZ 0x400000
 #define LO_MEM  0x300000  /* kernel resides in 0~LO_MEM */
 #define HI_MEM  0x1000000 /* total 128mb physical memory */
 #define ROOTINO 1
@@ -15,6 +16,7 @@
 #define NBLKDEV 2
 #define NINODE  128
 #define NMOUNT  16
+#define NKPAGE  (LO_MEM/PAGE)
 #define NPAGE   (HI_MEM/PAGE)
 
 typedef unsigned char   uchar;

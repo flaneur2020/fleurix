@@ -7,35 +7,67 @@ uint alloc_page();
 uint* find_pte(uint la);
 
 /*
- * the ONLY page directory, 
- * which indicates the linear address space of 4GB
- * each proc have a address space of 64MB, which starts at pid*64mb
+ * page.c
+ *
+ * this file indicated the codes on the initialization of the paging system and the
+ * implemtion of copy-on-write, maybe demand paging is the next.
+ * 
+ * Fleurix takes an seg & page memory model the same as linux0.11 and inherit the 16mb
+ * physical memory limit. Total 4Gb linear space address, and each process has got 64mb 
+ * virtual address space, which seperated by segments lied inside its LDT. 
+ *
+ * This file is heavily associated with fork(). In the routine copy_mem_to(), it will copy 
+ * the parent's page tables to the children, and mark each read-only, take an eye on the 
+ * fact that *** the parent's page table is also marked read-only *** in routine copy_ptab().
+ * Hence each modification will raise an page fault, so do_wp_page() handled this and copy 
+ * one page or just un-wp it(if it's the last one who does modify something).
+ *
+ * */
+
+/*
+ * the ONLY page directory, which indicates the linear address space of 4GB.
+ * each proc have a address space of 64MB, which starts at pid*64mb. limited 
+ * by each's LDT.
  * */
 uint *pgdir = (uint *) 0x00000;
 
+/*
+ * the map for page frames. Each physical page is associated with one reference
+ * count, and it's free on 0. Only 0 can be allocated via alloc_page().  
+ * Reference count is increased on a fork.
+ *
+ * note: the kernel pages(0~LO_MEM) are initialized as 100 (in page_init()) to 
+ * prevent any allocation.
+ * */
 uchar coremap[NPAGE] = {0, };
 
 /**************************************************************/
 
+/*
+ * on swap...
+ * */
 void do_no_page(uint la, uint err){
 }
 
-/* the handler of write-only protection.
- * here is the 'write' of the so called copy-on-write.
- * TODO: 
+/* 
+ * the handler of the read-only protection. here is the 'copy' action
+ * of the implemtion of copy-on-write.
+ * If this one is the last one who did the write, just mark the page as
+ * write-able.
+ * else allocate one page and associate inside the page table. 
  * */
 void do_wp_page(uint la, uint err){
     uint pa, npa, *pte;
 
     pa = la2pa(la);
-    // if the only 
+    // if it's the last one who did the write. 
     if (coremap[PPN(pa)]==1) {
         pte = find_pte(la);
         *pte &= ~PTE_W;
         flush_cr3(pgdir);
         return;
     }
-    // un_wp one page, decrease the reference count of the page frame.
+    // one page, decrease the reference count of the page frame.
     coremap[PPN(pa)]--;
     npa = alloc_page();
     memcpy(npa, pa, 0x1000);
@@ -43,6 +75,9 @@ void do_wp_page(uint la, uint err){
     flush_cr3(pgdir);
 }
 
+/*
+ * the common handler of all page faults, as a dispatcher.
+ * */
 void do_page_fault(struct trap *tf){
     uint cr2;
     asm volatile("movl %%cr2, %0":"=a"(cr2));
@@ -61,9 +96,9 @@ void do_page_fault(struct trap *tf){
  * */ 
 uint alloc_page(){
     int i;
-    for(i=0; i<NPAGE; i++){
+    for(i=0;i<NPAGE; i++){
         if(coremap[i]==0){
-            coremap[i] = 1;
+            coremap[i]++;
             return i*0x1000;
         }
     }
@@ -77,7 +112,7 @@ uint alloc_page(){
 int free_page(uint addr){
     int n;
     n = addr/0x1000;
-    if (n<(LO_MEM/0x1000) || n>NPAGE) {
+    if (n<NKPAGE || n>NPAGE) {
         panic("error page.");
     }
     if(coremap[n]==0){
@@ -113,7 +148,6 @@ int put_page(uint la, uint pa, uint flag){
  * note: this also mark the parent proc's page tables as read only.
  * note2: src, dst, and limit are deserved multiple of 0x1000
  *
- * TODO: and mark it READONLY.  note: the wired syscall bug may from this. 
  * */
 int copy_ptab(uint src, uint dst, uint limit){
     uint off, la, pa, *pte;
@@ -184,7 +218,7 @@ void page_init(){
         pgdir[i] = (uint)ptab | PTE_P | PTE_W | PTE_U;
         for(j=0; j<1024; j++) {
             ptab[j] = addr | PTE_P | PTE_W | PTE_U; 
-            addr += 4096; // 4096 = 4kb
+            addr += 0x1000; // 4096 = 4kb
         }
     }
 
@@ -195,7 +229,7 @@ void page_init(){
 	};
 
     // init coremap
-    for(i=0; i<LO_MEM/0x1000; i++) {
+    for(i=0; i<NKPAGE; i++) {
         coremap[i] = 100;
     }
 
@@ -207,3 +241,9 @@ void page_init(){
     page_enable();
 }
 
+void dump_coremap(){
+    int i;
+    for(i=200; i<250; i++){
+        printf("coremap[%d]: %d\n", i, coremap[i]);
+    }
+}

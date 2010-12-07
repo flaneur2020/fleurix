@@ -174,12 +174,12 @@ int copy_proc(struct trap *tf){
     
     nr = find_empty_pid();
     if (nr==0){
-        panic("copy_proc(): no pid availible.");
+        panic("no pid availible.");
     }
 
     p = (struct proc *) alloc_page(); 
     if (p==NULL){
-        panic("copy_proc(): no page availible.");
+        panic("no page availible.");
     }
 
     proc[nr] = p;

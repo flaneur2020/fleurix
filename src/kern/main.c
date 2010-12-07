@@ -12,6 +12,10 @@
 #include <inode.h>
 #include <fs.h>
 
+/*
+ * NOTE: share the memory of proc[0] may raise some wired bugs.
+ * */
+
 void main(){
     tty_init();         puts("* init tty\n");
     gdt_init();         puts("* init gdt\n");
@@ -27,12 +31,15 @@ void main(){
 
     /**/
     if (fork()){
+        putn(0);
         while(1) putn(0);
     }
     else if(fork()){
+        putn(1);
         while(1) putn(1);
     }
     else {
+        putn(2);
         while(1) putn(2);
     }
     for(;;);
