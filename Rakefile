@@ -1,5 +1,5 @@
 cinc   = '-Isrc/inc'
-cflag  = "-Wall -finline-functions -nostdinc -fno-builtin"
+cflag  = "-Wall -finline-functions -nostdinc -fno-builtin -fno-stack-protector"
 pgrep  = "grep --color -e 'error' -e 'error' -e '^'"
 
 sh "mkdir bin" if not File.exists? 'bin'
@@ -33,16 +33,16 @@ task :ctags do
   sh "ctags -R"
 end
 
-#######################################################################
+# ---------------------------------------------------------------------
 # => kernel.img
-#######################################################################
+# ---------------------------------------------------------------------
 file 'bin/kernel.img' => ['bin/boot.bin', 'bin/main.bin'] do
   sh "cat bin/boot.bin bin/main.bin > bin/kernel.img"
 end
 
-#######################################################################
+# ---------------------------------------------------------------------
 # => boot.bin
-#######################################################################
+# ---------------------------------------------------------------------
 file 'bin/boot.o' => ['src/boot/boot.S'] do
   sh "nasm -f elf -o bin/boot.o src/boot/boot.S"
 end
@@ -51,31 +51,12 @@ file 'bin/boot.bin' => ['bin/boot.o', 'boot.ld'] do
   sh "ld bin/boot.o -o bin/boot.bin -e c -T boot.ld"
 end
 
-#######################################################################
+# ---------------------------------------------------------------------
 # mainly C part
 # => main.bin
-#######################################################################
+# ---------------------------------------------------------------------
 
-hfiles = [
-  'src/inc/buf.h',
-  'src/inc/proto.h',
-  'src/inc/param.h',
-  'src/inc/proc.h',
-  'src/inc/unistd.h',
-  #
-  'src/inc/conf.h',
-  'src/inc/hd.h',
-  #
-  'src/inc/super.h',
-  'src/inc/inode.h',
-  # 
-  'src/inc/idt.h',
-  'src/inc/gdt.h',
-  'src/inc/mmu.h',
-  'src/inc/tss.h',
-  'src/inc/asm.h',
-  'src/inc/x86.h'
-]
+hfiles = Dir['src/inc/*.h']
 
 cfiles = [
   'src/kern/tty.c',
@@ -95,6 +76,8 @@ cfiles = [
   'src/fs/inode.c',
   'src/fs/mount.c',
   'src/fs/namei.c',
+  'src/fs/rdwri.c',
+  'src/fs/file.c',
   #
   'src/lib/str.c',
   #
@@ -121,7 +104,7 @@ sfiles.each do |fn_s|
   end
 end
 
-######################################################################################3
+# ---------------------------------------------------------------------3
 
 file 'bin/main.bin' => 'bin/main.elf' do
   sh "objcopy -R .pdr -R .comment -R .note -S -O binary bin/main.elf bin/main.bin"

@@ -151,7 +151,7 @@ int put_page(uint pa, uint la, uint flag){
  * as read only.
  * note2: src, dst, and limit are deserved multiple of 0x1000
  * */
-int copy_vm(uint src, uint dst, uint limit){
+int copy_vm(uint dst, uint src, uint limit){
     uint off, la, pa, *pte;
     for(off=0; off<=limit; off+=0x1000){
         // find and mark the parent's page as read only.
@@ -244,11 +244,4 @@ void page_init(){
     // write page directory to cr3 and enable PE on cr0
     flush_cr3(pgdir);
     page_enable();
-}
-
-void dump_coremap(){
-    int i;
-    for(i=200; i<250; i++){
-        printf("coremap[%d]: %d\n", i, coremap[i]);
-    }
 }

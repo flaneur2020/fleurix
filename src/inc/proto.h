@@ -32,10 +32,14 @@ void    ljmp(ushort seg, uint offset);
 int     nodev();
 int     nulldev();
 
+/* panic */
 #define panic(str)  \
     do {            \
         printf("PANIC %s:%d: %s\n", __FILE__, __LINE__, str);\
         asm volatile("cli");\
         for(;;);\
     } while(0)
+
+#define max(a, b) (((a)>(b))?(a):(b))
+#define min(a, b) (((a)<(b))?(a):(b))
 

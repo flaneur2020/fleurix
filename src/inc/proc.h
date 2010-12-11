@@ -2,6 +2,7 @@
 #define PROC_H
 
 #include <inode.h>
+#include <file.h>
 
 /* the regs saved in a task switch. */
 struct contxt {
@@ -34,8 +35,9 @@ struct proc {
     uint                p_chan;         /* the event channel which proc is awaiting */
     uint                p_error;        /* return error code */
     struct inode       *p_cdir;         /* current working dir */
-    struct seg_desc     p_ldt[3];       /* on context swtch */
+    struct file        *p_ofile[NOFILE];/* file desciptors of the current opened files */
     struct contxt       p_contxt;       /* - */
+    struct seg_desc     p_ldt[3];       /* on context swtch */
     struct trap        *p_trap;         /* the initialize trap, initialized on fork */
 };
 
@@ -79,7 +81,7 @@ extern uint runrun;
 #define ENOENT		 2
 #define ESRCH		 3
 #define EINTR		 4
-#define EIO		 5
+#define EIO		    5
 #define ENXIO		 6
 #define E2BIG		 7
 #define ENOEXEC		 8

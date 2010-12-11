@@ -8,7 +8,6 @@
 //
 #include <super.h>
 #include <inode.h>
-#include <fs.h>
 
 struct super    mnt[NMOUNT] = {0, };
 

@@ -28,7 +28,6 @@ short* memsetw(short *dest, short val, uint count){
     return dest;
 }
 
-
 /* on str */
 int strlen(char *str){
     char* sp;
@@ -61,8 +60,7 @@ int strcmp(char *s1, char *s2){
     return (*(uchar*)s1 - *(uchar*)(s2-1));
 }
 
-int strncmp(char *s1, char* s2, uint n)
-{
+int strncmp(char *s1, char* s2, uint n) {
     if (n == 0)
         return 0;
     while(n-- != 0) {
@@ -73,4 +71,6 @@ int strncmp(char *s1, char* s2, uint n)
     } 
     return 0;
 }
+
+
 

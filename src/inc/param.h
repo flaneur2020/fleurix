@@ -15,6 +15,8 @@
 #define NBUF    (0x200000/BLK/BSIZE) /* buffers take 2mb */
 #define NBLKDEV 2
 #define NINODE  128
+#define NFILE   128
+#define NOFILE  16
 #define NMOUNT  16
 #define NKPAGE  (LO_MEM/PAGE)
 #define NPAGE   (HI_MEM/PAGE)

@@ -8,7 +8,6 @@
 //
 #include <super.h>
 #include <inode.h>
-#include <fs.h>
 
 struct inode inode[NINODE];
 
@@ -22,7 +21,7 @@ struct inode inode[NINODE];
 /* get an (locked) inode via an number 
  * if the inode is in cache, return it right now.
  * return NULL on error.
- *
+ r
  * note1: you may compare this code with getblk, the idea here
  * is common used among everywhere on resource allocation.
  * it returns ONLY locked inode just as B_BUSY in getblk, just 

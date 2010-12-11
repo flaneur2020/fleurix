@@ -10,7 +10,7 @@
 
 #include <super.h>
 #include <inode.h>
-#include <fs.h>
+#include <file.h>
 
 /*
  * NOTE: share the memory of proc[0] may raise some wired bugs.
@@ -29,7 +29,7 @@ void main(){
     puts("* init user mode\n");
     umode_init();
 
-    /**/
+    /*
     if (fork()){
         while(1); // do nothing , don't pollute the stack.
     }
@@ -42,14 +42,12 @@ void main(){
         while(1) putn(2);
     }
     for(;;);
-    /**/
-    /*
+    */
     // in proc1
     if(fork()==0){
         // setup
         asm volatile("int $0x80"::"a"(0));
     }
-    */
 
     for(;;);
 }
@@ -57,6 +55,7 @@ void main(){
 /* TODO: just for debug right now.
  * we need two procs at least.
  * */
+char buff[256] = {0, };
 void sys_setup(struct trap *tf) {
     int dev = DEVNO(1, 0);
     struct buf *bp;
@@ -71,24 +70,14 @@ void sys_setup(struct trap *tf) {
     current->p_cdir = ip; 
     unlock_inode(ip);
 
-    // debug read_inode();
-    //
-
+    int off;
     ip = iget(rootdev, 2);
-    //dump_inode(ip);
+    readi(ip, buff, 0, 20);
+    printf("%s\n", buff);
+    readi(ip, buff, 20, 20);
+    printf("%s\n", buff);
     iput(ip);
 
-    // debug namei
-    path = "/dir/d///";
-    printf("xxxx\n");
-    rip = do_namei(path);
-    if (rip==NULL) {
-        printf("%s : inode not found", path);
-    }
-    else {
-        printf("path = %s\n ino = %d\n", path, rip->i_num);
-    }
-    iput(ip);
     unlock_super(sp);
 }
 
