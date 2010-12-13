@@ -55,7 +55,7 @@ void main(){
 /* TODO: just for debug right now.
  * we need two procs at least.
  * */
-char buff[256] = {0, };
+char buf[256] = {0, };
 void sys_setup(struct trap *tf) {
     int dev = DEVNO(1, 0);
     struct buf *bp;
@@ -70,14 +70,16 @@ void sys_setup(struct trap *tf) {
     current->p_cdir = ip; 
     unlock_inode(ip);
 
-    int off;
-    ip = iget(rootdev, 2);
-    readi(ip, buff, 0, 20);
-    printf("%s\n", buff);
-    readi(ip, buff, 20, 20);
-    printf("%s\n", buff);
+    ip = do_namei("/test.txt");
+    readi(ip, buf, 12400, 20);
+    printf("%s", buf);
     iput(ip);
-
+    int fd = do_open("/test.txt", O_RDONLY);
+    int r=0;
+    while((r=do_read(fd, buf, 50)) > 0){
+        buf[50] = '\0';
+        struct file *fp = current->p_ofile[fd];
+    }
     unlock_super(sp);
 }
 

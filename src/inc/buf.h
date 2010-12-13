@@ -12,7 +12,7 @@ struct buf {
     int             b_error;
 };
 
-extern struct buf   buf[NBUF];
+extern struct buf   buff[NBUF];
 
 /*
  * Each block device has a devtab, which contains private

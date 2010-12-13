@@ -103,11 +103,11 @@ void iput(struct inode *ip){
  * Given an inode and a position within the corresponding file, locate the
  * block (not zone) number in which that position is to be found and return it.
  * returns 0 on error.
- *
  * note: 
  * the first 7 entry of ip->zones[] are direct pointers, ip->zone[7] is an indirect 
  * pointer to a zone map, while ip->zone[8] is an double indirect pointer to a zone map.
- * TODO: debug it!.
+ *
+ * TODO: add one parameter 'alloc'
  */
 int bmap(struct inode *ip, ushort nr) {
     struct buf *bp, *bp2;
@@ -146,13 +146,7 @@ int bmap(struct inode *ip, ushort nr) {
     return ret;
 }
 
-/* 
- * TODO: similar with bmap, but used on writing file. 
- * allocate one block and map it onto file's logical block number, if 
- * nessary.
- * returns the device's physical block number.
- * */
-int put_blk(struct inode *ip, ushort nr){
+int itrunc(struct inode *ip){
 }
 
 /***************************************************/
@@ -186,6 +180,15 @@ void write_inode(struct inode *ip){
 }
 
 /*************************************************************/
+
+void lock_inode(struct inode *ip){
+    cli();
+    while(ip->i_flag & I_LOCK){
+        sleep(ip, PINOD);
+    }
+    ip->i_flag |= I_LOCK;
+    sti();
+}
 
 /* remember this just free with malloc. */
 void unlock_inode(struct inode *ip){

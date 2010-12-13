@@ -7,7 +7,7 @@ struct file {
     char            f_flag;
     char            f_count;
     uint            f_offset;
-    struct inode   *f_inode;
+    struct inode   *f_ino;
 };
 
 extern struct file file[NFILE];

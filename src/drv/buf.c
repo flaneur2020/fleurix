@@ -9,7 +9,7 @@
 extern char buffers[NBUF][BLK];
 
 /* buf heads */
-struct buf   buf[NBUF];
+struct buf   buff[NBUF];
 
 /* */
 struct buf  bfreelist;
@@ -193,7 +193,7 @@ void buf_init() {
     bfreelist.b_prev = bfreelist.b_next = &bfreelist;
     bfreelist.av_prev = bfreelist.av_next = &bfreelist;
     for(i=0; i<NBUF; i++){
-        bp = &buf[i]; 
+        bp = &buff[i]; 
         bp->b_dev = NODEV;
         bp->b_data = buffers[i];
         bp->b_flag = B_BUSY;

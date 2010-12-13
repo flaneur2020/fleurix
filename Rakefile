@@ -60,7 +60,7 @@ hfiles = Dir['src/inc/*.h']
 
 cfiles = [
   'src/kern/tty.c',
-  'src/kern/syscall.c',
+  'src/kern/sys.c',
   'src/kern/sched.c',
   'src/kern/seg.c',
   'src/kern/trap.c',

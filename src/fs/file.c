@@ -44,7 +44,7 @@ int do_open(char *path, uint mode){
     }
     unlock_inode(ip);
     fp->f_flag = mode;
-    fp->f_inode = ip;
+    fp->f_ino = ip;
     return fd;
 }
 
@@ -54,7 +54,35 @@ int do_close(int fd){
 
 /* -------------------------------------------------------------- */
 
-int do_read(int fd, char *buf, int count){
+/*
+ * read a file via a file descriptor.
+ * returns -1 on EOF and error
+ *
+ * TODO: consider special file later.
+ * */
+int do_read(int fd, char *buf, int cnt){
+    struct file *fp;
+    struct inode *ip;
+    int r;
+
+    fp = current->p_ofile[fd];
+    if ( fd<0 || fd>NOFILE || fp==NULL ) {
+        current->p_error = ENFILE;
+        return -1;
+    }
+    
+    lock_inode(fp->f_ino);
+    r = readi(fp->f_ino, buf, fp->f_offset, cnt);
+    if (r < 0){
+        unlock_inode(fp->f_ino);
+        return -1;
+    }
+    fp->f_offset += cnt;
+    unlock_inode(fp->f_ino);
+    return r;
+}
+
+int do_write(int fd, char *buf, int cnt){
 }
 
 /* -------------------------------------------------------------- */

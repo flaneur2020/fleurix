@@ -11,20 +11,16 @@
 #include <fs.h>
 
 /* on super block */
-uint alloc_blk(struct super *sp){
+uint balloc(struct super *sp){
 }
 
-void free_blk(uint nr){
+void bfree(uint nr){
 }
 
-/*
- * on
- * */
-
-uint alloc_inode(){
+uint ialloc(){
 }
 
-void free_inode(){
+void ifree(){
 }
 
 

@@ -85,10 +85,10 @@ void hd_start(){
     hdtab.d_active = 1;
     // read or write.
     if (bp->b_flag & B_READ) {
-        hd_cmd(0, HD_CMD_READ, bp->b_blkno*BSIZE, BSIZE);
+        hd_cmd(0, HD_CMD_READ, bp->b_blkno*BLK/PHYBLK, BLK/PHYBLK);
     }
     else {
-        hd_cmd(0, HD_CMD_WRITE, bp->b_blkno*BSIZE, BSIZE);
+        hd_cmd(0, HD_CMD_WRITE, bp->b_blkno*BLK/PHYBLK, BLK/PHYBLK);
         outsl(0x1F0, bp->b_data, BLK/4);
     }
 }

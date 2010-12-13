@@ -7,6 +7,15 @@
 
 int errno = 0;
 
+static uint sys_routines[NSYSC] = {
+    [NR_setup] = &sys_setup,
+    [NR_putn]  = &sys_putn,
+    [NR_fork]  = &sys_fork,
+    [NR_nice]  = &sys_nice,
+    [NR_debug] = &sys_debug,
+    0,
+}; 
+
 /***********************************************************/
 
 void sys_debug(struct trap *tf){
