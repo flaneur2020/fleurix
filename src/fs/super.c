@@ -38,7 +38,7 @@ _loop:
  * only called on mounting, an inode in-core. (reference count remains
  * but unlocked, it's released at sys_umount)
  * */
-int read_super(struct super *sp){
+int spload(struct super *sp){
     struct buf *bp;
     struct inode *ip;
 
@@ -65,7 +65,7 @@ int read_super(struct super *sp){
     return 0;
 }
 
-void write_super(struct super *sp){
+void spupdate(struct super *sp){
 }
 
 /*****************************************************************/

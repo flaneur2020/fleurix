@@ -79,7 +79,9 @@ void sys_setup(struct trap *tf) {
     while((r=do_read(fd, buf, 50)) > 0){
         buf[50] = '\0';
         struct file *fp = current->p_ofile[fd];
+        //printf("%s", buf);
     }
+    printf("...\n");
     unlock_super(sp);
 }
 

@@ -43,7 +43,7 @@ struct buf* incore(ushort dev, uint blkno){
  *      bp = bread(dev, 1); 
  * may sleep forever.
  *
- * TODO: ignored the DELWRI scenary.
+ * TODO: ignored the B_DIRTY scenary.
  * */
 struct buf* getblk(int dev, uint blkno){
     struct buf *bp;
@@ -65,26 +65,39 @@ _loop:
         // 1. found in the dev's cache list
         if (bp=incore(dev, blkno)) {
             // 2. found in the dev's cache list but busy
+            cli();
             if (bp->b_flag & B_BUSY) {
                 bp->b_flag |= B_WANTED;
                 sleep(bp, PRIBIO);
+                sti();
                 goto _loop;
             } 
+            sti();
             notavail(bp);
             return bp;
         }
     }
     // 3. not found in the dev's cache list, and free list is empty
+    cli();
     if (bfreelist.av_next==&bfreelist) {
         bfreelist.b_flag |= B_WANTED;
         sleep(&bfreelist, PRIBIO);
+        sti();
         goto _loop;
     }
+    sti();
     // 4. feel free to take something from the free list (head).
     bp = bfreelist.av_next;
     notavail(bp);
     bp->b_flag = B_BUSY;
-    // take it from the old dev's cache list and 
+    // 5. if it's an delayed write.
+    if (bp->b_flag & B_DIRTY) {
+        bp->b_flag |= B_ASYNC;
+        bwrite(bp);
+        goto _loop;
+    }
+    // finally, take it from the old dev's cache list and 
+    cli();
     bp->b_prev->b_next = bp->b_next;
     bp->b_next->b_prev = bp->b_prev;
     bp->b_next = dtp->b_next;
@@ -94,6 +107,7 @@ _loop:
     bp->b_next = dtp->b_next;
     dtp->b_next->b_prev = bp;
     dtp->b_next = bp;
+    sti();
     // 
     bp->b_dev = dev;
     bp->b_blkno = blkno;
@@ -119,7 +133,7 @@ void brelse(struct buf *bp){
     if (bp->b_flag & B_ERROR) {
         bp->b_dev = NODEV;
     }
-    bp->b_flag &= ~(B_WANTED|B_BUSY);
+    bp->b_flag &= ~(B_WANTED|B_BUSY|B_DIRTY|B_ASYNC);
     bp->av_next = &bfreelist;
     bp->av_prev = bfreelist.av_prev;
     bp->av_prev->av_next = bp;
@@ -169,12 +183,19 @@ struct buf* bread(int dev, uint blkno){
 
 /* Write the buffer, waiting for completion.
  * Then release the buffer.
- * TODO: write though right now. make it write back later.
+ * note: if it's an async writing, do not wait.
  */
 void bwrite(struct buf *bp) {
-	bp->b_flag &= ~(B_READ | B_DONE | B_ERROR | B_DIRTY);
+    uint flag;
+
+    flag = bp->b_flag;
+	bp->b_flag &= ~(B_DONE | B_ERROR | B_DIRTY );
     (*bdevsw[MAJOR(bp->b_dev)].d_request)(bp);
-    iowait(bp);
+    // if it's not an async write
+    if ((flag & B_ASYNC)==0) {
+        iowait(bp);
+        brelse(bp);
+    }
 }
 
 /**********************************************/

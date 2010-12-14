@@ -1,4 +1,4 @@
-#include <param.h>
+#include <lib.h>
 
 void* memcpy(void *dest, void *src, uint count) {
     char *sp = (char *)src;

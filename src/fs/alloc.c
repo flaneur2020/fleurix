@@ -10,17 +10,25 @@
 #include <inode.h>
 #include <fs.h>
 
-/* on super block */
-uint balloc(struct super *sp){
+/* alloc one disk block */
+uint balloc(ushort dev){
+    struct super *sp;
+    struct buf *bp;
+
+    sp = get_super(dev);
 }
 
 void bfree(uint nr){
 }
 
+/* on inodes */
 uint ialloc(){
 }
 
 void ifree(){
 }
 
+/* find the first zero bit of one bitmap */
+int bm_find(char *bm, int size){
+}
 

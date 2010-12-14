@@ -32,7 +32,7 @@ int do_mount(ushort dev, struct inode *ip){
     for(sp=&mnt[0]; sp<&mnt[NMOUNT]; sp++){
         if (sp->s_dev == NODEV) {
             sp->s_dev = dev;
-            read_super(sp);
+            spload(sp);
             goto _found;
         }
     }

@@ -26,7 +26,7 @@ struct inode {
     /* the rest only lies in core */
     ushort  i_count;    /* reference count*/
     ushort  i_dev;      /* dev number */
-    uint    i_num;      /* */
+    uint    i_num;      /* inode number */
     uint    i_flag;
 };
 
@@ -48,13 +48,14 @@ struct inode {
 #define S_ISGID  0002000
 #define S_ISVTX  0001000
 
-/* constants helper */
-#define NINO_PER_BLK (BLK/(sizeof(struct d_inode)))
-
 /* directory entry */
 struct dirent {
     ushort  d_ino;
     char    d_name[NAMELEN];
 };
+
+/* helpers */
+#define IPB            (BLK/(sizeof(struct d_inode)))
+#define IBLK(sp, ino)  (2 + ((sp)->s_nimap_blk) + ((sp)->s_nzmap_blk) + ((ino)-1)/IPB)
 
 #endif

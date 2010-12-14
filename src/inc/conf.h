@@ -22,6 +22,7 @@ extern struct cdevsw    cdevsw[];
 #define MAJOR(num) ((uchar)((num>>8)&0xFF))
 #define MINOR(num) ((uchar)((num)&0xFF))
 
+/* dev number is an ushort */
 #define DEVNO(major, minor) ((ushort)(((uchar)major<<8) + (uchar)minor))
 
 #define NODEV (DEVNO(0,0))

@@ -79,7 +79,8 @@ cfiles = [
   'src/fs/rdwri.c',
   'src/fs/file.c',
   #
-  'src/lib/str.c',
+  'src/lib/string.c',
+  'src/lib/bitmap.c',
   #
   'src/kern/main.c'
 ]

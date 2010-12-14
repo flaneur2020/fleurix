@@ -45,3 +45,6 @@ extern struct super    *rootsp;
 #define S_RDONLY    0x4
 #define S_DIRTY     0x8
 
+/* helpers */
+#define BPB             (BLK*8)
+#define BBLK(sp, bn)    ()

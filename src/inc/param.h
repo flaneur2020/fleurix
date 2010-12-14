@@ -1,4 +1,3 @@
-
 #define PHYBLK  512
 #define BLK     1024
 #define PAGE    0x1000
@@ -20,8 +19,4 @@
 #define NKPAGE  (LO_MEM/PAGE)
 #define NPAGE   (HI_MEM/PAGE)
 
-typedef unsigned char   uchar;
-typedef unsigned short  ushort;
-typedef unsigned int    uint;
-
-#define NULL ((void*)0)
+#include <lib.h>

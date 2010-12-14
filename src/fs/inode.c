@@ -21,7 +21,6 @@ struct inode inode[NINODE];
 /* get an (locked) inode via an number 
  * if the inode is in cache, return it right now.
  * return NULL on error.
- r
  * note1: you may compare this code with getblk, the idea here
  * is common used among everywhere on resource allocation.
  * it returns ONLY locked inode just as B_BUSY in getblk, just 
@@ -74,7 +73,7 @@ _loop:
             ip->i_num = num;
             ip->i_flag = I_LOCK;
             ip->i_count++;
-            read_inode(ip);
+            iload(ip);
             return ip;
         }
     }
@@ -89,11 +88,13 @@ _loop:
 void iput(struct inode *ip){
     ip->i_flag |= I_LOCK;
     if (ip->i_count==1){
-        write_inode(ip);
         ip->i_flag = 0;
         ip->i_num = 0;
+        iupdate(ip);
     }
-    ip->i_count--;
+    if (ip->i_count > 0) {
+        ip->i_count--;
+    }
     unlock_inode(ip);
 }
 
@@ -106,8 +107,9 @@ void iput(struct inode *ip){
  * note: 
  * the first 7 entry of ip->zones[] are direct pointers, ip->zone[7] is an indirect 
  * pointer to a zone map, while ip->zone[8] is an double indirect pointer to a zone map.
+ * note2: file extends only here.
  *
- * TODO: add one parameter 'alloc'
+ * TODO: add one parameter 'create'
  */
 int bmap(struct inode *ip, ushort nr) {
     struct buf *bp, *bp2;
@@ -123,7 +125,8 @@ int bmap(struct inode *ip, ushort nr) {
     nr -= 7;
     // read the indirect zone map
     if (nr<512){
-        if (ip->i_zone[7]==0) return 0;
+        if (ip->i_zone[7]==0)
+            return 0;
         bp = bread(ip->i_dev, ip->i_zone[7]);
         zmap = (short *)bp->b_data;
         ret = zmap[nr];
@@ -133,10 +136,12 @@ int bmap(struct inode *ip, ushort nr) {
     nr -= 512;
     // the double indirect zone map.
     // read the middle indirect zone map.
-    if (ip->i_zone[8]==0) return 0;
+    if (ip->i_zone[8]==0) 
+        return 0;
     bp = bread(ip->i_dev, ip->i_zone[8]);
     zmap = (short *)bp->b_data;
-    if (zmap[nr/512]==NULL) return 0;
+    if (zmap[nr/512]==NULL) 
+        return 0;
     // read the secondary indirect zone map.
     bp2 = bread(ip->i_dev, zmap[nr/512]);
     zmap2 = (short*)bp2->b_data;
@@ -151,9 +156,9 @@ int itrunc(struct inode *ip){
 
 /***************************************************/
 
-/* read/write a inode from disk 
+/* load a inode from disk 
  * */
-int read_inode(struct inode *ip){
+int iload(struct inode *ip){
     struct super *sp;
     struct d_inode *itab; /* note this is an d_inode, 32 bytes. */
     struct buf *bp;
@@ -164,30 +169,49 @@ int read_inode(struct inode *ip){
         panic("error on reading a super");
     }
     // get the blk number where this inode lies in.
-    lba = 2 + (sp->s_nimap_blk) + (sp->s_nzmap_blk) + (ip->i_num-1)/NINO_PER_BLK;
-    bp = bread(ip->i_dev, lba);
+    bp = bread(ip->i_dev, IBLK(sp, ip->i_num));
     if (bp->b_flag & B_ERROR) {
         panic("error on reading an inode");
     }
     itab = (struct d_inode*)bp->b_data;
-    memcpy(ip, &itab[(ip->i_num-1)%NINO_PER_BLK], sizeof(struct d_inode));
+    memcpy(ip, &itab[(ip->i_num-1)%IPB], sizeof(struct d_inode));
     brelse(bp);
     return 0;
 }
 
-/* TODO: fulfill it */
-void write_inode(struct inode *ip){
+/* write changes back to disk. */
+void iupdate(struct inode *ip){
+    struct super *sp;
+    struct d_inode *itab;
+    struct buf *bp;
+    uint lba;
+
+    sp = get_super(ip->i_dev);
+    if (sp==NULL){
+        panic("error on reading a super");
+    }
+    // get the blk number where this inode lies in.
+    bp = bread(ip->i_dev, IBLK(sp, ip->i_num));
+    if (bp->b_flag & B_ERROR) {
+        panic("error on reading an inode");
+    }
+    itab = (struct d_inode*)bp->b_data;
+    // which different from above.
+    memcpy(&itab[(ip->i_num-1)%IPB], ip, sizeof(struct d_inode));
+    bp->b_flag |= B_DIRTY;
+    ip->i_flag &= ~I_DIRTY;
+    bwrite(bp);
+    brelse(bp);
+    return 0;
 }
 
 /*************************************************************/
 
 void lock_inode(struct inode *ip){
-    cli();
     while(ip->i_flag & I_LOCK){
         sleep(ip, PINOD);
     }
     ip->i_flag |= I_LOCK;
-    sti();
 }
 
 /* remember this just free with malloc. */
