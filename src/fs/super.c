@@ -14,7 +14,7 @@ struct super    mnt[NMOUNT] = {0, };
 /* search the mount table.
  * note: super block is meaningless until the device is mounted 
  * */
-struct super* get_super(ushort dev){
+struct super* getsp(ushort dev){
     struct super *sp;
 
 _loop:
@@ -70,8 +70,6 @@ void spupdate(struct super *sp){
 
 /*****************************************************************/
 
-/*
- * */
 void unlock_super(struct super *sp){
     if (sp->s_flag & S_WANTED) {
         wakeup(sp);
@@ -79,35 +77,12 @@ void unlock_super(struct super *sp){
     sp->s_flag &= ~(S_LOCK | S_WANTED);
 }
 
-/******************************************************************/
-
-/* 
- * remember calling this at a end of syscall. 
- * TODO: write in-core super block to disk if S_DIRTY. 
- * */
-void put_super(struct super *sp){
+/* TODO: release one super block on umount */
+void putsp(struct super *sp){
     unlock_super(sp);
 }
 
-/* called on create a new file. 
- * */
-void ialloc(){
-}
-
-/* called on remove a file 
- * */
-void ifree(){
-} 
-
-/* allocate a block from a fs, via the bitmap.
- * called on increase one file's size.
- * */
-void balloc(struct super *sp){
-}
-
-/* free a block */
-void bfree(){
-}
+/******************************************************************/
 
 /* debug */
 void dump_super(struct super *sp){

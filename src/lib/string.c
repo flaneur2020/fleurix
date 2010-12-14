@@ -71,6 +71,3 @@ int strncmp(char *s1, char* s2, uint n) {
     } 
     return 0;
 }
-
-
-

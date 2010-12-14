@@ -15,7 +15,8 @@ uint balloc(ushort dev){
     struct super *sp;
     struct buf *bp;
 
-    sp = get_super(dev);
+    sp = getsp(dev);
+    unlock_super(sp);
 }
 
 void bfree(uint nr){
@@ -29,6 +30,16 @@ void ifree(){
 }
 
 /* find the first zero bit of one bitmap */
-int bm_find(char *bm, int size){
+int find_bit(char *bm, int size){
+    uint byte, i, j;
+    for (i=0; i<size; i++){
+        byte = bm[i];
+        for (j=0; j<8; j++){
+            if (byte & (1 << j)){
+                return i*8 + j;
+            }
+        }
+    }
+    return -1;
 }
 

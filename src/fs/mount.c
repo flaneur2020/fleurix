@@ -42,14 +42,14 @@ int do_mount(ushort dev, struct inode *ip){
 _found:
     // if the inode as mount point is not a directory
     if ((ip!=NULL) && (ip->i_mode & S_IFMT)!=S_IFDIR){
-        put_super(sp);
+        putsp(sp);
         return -1;
     }
     if (dev==rootdev) {
         rootsp = sp;
     }
     sp->s_imnt = ip;
-    put_super(sp);
+    putsp(sp);
     return 0;
 }
 
@@ -59,5 +59,4 @@ _found:
  * unmount an device.
  * */
 int do_umount(ushort dev){
-
 }

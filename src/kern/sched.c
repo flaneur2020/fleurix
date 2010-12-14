@@ -135,7 +135,7 @@ void swtch_to(struct proc *to){
  * find an empty proc slot, return the number as pid
  * return 0 on fail
  * */
-int find_empty_pid(){
+int find_pid(){
     int nr;
     for(nr=0; nr<NPROC; nr++){
         if (proc[nr]==NULL){
@@ -172,7 +172,7 @@ int copy_proc(struct trap *tf){
     struct proc *p;
     struct trap *ntf;
     
-    nr = find_empty_pid();
+    nr = find_pid();
     if (nr==0){
         panic("no pid availible.");
     }

@@ -164,7 +164,7 @@ int iload(struct inode *ip){
     struct buf *bp;
     uint lba;
 
-    sp = get_super(ip->i_dev);
+    sp = getsp(ip->i_dev);
     if (sp==NULL){
         panic("error on reading a super");
     }
@@ -186,7 +186,7 @@ void iupdate(struct inode *ip){
     struct buf *bp;
     uint lba;
 
-    sp = get_super(ip->i_dev);
+    sp = getsp(ip->i_dev);
     if (sp==NULL){
         panic("error on reading a super");
     }

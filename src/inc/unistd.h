@@ -58,11 +58,13 @@
         return r;                               \
     }
 
-#define NR_setup 0
-#define NR_putn  1
-#define NR_fork  2
-#define NR_nice  3
-#define NR_debug 4
+enum {
+    NR_setup, 
+    NR_putn,
+    NR_fork,
+    NR_nice,
+    NR_debug
+};
 
 extern int errno;
 
