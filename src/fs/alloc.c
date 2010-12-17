@@ -15,34 +15,41 @@
 int balloc(ushort dev){
     struct super *sp;
     struct buf *bp;
-    int bn, r, i;
+    int nr, r, bn;
 
     sp = getsp(dev);
-    for(i=0; i < sp->s_max_zone; i++){
-        bp = bread(dev, BBLK(sp, i));
+    for(nr=0; nr < sp->s_max_zone; nr++){
+        bp = bread(dev, BMAPBLK(sp, nr));
         r = find_bit(bp->b_data, BSIZE);
         if (r < 0) {
             brelse(bp);
             continue;
         }
-        bn = i*BPB + r;
+        bn = nr*BPB + r;
         bp->b_data[bn/8] |= 1<<(bn%8);
         bwrite(bp);
         brelse(bp);
         unlk_sp(sp);
-        return r;
+        return sp->s_data_zone0 + bn;
     }
     unlk_sp(sp);
     panic("no free block");
     return -1;
 }
 
-int bfree(ushort dev, uint bn){
+/* free a block. 
+ * */
+int bfree(ushort dev, uint nr){
     struct buf *bp;
     struct super *sp;
+    uint bn;
     
     sp = getsp(dev);
-    bp = bread(dev, BBLK(sp, bn));
+    if ((nr < sp->s_data_zone0) || (nr >= sp->s_max_zone)) {
+        panic("freeing a block not in data zone");
+    }
+    bn = nr - sp->s_data_zone0;
+    bp = bread(dev, nr);
     if (bp->b_data[bn/8]==0){
         panic("freeing free block");
     }
@@ -52,18 +59,20 @@ int bfree(ushort dev, uint bn){
     unlk_sp(sp);
 }
 
-/* zero one disk block */
+/* TODO: zero one disk block */
 int bzero(uint bn){
 }
 
-/* on inodes */
-uint ialloc(){
+/* allocate one inode 
+ * this may easier to debug.
+ * */
+uint ialloc(ushort dev){
 }
 
-void ifree(){
+void ifree(ushort dev, uint ino){
 }
 
-/* find the first zero bit of one bitmap */
+/* find the first zero bit in one bitmap */
 int find_bit(char *bm, int size){
     uint byte, i, j;
     for (i=0; i<size; i++){
@@ -71,7 +80,7 @@ int find_bit(char *bm, int size){
         //if (0 == ~byte)
             //continue;
         for (j=0; j<8; j++){
-            if (byte & (1 << j)){
+            if ((byte & (1 << j))==0){
                 return i*8 + j;
             }
         }

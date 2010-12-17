@@ -70,17 +70,19 @@ void sys_setup(struct trap *tf) {
     current->p_cdir = ip; 
     unlock_inode(ip);
 
-    ip = do_namei("/test.txt");
-    readi(ip, buf, 12400, 20);
-    printf("%s", buf);
-    iput(ip);
-    int fd = do_open("/test.txt", O_RDONLY);
-    int r=0;
-    while((r=do_read(fd, buf, 50)) > 0){
-        buf[50] = '\0';
-        struct file *fp = current->p_ofile[fd];
-        //printf("%s", buf);
-    }
+    // TODO: debug bwrite.
+    bp = bread(rootdev, 0);
+    bp->b_data[1] = 1;
+    bwrite(bp);
+    brelse(bp);
+    bp = bread(rootdev, 0);
+    dump_buf(bp);
+
+    panic("....\n");
+    nr = balloc(rootdev);
+    printf("balloc() => %d\n", nr);
+    nr = balloc(rootdev);
+    printf("balloc() => %d\n", nr);
     printf("...\n");
     unlk_sp(sp);
 }

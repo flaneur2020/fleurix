@@ -46,8 +46,14 @@ extern struct super    *rootsp;
 #define S_DIRTY     0x8
 
 /* helpers */
-#define BPB            (BSIZE*8)
-#define BBLK(sp, bn)   (((sp)->s_data_zone0) + bn)
+/* bits/inodes per block */
+#define BPB             (BSIZE*8)
+#define IPB             (BSIZE/(sizeof(struct d_inode)))
+/* inode number/block number to each's bitmap block.
+ * note that inode number starts at 1.
+ * */
+#define IMAPBLK(sp, in) (2 + ((in)-1)/BPB)
+#define BMAPBLK(sp, bn) (2 + ((sp)->s_nimap_blk) + ((bn))/BPB)
+/* inode number to its block number */
+#define IBLK(sp, ino)   (2 + ((sp)->s_nimap_blk) + ((sp)->s_nzmap_blk) + ((ino)-1)/IPB)
 
-#define IPB            (BSIZE/(sizeof(struct d_inode)))
-#define IBLK(sp, ino)  (2 + ((sp)->s_nimap_blk) + ((sp)->s_nzmap_blk) + ((ino)-1)/IPB)

@@ -184,6 +184,7 @@ struct buf* bread(int dev, uint blkno){
 /* Write the buffer, waiting for completion.
  * Then release the buffer.
  * note: if it's an async writing, do not wait.
+ * TODO: bug may resides here.
  */
 void bwrite(struct buf *bp) {
     uint flag;
@@ -194,7 +195,7 @@ void bwrite(struct buf *bp) {
     // if it's not an async write
     if ((flag & B_ASYNC)==0) {
         iowait(bp);
-        brelse(bp);
+        //brelse(bp);
     }
 }
 
@@ -235,7 +236,7 @@ void buf_init() {
 
 void dump_buf(struct buf *bp){
     int i, c;
-    for(i=0; i<512; i++){
+    for(i=0; i<255; i++){
         c = bp->b_data[i];
         if (c>31 && c<127){
             printf("%c", c);

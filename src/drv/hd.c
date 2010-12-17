@@ -72,7 +72,7 @@ int hd_request(struct buf *bp){
  * for the hard disk drive and mark it active.
  * note: BSIZE = (sizeof logical block) / (sizeof disk block), so 
  * physical address = lba * BSIZE
- * TODO: don't support two disk yet.
+ * TODO: don't support two hd disk yet.
  * */
 void hd_start(){
     struct buf *bp;
