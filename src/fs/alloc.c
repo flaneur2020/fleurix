@@ -9,32 +9,51 @@
 #include <super.h>
 #include <inode.h>
 
-/* alloc one disk block.
- * returns -1 on error.
+/* alloc one disk block. returns its LBA
  * TODO: here assumes each zone equals one block.
  * */
 int balloc(ushort dev){
     struct super *sp;
     struct buf *bp;
-    int r, bn;
+    int bn, r, i;
 
     sp = getsp(dev);
-    for(bn=0; bn < sp->s_max_zone; bn++){
-        bp = bread(dev, BBLK(sp, bn));
+    for(i=0; i < sp->s_max_zone; i++){
+        bp = bread(dev, BBLK(sp, i));
         r = find_bit(bp->b_data, BSIZE);
         if (r < 0) {
             brelse(bp);
-            return -1;
+            continue;
         }
-        bp->b_data[r/8] |= 1<<(r%8);
+        bn = i*BPB + r;
+        bp->b_data[bn/8] |= 1<<(bn%8);
         bwrite(bp);
         brelse(bp);
-        return BBLK(sp, r);
+        unlk_sp(sp);
+        return r;
     }
-    unlock_super(sp);
+    unlk_sp(sp);
+    panic("no free block");
+    return -1;
 }
 
-void bfree(uint nr){
+int bfree(ushort dev, uint bn){
+    struct buf *bp;
+    struct super *sp;
+    
+    sp = getsp(dev);
+    bp = bread(dev, BBLK(sp, bn));
+    if (bp->b_data[bn/8]==0){
+        panic("freeing free block");
+    }
+    bp->b_data[bn/8] &= ~(1<<(bn&8));
+    bwrite(bp);
+    brelse(bp);
+    unlk_sp(sp);
+}
+
+/* zero one disk block */
+int bzero(uint bn){
 }
 
 /* on inodes */

@@ -82,6 +82,6 @@ void sys_setup(struct trap *tf) {
         //printf("%s", buf);
     }
     printf("...\n");
-    unlock_super(sp);
+    unlk_sp(sp);
 }
 

@@ -70,16 +70,19 @@ void spupdate(struct super *sp){
 
 /*****************************************************************/
 
-void unlock_super(struct super *sp){
+/* 
+ * unlock(release) a super
+ * */
+void unlk_sp(struct super *sp){
     if (sp->s_flag & S_WANTED) {
         wakeup(sp);
     }
     sp->s_flag &= ~(S_LOCK | S_WANTED);
 }
 
-/* TODO: release one super block on umount */
+/* TODO: called on umount */
 void putsp(struct super *sp){
-    unlock_super(sp);
+    unlk_sp(sp);
 }
 
 /******************************************************************/
