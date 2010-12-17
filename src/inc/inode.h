@@ -54,8 +54,4 @@ struct dirent {
     char    d_name[NAMELEN];
 };
 
-/* helpers */
-#define IPB            (BLK/(sizeof(struct d_inode)))
-#define IBLK(sp, ino)  (2 + ((sp)->s_nimap_blk) + ((sp)->s_nzmap_blk) + ((ino)-1)/IPB)
-
 #endif

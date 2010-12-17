@@ -12,7 +12,7 @@ struct d_super {
     ushort  s_log_bz;       // log(blk,zone), lba == nr_zone >> s_log_bz
     uint    s_max_size;     // the max size of one file (in bytes)
     ushort  s_magic;        // 0x138F
-    ushort  s_nzone;        // number of zones in used.
+    ushort  s_padding;      // seems useless
 };
 
 struct super {
@@ -20,11 +20,11 @@ struct super {
     ushort  s_max_zone;     // -
     ushort  s_nimap_blk;    // number of inode bit map blocks
     ushort  s_nzmap_blk;    // number of zone bitmap blocks
-    ushort  s_zone0;        // number of the first data zone.
+    ushort  s_data_zone0;   // number of the first data zone.
     ushort  s_log_bz;       // log(blk,zone), lba == nr_zone >> s_log_bz
     uint    s_max_size;     // the max size of one file (in bytes)
     ushort  s_magic;        // 0x138F
-    ushort  s_nzone;        // number of zones in used.
+    ushort  s_padding;      // seems useless
     /* the rest fields only lie in-core, for mount */
     short           s_dev;
     struct inode   *s_iroot; // the root inode of this super block
@@ -46,5 +46,8 @@ extern struct super    *rootsp;
 #define S_DIRTY     0x8
 
 /* helpers */
-#define BPB             (BLK*8)
-#define BBLK(sp, bn)    ()
+#define BPB            (BSIZE*8)
+#define BBLK(sp, bn)   (((sp)->s_data_zone0) + bn)
+
+#define IPB            (BSIZE/(sizeof(struct d_inode)))
+#define IBLK(sp, ino)  (2 + ((sp)->s_nimap_blk) + ((sp)->s_nzmap_blk) + ((ino)-1)/IPB)

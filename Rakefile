@@ -78,6 +78,7 @@ cfiles = [
   'src/fs/namei.c',
   'src/fs/rdwri.c',
   'src/fs/file.c',
+  'src/fs/alloc.c',
   #
   'src/lib/string.c',
   'src/lib/bitmap.c',

@@ -33,9 +33,9 @@ int readi(struct inode *ip, char *buf, uint off, uint cnt){
     }
     // read
     for(tot=0; tot<cnt; tot+=m, off+=m, buf+=m){
-        bp = bread(ip->i_dev, bmap(ip, off/BLK));
-        m = min(cnt - tot, BLK - off%BLK);
-        memcpy(buf, bp->b_data + off%BLK, m);
+        bp = bread(ip->i_dev, bmap(ip, off/BSIZE));
+        m = min(cnt - tot, BSIZE - off%BSIZE);
+        memcpy(buf, bp->b_data + off%BSIZE, m);
         brelse(bp);
     }
     return cnt;

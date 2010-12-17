@@ -116,7 +116,7 @@ int bmap(struct inode *ip, ushort nr) {
     short *zmap, *zmap2;
     ushort ret;
 
-    if ((nr>7+512+512*512) || (nr > (ip->i_size / BLK))) {
+    if ((nr>7+512+512*512) || (nr > (ip->i_size / BSIZE))) {
         panic("blk nr too big.");
     }
     if (nr<7){

@@ -6,7 +6,7 @@
 #include <conf.h>
 
 /* buf bodies. Make it start at 0x100000 alright!  */
-extern char buffers[NBUF][BLK];
+extern char buffers[NBUF][BSIZE];
 
 /* buf heads */
 struct buf   buff[NBUF];

@@ -24,11 +24,11 @@ uint find_entry(struct inode* ip, char *name, uint len){
         return 0;
     }
 
-    for(i=0; i<ip->i_size/BLK+1; i++){
+    for(i=0; i<ip->i_size/BSIZE+1; i++){
         bn = bmap(ip, i);
         bp = bread(ip->i_dev, bn);
         dep = (struct dirent *)bp->b_data;
-        for(j=0; j<BLK/(sizeof(struct dirent))+1; j++) {
+        for(j=0; j<BSIZE/(sizeof(struct dirent))+1; j++) {
             if (0==strncmp(name, dep[j].d_name, len)){
                 ino = dep[j].d_ino;
                 brelse(bp);
