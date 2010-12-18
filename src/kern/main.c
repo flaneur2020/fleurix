@@ -73,12 +73,8 @@ void sys_setup(struct trap *tf) {
     // TODO: debug bwrite.
     bp = bread(rootdev, 0);
     printf("bp -> %x\n", bp);
-    bp->b_data[0] = 0xF;
     dump_buf(bp);
-    bwrite(bp);
     brelse(bp);
-    bp = bread(rootdev, 0);
-    dump_buf(bp);
 
     panic("....\n");
     nr = balloc(rootdev);

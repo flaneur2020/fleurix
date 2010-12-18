@@ -2,9 +2,6 @@ cinc   = '-Isrc/inc'
 cflag  = "-Wall -finline-functions -nostdinc -fno-builtin -fno-stack-protector"
 pgrep  = "grep --color -e 'error' -e 'error' -e '^'"
 
-sh "mkdir bin" if not File.exists? 'bin'
-sh "mkdir root" if not File.exists? 'root'
-
 task :default => :bochs
 
 task :bochs => :build do
@@ -19,7 +16,7 @@ task :debug => :build do
   sh "bochs-dbg -q -f .bochsrc"
 end
   
-task :build => ['bin/kernel.img', 'bin/rootfs.img', :ctags]
+task :build => ['bin/kernel.img', :rootfs, :ctags]
 
 task :clean do
   sh "rm -rf bin/* src/kern/entry.S .bochsout"
@@ -39,11 +36,17 @@ end
 # partition
 # note: for the mounting, a root privilege is required.
 # 
+task :rootfs => ['bin/rootfs.img']
+
+desc 'init and copy some thing into the hard disk image.'
 file 'bin/rootfs.img' do 
   sh "bximage bin/rootfs.img -hd -mode=flat -size=1 -q"
   sh "mkfs.minix bin/rootfs.img"
-  sh "sudo mount -o loop -t minix bin/rootfs.img ./root"
-  # todo: some copy here
+  mkdir_p '/tmp/fx_mnt_root'
+  sh "sudo mount -o loop -t minix bin/rootfs.img /tmp/fx_mnt_root"
+  sh "cp ./root/* /tmp/fx_mnt_root"
+  sh "sudo umount /tmp/fx_mnt_root"
+  sh "rm -rf /tmp/fx_mnt_root"
 end
 
 # 

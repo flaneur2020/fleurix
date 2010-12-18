@@ -2,6 +2,7 @@
 *.img
 *.o
 bin/*
+root/*
 src/kern/entry.S
 .bochsout
 main.sym
