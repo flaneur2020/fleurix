@@ -1,9 +1,13 @@
-#define PBSIZE  512
-#define BSIZE   1024
+typedef unsigned char   uchar;
+typedef unsigned short  ushort;
+typedef unsigned int    uint;
+
+#define PBSIZE  512         /* physical block size */
+#define BSIZE   1024        /* logical block size */
 #define PAGE    0x1000
 #define PROCSIZ 0x400000
-#define LO_MEM  0x300000  /* kernel resides in 0~LO_MEM */
-#define HI_MEM  0x1000000 /* total 128mb physical memory */
+#define LO_MEM  0x300000    /* kernel resides in 0~LO_MEM */
+#define HI_MEM  0x1000000   /* total 128mb physical memory */
 #define ROOTINO 1
 #define NAMELEN 14
 
@@ -18,5 +22,10 @@
 #define NMOUNT  16
 #define NKPAGE  (LO_MEM/PAGE)
 #define NPAGE   (HI_MEM/PAGE)
+
+#define NINDBLK (BSIZE/sizeof(ushort))
+#define MAX_FILESIZ ((7+NINDBLK+NINDBLK*NINDBLK)*BSIZE)
+
+#define NULL ((void*)0)
 
 #include <lib.h>

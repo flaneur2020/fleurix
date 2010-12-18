@@ -25,7 +25,7 @@ uint find_entry(struct inode* ip, char *name, uint len){
     }
 
     for(i=0; i<ip->i_size/BSIZE+1; i++){
-        bn = bmap(ip, i);
+        bn = bmap(ip, i, 0);
         bp = bread(ip->i_dev, bn);
         dep = (struct dirent *)bp->b_data;
         for(j=0; j<BSIZE/(sizeof(struct dirent))+1; j++) {
@@ -44,7 +44,7 @@ uint find_entry(struct inode* ip, char *name, uint len){
  * returns a locked inode.
  * take an eye on dead lock.
  * */
-struct inode* do_namei(char *path){
+struct inode* namei(char *path){
     struct inode *wip=NULL, *cdp=NULL;
     uint ino, offset;
     char* tmp;

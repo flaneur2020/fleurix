@@ -11,13 +11,12 @@
 
 /*
  * this file indicated the read/write operations of the inodes.
+ * TODO: ignored special files yet.
  * */
 
 /* 
  * read data from inode.
  * returns -1 on error.
- *
- * TODO: special files.
  * */
 int readi(struct inode *ip, char *buf, uint off, uint cnt){
     struct buf *bp;
@@ -33,7 +32,7 @@ int readi(struct inode *ip, char *buf, uint off, uint cnt){
     }
     // read
     for(tot=0; tot<cnt; tot+=m, off+=m, buf+=m){
-        bp = bread(ip->i_dev, bmap(ip, off/BSIZE));
+        bp = bread(ip->i_dev, bmap(ip, off/BSIZE, 0));
         m = min(cnt - tot, BSIZE - off%BSIZE);
         memcpy(buf, bp->b_data + off%BSIZE, m);
         brelse(bp);
@@ -42,4 +41,10 @@ int readi(struct inode *ip, char *buf, uint off, uint cnt){
 }
 
 int writei(struct inode *ip, char *buf, uint off, uint cnt){
+    struct buf *bp;
+    uint tot=0, m=0;
+
+    if (off+cnt < off){
+        return -1;
+    }
 }

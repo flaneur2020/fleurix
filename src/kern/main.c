@@ -55,11 +55,11 @@ void main(){
 /* TODO: just for debug right now.
  * we need two procs at least.
  * */
-char buf[256] = {0, };
+char buf[512] = {0, };
 void sys_setup(struct trap *tf) {
     int dev = DEVNO(1, 0);
     struct buf *bp;
-    int i, ino, nr;
+    int i, ino, fd, nr;
     struct super *sp;
     struct inode *ip, *rip;
     char *str, *path;
@@ -68,20 +68,17 @@ void sys_setup(struct trap *tf) {
     do_mount(rootdev, NULL);
     ip = iget(rootdev, ROOTINO);
     current->p_cdir = ip; 
-    unlock_inode(ip);
+    unlk_ino(ip);
 
-    // TODO: debug bwrite.
-    bp = bread(rootdev, 0);
-    printf("bp -> %x\n", bp);
-    dump_buf(bp);
-    brelse(bp);
+    fd = do_open("/hello.txt", O_RDONLY);
+    if (fd < 0) {
+        panic("open error");
+    }
+    int cnt;
+    while((cnt=do_read(fd, buf, 512)) >= 0){
+        buf[cnt] = '\0';
+        printf("%s", buf);
+    }
 
-    panic("....\n");
-    nr = balloc(rootdev);
-    printf("balloc() => %d\n", nr);
-    nr = balloc(rootdev);
-    printf("balloc() => %d\n", nr);
-    printf("...\n");
-    unlk_sp(sp);
 }
 

@@ -9,8 +9,10 @@
 #include <super.h>
 #include <inode.h>
 
-/* alloc one disk block. returns its LBA
- * TODO: here assumes each zone equals one block.
+/* alloc one disk block in order to extend one file. returns 
+ * its LBA.
+ * note: only called in bmap(, , 1). 
+ * note2: here assumes each zone equals one block.
  * */
 int balloc(ushort dev){
     struct super *sp;
@@ -30,6 +32,7 @@ int balloc(ushort dev){
         bwrite(bp);
         brelse(bp);
         unlk_sp(sp);
+        bzero(dev, bn);
         return sp->s_data_zone0 + bn;
     }
     unlk_sp(sp);
@@ -49,18 +52,26 @@ int bfree(ushort dev, uint nr){
         panic("freeing a block not in data zone");
     }
     bn = nr - sp->s_data_zone0;
-    bp = bread(dev, nr);
-    if (bp->b_data[bn/8]==0){
+    bp = bread(dev, BMAPBLK(sp, bn));
+    if ((bp->b_data[bn/8] & (1<<(bn%8))) == 0){
         panic("freeing free block");
     }
-    bp->b_data[bn/8] &= ~(1<<(bn&8));
+    bp->b_data[bn/8] &= ~(1<<(bn%8));
     bwrite(bp);
     brelse(bp);
     unlk_sp(sp);
 }
 
-/* TODO: zero one disk block */
-int bzero(uint bn){
+/* zero one disk block. only called in balloc().
+ * TODO: debug this.
+ * */
+int bzero(ushort dev, uint bn){
+    struct buf *bp;
+
+    bp = getblk(dev, bn);
+    memset(bp->b_data, 0, BSIZE);
+    bwrite(bp);
+    return 0;
 }
 
 /* allocate one inode 
@@ -77,8 +88,8 @@ int find_bit(char *bm, int size){
     uint byte, i, j;
     for (i=0; i<size; i++){
         byte = bm[i];
-        //if (0 == ~byte)
-            //continue;
+        if (0 == ~byte)
+            continue;
         for (j=0; j<8; j++){
             if ((byte & (1 << j))==0){
                 return i*8 + j;

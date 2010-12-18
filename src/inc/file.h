@@ -12,13 +12,16 @@ struct file {
 
 extern struct file file[NFILE];
 
-#define F_READ  0x1
-#define F_WRITE 0x2
-
 /* fcntl */
-#define O_RDONLY  0x000
-#define O_WRONLY  0x001
-#define O_RDWR    0x002
-#define O_CREATE  0x200
+#define O_ACCMODE	00003
+#define O_RDONLY	   00
+#define O_WRONLY	   01
+#define O_RDWR		   02
+#define O_CREAT		00100	/* not fcntl */
+#define O_EXCL		00200	/* not fcntl */
+#define O_NOCTTY	00400	/* not fcntl */
+#define O_TRUNC		01000	/* not fcntl */
+#define O_APPEND	02000
+#define O_NONBLOCK	04000	/* not fcntl */
 
 #endif

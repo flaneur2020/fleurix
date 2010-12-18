@@ -12,10 +12,6 @@
 
 struct file file[NFILE];
 
-// 
-struct file* falloc();
-int ufalloc();
-
 /*
  * 
  * */
@@ -25,11 +21,11 @@ int do_open(char *path, uint mode){
     int fd;
 
     // TODO: on create a new file.
-    if (mode & O_CREATE){
+    if (mode & O_CREAT){
     }
     // an existing file.
     else {
-        ip=do_namei(path);
+        ip=namei(path);
         if (ip == NULL){
             iput(ip);
             current->p_error = ENFILE;
@@ -39,10 +35,10 @@ int do_open(char *path, uint mode){
     } 
 
     if ((fd=ufalloc()<0) || (fp=falloc(fd))==NULL) {
-        unlock_inode(ip);
+        unlk_ino(ip);
         return -1;
     }
-    unlock_inode(ip);
+    unlk_ino(ip);
     fp->f_flag = mode;
     fp->f_ino = ip;
     return fd;
@@ -50,7 +46,6 @@ int do_open(char *path, uint mode){
 
 int do_close(int fd){
 }
-
 
 /* -------------------------------------------------------------- */
 
@@ -71,18 +66,21 @@ int do_read(int fd, char *buf, int cnt){
         return -1;
     }
     
-    lock_inode(fp->f_ino);
+    lock_ino(fp->f_ino);
     r = readi(fp->f_ino, buf, fp->f_offset, cnt);
     if (r < 0){
-        unlock_inode(fp->f_ino);
+        unlk_ino(fp->f_ino);
         return -1;
     }
     fp->f_offset += cnt;
-    unlock_inode(fp->f_ino);
+    unlk_ino(fp->f_ino);
     return r;
 }
 
 int do_write(int fd, char *buf, int cnt){
+}
+
+int do_creat(){
 }
 
 /* -------------------------------------------------------------- */

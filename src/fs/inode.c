@@ -1,6 +1,5 @@
 #include <param.h>
 #include <x86.h>
-#include <proto.h>
 #include <proc.h>
 // 
 #include <buf.h>
@@ -8,6 +7,9 @@
 //
 #include <super.h>
 #include <inode.h>
+//
+#include <proto.h>
+
 
 struct inode inode[NINODE];
 
@@ -95,7 +97,7 @@ void iput(struct inode *ip){
     if (ip->i_count > 0) {
         ip->i_count--;
     }
-    unlock_inode(ip);
+    unlk_ino(ip);
 }
 
 /***************************************************/
@@ -109,9 +111,9 @@ void iput(struct inode *ip){
  * pointer to a zone map, while ip->zone[8] is an double indirect pointer to a zone map.
  * note2: file extends only here.
  *
- * TODO: add one parameter 'create'
+ * TODO: some common code here. and ip->i_size might be adjusted.
  */
-int bmap(struct inode *ip, ushort nr) {
+int bmap(struct inode *ip, ushort nr, uchar creat) {
     struct buf *bp, *bp2;
     short *zmap, *zmap2;
     ushort ret;
@@ -120,32 +122,70 @@ int bmap(struct inode *ip, ushort nr) {
         panic("blk nr too big.");
     }
     if (nr<7){
-        return ip->i_zone[nr];
+        ret = ip->i_zone[nr];
+        // if the create flag is set
+        if (ret==0 && creat){
+            ret = balloc(ip->i_dev);
+            ip->i_zone[nr] = ret;
+            ip->i_flag |= I_DIRTY;
+            iupdate(ip);
+        }
+        return ret;
     }
     nr -= 7;
     // read the indirect zone map
     if (nr<512){
-        if (ip->i_zone[7]==0)
-            return 0;
+        if (ip->i_zone[7]==0) {
+            if (creat==0) {
+                return 0;
+            }
+            ip->i_zone[7] = balloc(ip->i_dev);
+            ip->i_flag |= I_DIRTY;
+            iupdate(ip);
+        }
         bp = bread(ip->i_dev, ip->i_zone[7]);
         zmap = (short *)bp->b_data;
         ret = zmap[nr];
+        if (ret==0 && creat) {
+            ret = balloc(ip->i_dev);   
+            zmap[nr] = ret;
+            bwrite(bp);
+        }
         brelse(bp);
         return ret;
     }
     nr -= 512;
     // the double indirect zone map.
     // read the middle indirect zone map.
-    if (ip->i_zone[8]==0) 
-        return 0;
+    if (ip->i_zone[8]==0) {
+        if (creat == 0) {
+            return 0;
+        }
+        // if the first indirect block is null
+        ret = balloc(ip->i_dev);
+        ip->i_zone[8] = ret;
+        ip->i_flag |= I_DIRTY;
+        iupdate(ip);
+    } 
     bp = bread(ip->i_dev, ip->i_zone[8]);
     zmap = (short *)bp->b_data;
-    if (zmap[nr/512]==NULL) 
-        return 0;
+    if (zmap[nr/512]==0) {
+        if (creat==0) {
+            brelse(bp);
+            return 0;
+        }
+        // if the second indirect block is null
+        zmap[nr/512] = balloc(ip->i_dev);
+        bwrite(bp);
+    }
     // read the secondary indirect zone map.
     bp2 = bread(ip->i_dev, zmap[nr/512]);
     zmap2 = (short*)bp2->b_data;
     ret = zmap2[nr%512];
+    if (ret==0 & creat) {
+        zmap2[nr%512] = ret = balloc(ip->i_dev);
+        bwrite(bp2);
+    }
     brelse(bp);
     brelse(bp2);
     return ret;
@@ -179,12 +219,18 @@ int iload(struct inode *ip){
     return 0;
 }
 
-/* write changes back to disk. */
+/* write changes back to disk if nessary. */
 void iupdate(struct inode *ip){
     struct super *sp;
     struct d_inode *itab;
     struct buf *bp;
     uint lba;
+
+    /*
+    if ((ip->i_flag & I_DIRTY)==0){
+        return;
+    }
+    */
 
     sp = getsp(ip->i_dev);
     if (sp==NULL){
@@ -207,7 +253,7 @@ void iupdate(struct inode *ip){
 
 /*************************************************************/
 
-void lock_inode(struct inode *ip){
+void lock_ino(struct inode *ip){
     while(ip->i_flag & I_LOCK){
         sleep(ip, PINOD);
     }
@@ -215,7 +261,7 @@ void lock_inode(struct inode *ip){
 }
 
 /* remember this just free with malloc. */
-void unlock_inode(struct inode *ip){
+void unlk_ino(struct inode *ip){
     if (ip->i_flag & I_WANTED) {
         wakeup(ip);
     }
@@ -244,8 +290,6 @@ void dump_inode(struct inode *ip){
     uint nr;
     struct buf *bp;
 
-    nr = bmap(ip, 0);
-    printf("bmap: %d\n", nr);
     bp = bread(rootdev, nr);
     dump_buf(bp);
     brelse(bp);

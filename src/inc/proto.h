@@ -28,10 +28,30 @@ void    ltr(uint n);
 void    lldt(uint n);
 void    ljmp(ushort seg, uint offset);
 
-// bio.c
+// drv/bio.c
 int     nodev();
 int     nulldev();
 
+// fs/inode.c
+struct inode* iget(ushort dev, uint num);
+void iput(struct inode *ip);
+int bmap(struct inode *ip, ushort nr, uchar creat);
+int iload(struct inode *ip);
+void iupdate(struct inode *ip);
+
+// fs/alloc.c
+int balloc(ushort dev);
+int bfree(ushort dev, uint nr);
+int bzero(ushort dev, uint bn);
+
+
+// fs/namei.c
+struct inode* namei(char *path);
+
+// fs/file.c 
+struct file* falloc(int fd);
+
+/* --------------------------------------------------- */
 /* panic */
 #define panic(str)  \
     do {            \
