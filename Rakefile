@@ -3,6 +3,7 @@ cflag  = "-Wall -finline-functions -nostdinc -fno-builtin -fno-stack-protector"
 pgrep  = "grep --color -e 'error' -e 'error' -e '^'"
 
 sh "mkdir bin" if not File.exists? 'bin'
+sh "mkdir root" if not File.exists? 'root'
 
 task :default => :bochs
 
@@ -18,7 +19,7 @@ task :debug => :build do
   sh "bochs-dbg -q -f .bochsrc"
 end
   
-task :build => ['bin/kernel.img', :ctags]
+task :build => ['bin/kernel.img', 'bin/rootfs.img', :ctags]
 
 task :clean do
   sh "rm -rf bin/* src/kern/entry.S .bochsout"
@@ -33,16 +34,28 @@ task :ctags do
   sh "ctags -R"
 end
 
-# ---------------------------------------------------------------------
-# => kernel.img
-# ---------------------------------------------------------------------
+# 
+# the root file system aka the hard disk image, 1mb yet and ignored
+# partition
+# note: for the mounting, a root privilege is required.
+# 
+file 'bin/rootfs.img' do 
+  sh "bximage bin/rootfs.img -hd -mode=flat -size=1 -q"
+  sh "mkfs.minix bin/rootfs.img"
+  sh "sudo mount -o loop -t minix bin/rootfs.img ./root"
+  # todo: some copy here
+end
+
+# 
+# the kernel image, a concat of boot image and the main binary.
+# 
 file 'bin/kernel.img' => ['bin/boot.bin', 'bin/main.bin'] do
   sh "cat bin/boot.bin bin/main.bin > bin/kernel.img"
 end
 
-# ---------------------------------------------------------------------
-# => boot.bin
-# ---------------------------------------------------------------------
+# 
+# boot.o
+#
 file 'bin/boot.o' => ['src/boot/boot.S'] do
   sh "nasm -f elf -o bin/boot.o src/boot/boot.S"
 end

@@ -35,7 +35,7 @@ int     nulldev();
 /* panic */
 #define panic(str)  \
     do {            \
-        printf("PANIC %s:%d: %s\n", __FILE__, __LINE__, str);\
+        printf("\nPANIC %s:%d: %s\n", __FILE__, __LINE__, str);\
         asm volatile("cli");\
         for(;;);\
     } while(0)

@@ -183,14 +183,15 @@ struct buf* bread(int dev, uint blkno){
 
 /* Write the buffer, waiting for completion.
  * Then release the buffer.
- * note: if it's an async writing, do not wait.
+ * note: Turn off the flag B_READ, and that's write.
+ * note2: if it's an async writing, do not wait.
  * TODO: bug may resides here.
  */
 void bwrite(struct buf *bp) {
     uint flag;
 
     flag = bp->b_flag;
-	bp->b_flag &= ~(B_DONE | B_ERROR | B_DIRTY );
+	bp->b_flag &= ~(B_READ | B_DONE | B_ERROR | B_DIRTY );
     (*bdevsw[MAJOR(bp->b_dev)].d_request)(bp);
     // if it's not an async write
     if ((flag & B_ASYNC)==0) {
@@ -245,4 +246,5 @@ void dump_buf(struct buf *bp){
             printf("%x", c);
         }
     }
+    printf("\n");
 }

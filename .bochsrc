@@ -10,7 +10,7 @@ megs: 128
 # floppy image
 floppya: 1_44=bin/kernel.img, status=inserted
 # just a partition image, formatted by mkfs.minix, 1mb
-ata0-master: type=disk, path="minixfs.img", mode=flat, cylinders=2, heads=16, spt=63
+ata0-master: type=disk, path="bin/rootfs.img", mode=flat, cylinders=2, heads=16, spt=63
 
 boot: a
 

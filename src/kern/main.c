@@ -72,7 +72,9 @@ void sys_setup(struct trap *tf) {
 
     // TODO: debug bwrite.
     bp = bread(rootdev, 0);
-    bp->b_data[1] = 1;
+    printf("bp -> %x\n", bp);
+    bp->b_data[0] = 0xF;
+    dump_buf(bp);
     bwrite(bp);
     brelse(bp);
     bp = bread(rootdev, 0);
