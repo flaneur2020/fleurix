@@ -111,28 +111,28 @@ void iput(struct inode *ip){
  * pointer to a zone map, while ip->zone[8] is an double indirect pointer to a zone map.
  * note2: file extends only here.
  *
- * TODO: some common code here. and ip->i_size might be adjusted.
+ * ip->i_size is adjusted in writei();
+ *
+ * TODO: maybe we can remove all the updatei and bwrite stuff, but sync() required first.
  */
 int bmap(struct inode *ip, ushort nr, uchar creat) {
     struct buf *bp, *bp2;
     short *zmap, *zmap2;
-    ushort ret;
 
-    if ((nr>7+512+512*512) || (nr > (ip->i_size / BSIZE))) {
+    if ((nr>7+512+512*512) || ((nr > (ip->i_size / BSIZE) && (creat==0)))) {
         panic("blk nr too big.");
     }
     if (nr<7){
-        ret = ip->i_zone[nr];
         // if the create flag is set
-        if (ret==0 && creat){
-            ret = balloc(ip->i_dev);
-            ip->i_zone[nr] = ret;
+        if (ip->i_zone[nr]==0 && creat){
+            ip->i_zone[nr] = balloc(ip->i_dev);
             ip->i_flag |= I_DIRTY;
             iupdate(ip);
         }
-        return ret;
+        return ip->i_zone[nr];
     }
     nr -= 7;
+    /*----------------------------*/
     // read the indirect zone map
     if (nr<512){
         if (ip->i_zone[7]==0) {
@@ -145,25 +145,23 @@ int bmap(struct inode *ip, ushort nr, uchar creat) {
         }
         bp = bread(ip->i_dev, ip->i_zone[7]);
         zmap = (short *)bp->b_data;
-        ret = zmap[nr];
-        if (ret==0 && creat) {
-            ret = balloc(ip->i_dev);   
-            zmap[nr] = ret;
+        if (zmap[nr]==0 && creat) {
+            zmap[nr] = balloc(ip->i_dev);
             bwrite(bp);
         }
         brelse(bp);
-        return ret;
+        return zmap[nr];
     }
+    /*----------------------------*/
     nr -= 512;
     // the double indirect zone map.
     // read the middle indirect zone map.
     if (ip->i_zone[8]==0) {
+        // if the first indirect block is null
         if (creat == 0) {
             return 0;
         }
-        // if the first indirect block is null
-        ret = balloc(ip->i_dev);
-        ip->i_zone[8] = ret;
+        ip->i_zone[8] = balloc(ip->i_dev);
         ip->i_flag |= I_DIRTY;
         iupdate(ip);
     } 
@@ -174,21 +172,20 @@ int bmap(struct inode *ip, ushort nr, uchar creat) {
             brelse(bp);
             return 0;
         }
-        // if the second indirect block is null
+        // if the second indirect block is null and creat is set
         zmap[nr/512] = balloc(ip->i_dev);
         bwrite(bp);
     }
     // read the secondary indirect zone map.
     bp2 = bread(ip->i_dev, zmap[nr/512]);
     zmap2 = (short*)bp2->b_data;
-    ret = zmap2[nr%512];
-    if (ret==0 & creat) {
-        zmap2[nr%512] = ret = balloc(ip->i_dev);
+    if (zmap2[nr%512]==0 & creat) {
+        zmap2[nr%512] = balloc(ip->i_dev);
         bwrite(bp2);
     }
     brelse(bp);
     brelse(bp2);
-    return ret;
+    return zmap2[nr%512];
 }
 
 int itrunc(struct inode *ip){

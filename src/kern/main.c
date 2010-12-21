@@ -59,7 +59,7 @@ char buf[512] = {0, };
 void sys_setup(struct trap *tf) {
     int dev = DEVNO(1, 0);
     struct buf *bp;
-    int i, ino, fd, nr;
+    int i, ino, fd, nr, r;
     struct super *sp;
     struct inode *ip, *rip;
     char *str, *path;
@@ -70,15 +70,24 @@ void sys_setup(struct trap *tf) {
     current->p_cdir = ip; 
     unlk_ino(ip);
 
-    fd = do_open("/hello.txt", O_RDONLY);
+    /*--------------------*/
+
+    fd = do_open("/hello.txt", O_RDWR | O_APPEND);
     if (fd < 0) {
         panic("open error");
     }
     int cnt;
-    while((cnt=do_read(fd, buf, 512)) >= 0){
-        buf[cnt] = '\0';
-        printf("%s", buf);
+    char tstr[] = "I'm losing what I don't deserve.\n";
+    for(i=0; i<1000; i++)
+        r = do_write(fd, tstr, strlen(tstr));
+    printf("hello~");
+
+    fd = do_open("/hello.txt", O_RDWR);
+    if (fd < 0) {
+        panic("open error");
     }
-
+    while ((r = do_read(fd, buf, 512)) > 0) {
+        buf[r] = '\0';
+        printf("%s\n", buf);
+    }
 }
-

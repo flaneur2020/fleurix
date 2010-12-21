@@ -39,12 +39,18 @@ int do_open(char *path, uint mode){
         return -1;
     }
     unlk_ino(ip);
-    fp->f_flag = mode;
+    fp->f_mode = mode;
     fp->f_ino = ip;
     return fd;
 }
 
 int do_close(int fd){
+}
+
+/* -------------------------------------------------------------- */
+
+/* TODO: check file access permssion */
+int do_access(char *fn, uint acc){
 }
 
 /* -------------------------------------------------------------- */
@@ -65,7 +71,7 @@ int do_read(int fd, char *buf, int cnt){
         current->p_error = ENFILE;
         return -1;
     }
-    
+    // TODO: special files
     lock_ino(fp->f_ino);
     r = readi(fp->f_ino, buf, fp->f_offset, cnt);
     if (r < 0){
@@ -78,6 +84,31 @@ int do_read(int fd, char *buf, int cnt){
 }
 
 int do_write(int fd, char *buf, int cnt){
+    struct file *fp;
+    struct inode *ip;
+    int r, off;
+    
+    fp = current->p_ofile[fd];
+    if ( fd<0 || fd>NOFILE || fp==NULL) {
+        current->p_error = ENFILE;
+        return -1;
+    }
+    if (fp->f_mode & O_APPEND) {
+        off = fp->f_ino->i_size;
+    }
+    else {
+        off = fp->f_offset;
+    }
+    // TODO: special files
+    lock_ino(fp->f_ino);
+    r = writei(fp->f_ino, buf, off, cnt);
+    if (r < 0){
+        unlk_ino(fp->f_ino);
+        return -1;
+    }
+    fp->f_offset = off + cnt;
+    unlk_ino(fp->f_ino);
+    return r;
 }
 
 int do_creat(){

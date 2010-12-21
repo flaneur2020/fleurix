@@ -20,7 +20,7 @@
  * */
 int readi(struct inode *ip, char *buf, uint off, uint cnt){
     struct buf *bp;
-    uint tot=0, m=0;
+    uint tot=0, m=0, bn=0;
 
     // file size limit 
     if ((off > ip->i_size) || (off+cnt < off)){
@@ -32,19 +32,54 @@ int readi(struct inode *ip, char *buf, uint off, uint cnt){
     }
     // read
     for(tot=0; tot<cnt; tot+=m, off+=m, buf+=m){
-        bp = bread(ip->i_dev, bmap(ip, off/BSIZE, 0));
         m = min(cnt - tot, BSIZE - off%BSIZE);
-        memcpy(buf, bp->b_data + off%BSIZE, m);
-        brelse(bp);
+        bn = bmap(ip, off/BSIZE, 0);
+        if (bn == 0) {
+            memset(bp->b_data + off%BSIZE, 0, m);
+        }
+        else {
+            bp = bread(ip->i_dev, bn);
+            memcpy(buf, bp->b_data + off%BSIZE, m);
+            brelse(bp);
+        }
     }
     return cnt;
 }
 
+/*
+ * write data to inode.
+ * 
+ * */
 int writei(struct inode *ip, char *buf, uint off, uint cnt){
     struct buf *bp;
-    uint tot=0, m=0;
+    struct super *sp;
+    uint tot=0, m=0, bn=0;
 
     if (off+cnt < off){
         return -1;
     }
+    if (off+cnt > MAX_FILESIZ) {
+        cnt = MAX_FILESIZ - off;
+    }
+    // append
+    // do write.
+    for(tot=0; tot<cnt; tot+=m, off+=m, buf+=m){
+        m = min(cnt - tot, BSIZE - off%BSIZE);
+        bn = bmap(ip, off/BSIZE, 1);
+        if (bn==0) {
+            panic("bad block.");
+        }
+        else {
+            bp = bread(ip->i_dev, bn); // note here!
+            memcpy(bp->b_data + off%BSIZE, buf, m);
+            bwrite(bp);
+            brelse(bp);
+        }
+    }
+    // adjust the inode's file size
+    if (cnt > 0 && off > ip->i_size) {
+        ip->i_size = off;
+        iupdate(ip);
+    }
+    return cnt;
 }

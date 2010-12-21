@@ -24,7 +24,6 @@ int balloc(ushort dev){
         bp = bread(dev, BMAPBLK(sp, nr));
         r = find_bit(bp->b_data, BSIZE);
         if (r < 0) {
-            brelse(bp);
             continue;
         }
         bn = nr*BPB + r;
@@ -32,7 +31,7 @@ int balloc(ushort dev){
         bwrite(bp);
         brelse(bp);
         unlk_sp(sp);
-        bzero(dev, bn);
+        bzero(dev, sp->s_data_zone0+ bn);
         return sp->s_data_zone0 + bn;
     }
     unlk_sp(sp);
@@ -63,7 +62,6 @@ int bfree(ushort dev, uint nr){
 }
 
 /* zero one disk block. only called in balloc().
- * TODO: debug this.
  * */
 int bzero(ushort dev, uint bn){
     struct buf *bp;
@@ -71,8 +69,11 @@ int bzero(ushort dev, uint bn){
     bp = getblk(dev, bn);
     memset(bp->b_data, 0, BSIZE);
     bwrite(bp);
+    brelse(bp);
     return 0;
 }
+
+/* --------------------------------------------------- */
 
 /* allocate one inode 
  * this may easier to debug.

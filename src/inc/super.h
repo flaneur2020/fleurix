@@ -10,7 +10,7 @@ struct d_super {
     ushort  s_nzmap_blk;    // number of zone bitmap blocks
     ushort  s_zone0;        // number of the first data zone.
     ushort  s_log_bz;       // log(blk,zone), lba == nr_zone >> s_log_bz
-    uint    s_max_size;     // the max size of one file (in bytes)
+    uint    s_max_filesiz;  // the max size of one file (in bytes)
     ushort  s_magic;        // 0x138F
     ushort  s_padding;      // seems useless
 };
@@ -36,6 +36,8 @@ struct super {
 extern struct super     mnt[NMOUNT];
 /* the root super block */
 extern struct super    *rootsp;
+
+extern uint max_filesiz;
 
 #define S_MAGIC 0x138F
 
