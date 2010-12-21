@@ -31,7 +31,7 @@ int balloc(ushort dev){
         bwrite(bp);
         brelse(bp);
         unlk_sp(sp);
-        bzero(dev, sp->s_data_zone0+ bn);
+        bzero(dev, sp->s_data_zone0 + bn);
         return sp->s_data_zone0 + bn;
     }
     unlk_sp(sp);

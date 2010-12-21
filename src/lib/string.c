@@ -1,7 +1,6 @@
-#include <param.h>
 #include <lib.h>
 
-void* memcpy(void *dest, void *src, uint count) {
+void* memcpy(void *dest, void *src, unsigned int count) {
     char *sp = (char *)src;
     char *dp = (char *)dest;
     int i;
@@ -11,7 +10,7 @@ void* memcpy(void *dest, void *src, uint count) {
     return dest;
 }
 
-void* memset(void *dest, char val, uint count){
+void* memset(void *dest, char val, unsigned int count){
     char *dp = (char *)dest;
     int i;
     for(i=0; i<count; i++){
@@ -20,7 +19,7 @@ void* memset(void *dest, char val, uint count){
     return dest;
 }
 
-short* memsetw(short *dest, short val, uint count){
+short* memsetw(short *dest, short val, unsigned int count){
     short *dp = (short *)dest;
     int i;
     for(i=0; i<count; i++){
@@ -58,15 +57,15 @@ int strcmp(char *s1, char *s2){
     while (*s1 == *s2++)
         if (*s1++ == 0)
             return (0);
-    return (*(uchar*)s1 - *(uchar*)(s2-1));
+    return (*(unsigned char*)s1 - *(unsigned char*)(s2-1));
 }
 
-int strncmp(char *s1, char* s2, uint n) {
+int strncmp(char *s1, char* s2, unsigned int n) {
     if (n == 0)
         return 0;
     while(n-- != 0) {
         if (*s1 != *s2++)
-            return (*(uchar*)s1 - *(uchar*)(s2-1));
+            return (*(unsigned char*)s1 - *(unsigned char*)(s2-1));
         if (*s1++ == 0)
             break;
     } 
