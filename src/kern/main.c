@@ -76,5 +76,14 @@ void sys_setup(struct trap *tf) {
     if (ip==NULL){
         panic("bad ino");
     }
-    printf("end of main !%d\n", ip->i_num);
+    iupdate(ip);
+    iput(ip);
+    unlk_ino(ip);
+    ip = namei("/about.txt", 0);
+    printf("i_mode: %x\n", ip->i_mode);
+    ip = namei("/dir/hello.txt", 0);
+    printf("i_mode: %x\n", ip->i_mode);
+    if (ip==NULL) {
+        panic("damn");
+    }
 }

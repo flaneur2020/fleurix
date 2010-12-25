@@ -61,20 +61,16 @@ uint link_entry(struct inode *dip, char *name, uint len, uint ino){
 
     for (off=0; off < dip->i_size; off+=sizeof(struct dirent)){
         r = readi(dip, &de, off, sizeof(struct dirent));
-        printf("dip ----> %x\n", dip);
         if (r != sizeof(struct dirent)){
             panic("bad read dir ino");
         }
         if (de.d_ino == 0) {
-            printf("dip ----> %x\n", dip);
             break;
         }
     }
     strncpy(de.d_name, name, len);
     de.d_ino = ino;
-    printf("> writei(); dead here!! ='= dip:%x\n", dip);
     r = writei(dip, &de, off, sizeof(struct dirent));
-    printf("< writei();");
     if (r != sizeof(struct dirent)){
         panic("bad inode");
     }
@@ -137,9 +133,7 @@ struct inode* _namei(char *path, uchar parent, uchar creat){
             ino = ialloc(wip->i_dev);
             wip->i_flag |= I_LOCK;
             // what a fuck
-            printf("> link_entry();");
             link_entry(wip, path, len, ino);
-            printf("< link_entry()\n");
         }
         iput(wip);
         wip = iget(wip->i_dev, ino);

@@ -33,7 +33,6 @@ struct inode {
 /* flags */
 #define I_LOCK   0x1    /* for synchronize */
 #define I_WANTED 0x2    /* - */
-
 #define I_DIRTY  0x4    /* this inode has been modified*/
 #define I_MOUNT  0x8    /* - */
 

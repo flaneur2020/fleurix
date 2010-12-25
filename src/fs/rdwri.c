@@ -64,9 +64,7 @@ int writei(struct inode *ip, char *buf, uint off, uint cnt){
     // do write.
     for(tot=0; tot<cnt; tot+=m, off+=m, buf+=m){
         m = min(cnt - tot, BSIZE - off%BSIZE);
-        printf("> bmap()");
         bn = bmap(ip, off/BSIZE, 1);
-        printf("< bmap()");
         if (bn==0) {
             panic("bad block.");
         }
