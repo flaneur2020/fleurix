@@ -11,7 +11,9 @@
 
 
 /* 
- * fetch an inode number from a single directory file (via a locked inode). 
+ * fetch an inode number from a single directory file (via a locked inode, make sure
+ * it's an directory).
+ * returns 0 on fail.
  * */
 uint find_entry(struct inode* ip, char *name, uint len){
     struct inode *nip;
@@ -40,6 +42,11 @@ uint find_entry(struct inode* ip, char *name, uint len){
     return 0;
 }
 
+/*
+ * assign a new directory entry with a given inode. the given inode number
+ * equals 0, it's a remove.
+ * note: this routine do NOT check the existence of the given name.
+ * */
 uint link_entry(struct inode *dip, char *name, uint ino){
     struct buf *bp;
     struct dirent de;
@@ -70,7 +77,6 @@ uint link_entry(struct inode *dip, char *name, uint ino){
 
 /*
  * returns a locked inode.
- * take an eye on dead lock.
  * */
 struct inode* _namei(char *path, uchar parent, uchar creat){
     struct inode *wip=NULL, *cdp=NULL;
@@ -99,10 +105,17 @@ struct inode* _namei(char *path, uchar parent, uchar creat){
         if ((wip->i_num==ROOTINO) && (strncmp(path, "..", 2)==0)) {
             continue;
         }
+        // wip must be a directory, TODO: check access
+        if ((wip->i_mode & S_IFMT)!=S_IFDIR) {
+            syserr(EACCES);
+            return NULL;
+        }
         tmp = strchr(path, '/');
         offset = (tmp==NULL) ? strlen(path): (tmp-path);
         ino = find_entry(wip, path, offset);
+        // if not found
         if (ino <= 0){
+            syserr(ENOENT);
             return NULL;
         }
         iput(wip);
