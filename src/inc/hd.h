@@ -23,8 +23,8 @@ extern struct hd_minor hd_minor[16];
 /* flags for HD_STAT */
 #define HD_BSY	  0x80 
 #define HD_DRDY	  0x40 //Device Ready
-#define HD_DF		  0x20 //Device Fault
-#define HD_ERR		0x01
+#define HD_DF     0x20 //Device Fault
+#define HD_ERR	  0x01
 
 
 int hd_request();

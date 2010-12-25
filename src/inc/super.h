@@ -54,7 +54,7 @@ extern uint max_filesiz;
 /* inode number/block number to each's bitmap block.
  * note that inode number starts at 1.
  * */
-#define IMAPBLK(sp, in) (2 + ((in)-1)/BPB)
+#define IMAPBLK(sp, in) (2 + ((in))/BPB)
 #define BMAPBLK(sp, bn) (2 + ((sp)->s_nimap_blk) + ((bn))/BPB)
 /* inode number to its block number */
 #define IBLK(sp, ino)   (2 + ((sp)->s_nimap_blk) + ((sp)->s_nzmap_blk) + ((ino)-1)/IPB)

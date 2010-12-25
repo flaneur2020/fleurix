@@ -29,7 +29,7 @@ extern struct buf   buff[NBUF];
  * visited via a struct buf *.
  * */
 struct devtab {
-    uint            d_active;             /* busy flags */
+    uint            d_active;           /* busy flags */
     struct buf      *b_next;            /* first buf for this dev */
     struct buf      *b_prev;            /* last  buf for this dev */
     struct buf      *av_next;           /* head of IO queue */

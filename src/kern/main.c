@@ -72,9 +72,9 @@ void sys_setup(struct trap *tf) {
 
     /*--------------------*/
 
-    ip = namei("/dir/file.txt", 0);
+    ip = namei("/dir/hello.txt", 1);
     if (ip==NULL){
         panic("bad ino");
     }
-    printf("%d\n", ip->i_num);
+    printf("end of main !%d\n", ip->i_num);
 }

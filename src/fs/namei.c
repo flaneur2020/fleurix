@@ -15,20 +15,20 @@
  * it's an directory).
  * returns 0 on fail.
  * */
-uint find_entry(struct inode* ip, char *name, uint len){
-    struct inode *nip;
+uint find_entry(struct inode* dip, char *name, uint len){
     struct buf *bp;
     struct dirent *dep;
     int i, j, bn=0, ino=0;
 
-    if ((ip->i_mode & S_IFMT)!=S_IFDIR) {
+    if ((dip->i_mode & S_IFMT)!=S_IFDIR) {
         syserr(EFAULT);
         return 0;
     }
+    len = min(len, NAMELEN);
 
-    for(i=0; i<ip->i_size/BSIZE+1; i++){
-        bn = bmap(ip, i, 0);
-        bp = bread(ip->i_dev, bn);
+    for(i=0; i<dip->i_size/BSIZE+1; i++){
+        bn = bmap(dip, i, 0);
+        bp = bread(dip->i_dev, bn);
         dep = (struct dirent *)bp->b_data;
         for(j=0; j<BSIZE/(sizeof(struct dirent))+1; j++) {
             if (0==strncmp(name, dep[j].d_name, len)){
@@ -47,8 +47,9 @@ uint find_entry(struct inode* ip, char *name, uint len){
  * equals 0, it's a remove.
  * note: this routine do NOT check the existence of the given name.
  * */
-uint link_entry(struct inode *dip, char *name, uint ino){
+uint link_entry(struct inode *dip, char *name, uint len, uint ino){
     struct buf *bp;
+    struct inode *ip;
     struct dirent de;
     int i, r, off;
 
@@ -56,21 +57,32 @@ uint link_entry(struct inode *dip, char *name, uint ino){
         syserr(EFAULT);
         return 0;
     }
+    len = min(len, NAMELEN);
 
-    for (off=0; off < dip->i_size; dip+=sizeof(struct dirent)){
-        r = readi(dip, &de, sizeof(struct dirent));
+    for (off=0; off < dip->i_size; off+=sizeof(struct dirent)){
+        r = readi(dip, &de, off, sizeof(struct dirent));
+        printf("dip ----> %x\n", dip);
         if (r != sizeof(struct dirent)){
-            panic("bad inode");
+            panic("bad read dir ino");
         }
         if (de.d_ino == 0) {
+            printf("dip ----> %x\n", dip);
             break;
         }
     }
-    strncpy(de.d_name, name, NAMELEN);
+    strncpy(de.d_name, name, len);
     de.d_ino = ino;
+    printf("> writei(); dead here!! ='= dip:%x\n", dip);
     r = writei(dip, &de, off, sizeof(struct dirent));
+    printf("< writei();");
     if (r != sizeof(struct dirent)){
         panic("bad inode");
+    }
+    if (ino != 0) {
+        ip = iget(dip->i_dev, ino);
+        ip->i_nlinks++;
+        iupdate(ip);
+        iput(ip);
     }
     return ino;
 }
@@ -80,7 +92,7 @@ uint link_entry(struct inode *dip, char *name, uint ino){
  * */
 struct inode* _namei(char *path, uchar parent, uchar creat){
     struct inode *wip=NULL, *cdp=NULL;
-    uint ino, offset;
+    uint ino, len;
     char* tmp;
 
     // if path starts from root
@@ -107,20 +119,31 @@ struct inode* _namei(char *path, uchar parent, uchar creat){
         }
         // wip must be a directory, TODO: check access
         if ((wip->i_mode & S_IFMT)!=S_IFDIR) {
-            syserr(EACCES);
+            iput(wip);
+            syserr(EISDIR);
             return NULL;
         }
         tmp = strchr(path, '/');
-        offset = (tmp==NULL) ? strlen(path): (tmp-path);
-        ino = find_entry(wip, path, offset);
+        len = (tmp==NULL) ? strlen(path): (tmp-path);
+        ino = find_entry(wip, path, len);
         // if not found
         if (ino <= 0){
-            syserr(ENOENT);
-            return NULL;
+            if (creat == 0) {
+                iput(wip);
+                syserr(ENOENT);
+                return NULL;
+            }
+            // file is not found and creat is set, assign a new inode
+            ino = ialloc(wip->i_dev);
+            wip->i_flag |= I_LOCK;
+            // what a fuck
+            printf("> link_entry();");
+            link_entry(wip, path, len, ino);
+            printf("< link_entry()\n");
         }
         iput(wip);
         wip = iget(wip->i_dev, ino);
-        path += offset;
+        path += len;
     }
     return wip;
 }
