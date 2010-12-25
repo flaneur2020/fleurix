@@ -61,7 +61,6 @@ int writei(struct inode *ip, char *buf, uint off, uint cnt){
     if (off+cnt > MAX_FILESIZ) {
         cnt = MAX_FILESIZ - off;
     }
-    // append
     // do write.
     for(tot=0; tot<cnt; tot+=m, off+=m, buf+=m){
         m = min(cnt - tot, BSIZE - off%BSIZE);

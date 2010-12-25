@@ -44,9 +44,8 @@ int balloc(ushort dev);
 int bfree(ushort dev, uint nr);
 int bzero(ushort dev, uint bn);
 
-
 // fs/namei.c
-struct inode* namei(char *path);
+struct inode* namei(char *path, uchar creat);
 
 // fs/file.c 
 struct file* falloc(int fd);

@@ -72,22 +72,9 @@ void sys_setup(struct trap *tf) {
 
     /*--------------------*/
 
-    fd = do_open("/hello.txt", O_RDWR | O_APPEND);
-    if (fd < 0) {
-        panic("open error");
+    ip = namei("/dir/file.txt", 0);
+    if (ip==NULL){
+        panic("bad ino");
     }
-    int cnt;
-    char tstr[] = "I'm losing what I don't deserve.\n";
-    for(i=0; i<1000; i++)
-        r = do_write(fd, tstr, strlen(tstr));
-    printf("hello~");
-
-    fd = do_open("/hello.txt", O_RDWR);
-    if (fd < 0) {
-        panic("open error");
-    }
-    while ((r = do_read(fd, buf, 512)) > 0) {
-        buf[r] = '\0';
-        printf("%s\n", buf);
-    }
+    printf("%d\n", ip->i_num);
 }

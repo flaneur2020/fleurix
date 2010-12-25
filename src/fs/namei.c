@@ -20,7 +20,7 @@ uint find_entry(struct inode* ip, char *name, uint len){
     int i, j, bn=0, ino=0;
 
     if ((ip->i_mode & S_IFMT)!=S_IFDIR) {
-        current->p_error = EFAULT;
+        syserr(EFAULT);
         return 0;
     }
 
@@ -40,11 +40,39 @@ uint find_entry(struct inode* ip, char *name, uint len){
     return 0;
 }
 
+uint link_entry(struct inode *dip, char *name, uint ino){
+    struct buf *bp;
+    struct dirent de;
+    int i, r, off;
+
+    if ((dip->i_mode & S_IFMT)!=S_IFDIR) {
+        syserr(EFAULT);
+        return 0;
+    }
+
+    for (off=0; off < dip->i_size; dip+=sizeof(struct dirent)){
+        r = readi(dip, &de, sizeof(struct dirent));
+        if (r != sizeof(struct dirent)){
+            panic("bad inode");
+        }
+        if (de.d_ino == 0) {
+            break;
+        }
+    }
+    strncpy(de.d_name, name, NAMELEN);
+    de.d_ino = ino;
+    r = writei(dip, &de, off, sizeof(struct dirent));
+    if (r != sizeof(struct dirent)){
+        panic("bad inode");
+    }
+    return ino;
+}
+
 /*
  * returns a locked inode.
  * take an eye on dead lock.
  * */
-struct inode* namei(char *path){
+struct inode* _namei(char *path, uchar parent, uchar creat){
     struct inode *wip=NULL, *cdp=NULL;
     uint ino, offset;
     char* tmp;
@@ -74,7 +102,7 @@ struct inode* namei(char *path){
         tmp = strchr(path, '/');
         offset = (tmp==NULL) ? strlen(path): (tmp-path);
         ino = find_entry(wip, path, offset);
-        if (ino == 0){
+        if (ino <= 0){
             return NULL;
         }
         iput(wip);
@@ -82,4 +110,12 @@ struct inode* namei(char *path){
         path += offset;
     }
     return wip;
+}
+
+struct inode* namei(char *path, uchar creat){
+    return _namei(path, 0, creat);
+}
+
+struct inode* namei_parent(char *path){
+    return _namei(path, 1, 0);
 }

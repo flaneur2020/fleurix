@@ -85,18 +85,24 @@ _loop:
     return NULL;
 }
 
-/* decrease the reference count, write updates to disk if
- * nessary.
- * release an inode */
+/* 
+ * release an inode.
+ * decrease the reference count, write updates to disk if nessary.
+ * also check the link count, if zero, trucate it.
+ * */
 void iput(struct inode *ip){
     ip->i_flag |= I_LOCK;
-    if (ip->i_count==1){
-        ip->i_flag = 0;
-        ip->i_num = 0;
-        iupdate(ip);
-    }
     if (ip->i_count > 0) {
         ip->i_count--;
+    }
+    if (ip->i_count==0){
+        if (ip->i_nlinks==0) {
+            itrunc(ip);
+            ifree(ip->i_dev, ip->i_num);
+        }
+        iupdate(ip);
+        ip->i_flag = 0;
+        ip->i_num = 0;
     }
     unlk_ino(ip);
 }
@@ -151,7 +157,6 @@ void iupdate(struct inode *ip){
     itab = (struct d_inode*)bp->b_data;
     // which different from above.
     memcpy(&itab[(ip->i_num-1)%IPB], ip, sizeof(struct d_inode));
-    bp->b_flag |= B_DIRTY;
     ip->i_flag &= ~I_DIRTY;
     bwrite(bp);
     brelse(bp);

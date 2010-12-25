@@ -31,7 +31,7 @@ int balloc(ushort dev){
         bwrite(bp);
         brelse(bp);
         unlk_sp(sp);
-        bzero(dev, sp->s_data_zone0 + bn);
+        // bzero(dev, sp->s_data_zone0 + bn);
         return sp->s_data_zone0 + bn;
     }
     unlk_sp(sp);
@@ -61,7 +61,7 @@ int bfree(ushort dev, uint nr){
     unlk_sp(sp);
 }
 
-/* zero one disk block. only called in balloc().
+/* zero one disk block.
  * */
 int bzero(ushort dev, uint bn){
     struct buf *bp;
@@ -75,13 +75,51 @@ int bzero(ushort dev, uint bn){
 
 /* --------------------------------------------------- */
 
-/* allocate one inode 
- * this may easier to debug.
+/* allocate one inode. returns the inode number which can be
+ * fetched with via an iget.
  * */
-uint ialloc(ushort dev){
+int ialloc(ushort dev){
+    uint nr, ino;
+    int r;
+    struct super *sp;
+    struct buf *bp;
+
+    sp = getsp(dev);
+    for (nr=0; nr < sp->s_max_inode; nr++){
+        bp = bread(dev, IMAPBLK(sp, nr));
+        r = find_bit(bp->b_data, BSIZE);   
+        if (r < 0) {
+            continue;
+        }
+        ino = nr*BPB + r;
+        bp->b_data[ino/8] |= 1<<(ino%8);
+        bwrite(bp);
+        brelse(bp);
+        unlk_sp(sp);
+        // bzero(dev, sp->s_data_zone0 + bn);
+        return ino;
+    }
+    unlk_sp(sp);
+    panic("no free inode");
+    return -1;
 }
 
 void ifree(ushort dev, uint ino){
+    struct buf *bp;
+    struct super *sp;
+    
+    sp = getsp(dev);
+    if ((ino <= 0) || (ino >= sp->s_max_inode)) {
+        panic("freeing an non-existing inode");
+    }
+    bp = bread(dev, IMAPBLK(sp, ino));
+    if ((bp->b_data[ino/8] & (1<<(ino%8))) == 0){
+        panic("freeing free inode");
+    }
+    bp->b_data[ino/8] &= ~(1<<(ino%8));
+    bwrite(bp);
+    brelse(bp);
+    unlk_sp(sp);
 }
 
 /* find the first zero bit in one bitmap */

@@ -12,6 +12,14 @@
 
 struct file file[NFILE];
 
+
+/* -------------------------------------------------------------- */
+
+/* TODO: check file access permssion */
+int do_access(char *fn, uint acc){
+}
+
+/* ------------------------------------------------------------- */
 /*
  * 
  * */
@@ -25,7 +33,7 @@ int do_open(char *path, uint mode){
     }
     // an existing file.
     else {
-        ip=namei(path);
+        ip = namei(path, 0);
         if (ip == NULL){
             iput(ip);
             current->p_error = ENFILE;
@@ -33,10 +41,12 @@ int do_open(char *path, uint mode){
         }
         // TODO: check access and special files
     } 
-
     if ((fd=ufalloc()<0) || (fp=falloc(fd))==NULL) {
         unlk_ino(ip);
         return -1;
+    }
+    if (mode & O_TRUNC){
+        itrunc(ip);
     }
     unlk_ino(ip);
     fp->f_mode = mode;
@@ -45,12 +55,6 @@ int do_open(char *path, uint mode){
 }
 
 int do_close(int fd){
-}
-
-/* -------------------------------------------------------------- */
-
-/* TODO: check file access permssion */
-int do_access(char *fn, uint acc){
 }
 
 /* -------------------------------------------------------------- */
@@ -111,7 +115,36 @@ int do_write(int fd, char *buf, int cnt){
     return r;
 }
 
+/* -------------------------------------------------------------- */
+
 int do_creat(){
+}
+
+int do_mknod(){
+}
+
+/*
+ * create a new link (directory entry) for the existing file, path1.
+ * */
+int do_link(char *path1, char *path2){
+}
+
+/*
+ * remove  
+ * returns 0 on success. Otherwise returns -1 and errno 
+ * set to indicate the error.
+ * */
+int do_unlink(char *path){
+    struct inode *ip;
+    char *name;
+
+    ip = namei(path, 0);
+    if (ip == NULL) {
+        syserr(ENOENT);
+        return -1;
+    }
+
+    printf("name: %s; path: %s\n", name, path);
 }
 
 /* -------------------------------------------------------------- */
@@ -125,7 +158,7 @@ int ufalloc(){
             return i;
         }
     }
-    current->p_error = EMFILE;
+    syserr(EMFILE);
     return -1;
 }
 

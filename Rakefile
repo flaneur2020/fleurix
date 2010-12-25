@@ -45,7 +45,7 @@ file 'bin/rootfs.img' do
   mkdir_p '/tmp/fx_mnt_root'
   `sudo umount /tmp/fx_mnt_root`
   sh "sudo mount -o loop -t minix bin/rootfs.img /tmp/fx_mnt_root"
-  sh "cp ./root/* /tmp/fx_mnt_root"
+  sh "cp -r ./root/* /tmp/fx_mnt_root"
   sh "sudo umount /tmp/fx_mnt_root"
   sh "rm -rf /tmp/fx_mnt_root"
 end

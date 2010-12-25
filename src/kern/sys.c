@@ -41,6 +41,10 @@ void sys_putn(struct trap *tf){
 
 /***********************************************************/
 
+void syserr(uint err){
+    current->p_error = err;
+}
+
 void do_syscall(struct trap *r){
     //printf("do_syscall();\n");
     void (*fn)(struct trap *r);

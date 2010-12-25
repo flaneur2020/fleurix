@@ -35,6 +35,22 @@ int strlen(char *str){
     return sp-str;
 }
 
+char* strcpy(char *dst, const char *src) {
+	char *tmp = dst;
+    while (*dst++ = *src++); 
+	return tmp;
+}
+
+char *strncpy(char *dst, const char *src, unsigned int cnt) {
+    char *tmp = dst;
+    while (cnt && (*dst++ = *src++)) 
+        cnt--;
+    if (cnt > 0) 
+        while (--cnt) 
+            *dst++ = '\0';
+    return tmp;
+}
+
 /* 
  * note that '\0' is considered to be part of the string. 
  * returns not a number but a pointer.
@@ -47,6 +63,19 @@ char* strchr(const char *str, int c){
     }
     if (*str == (char)c) 
         return str;
+    return NULL;
+}
+
+/* just like strchr, but in reverse order. */
+char* strrchr(const char *str, int c){
+    char *ret;
+    for(; *str!='\0'; str++){
+        if (*str == (char)c) {
+            ret = str;
+        }
+    }
+    if (*ret == (char)c)
+        return ret;
     return NULL;
 }
 
