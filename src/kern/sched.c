@@ -12,7 +12,7 @@ uchar kstack0[1024] = {0, };
 void _hwint_ret();
 
 struct proc *proc[NPROC] = {NULL, };
-struct proc *current = NULL;
+struct proc *cu = NULL;
 
 struct tss_desc tss;
 
@@ -27,9 +27,9 @@ uint runrun = 0;
  * */
 void sleep(uint chan, int pri){
     cli();
-    current->p_chan = chan;
-    current->p_pri  = pri;
-    current->p_stat = SWAIT;
+    cu->p_chan = chan;
+    cu->p_pri  = pri;
+    cu->p_stat = SWAIT;
     sti();
     swtch();
 }
@@ -60,7 +60,7 @@ void setpri(struct proc *p){
     n = p->p_cpu/16 + PUSER + p->p_nice;
     if (n >= 127) n=127;
     if (n <= -126) n=-126;
-    if (p->p_pri < current->p_pri){
+    if (p->p_pri < cu->p_pri){
         runrun = 1;
     }
     p->p_pri = n;
@@ -95,8 +95,8 @@ void swtch(){
     // clear the re-schedule flag
     runrun = 0;
 
-    // re-caculate current's p_pri
-    setpri(current);
+    // re-caculate cu's p_pri
+    setpri(cu);
 
     // find the proc
     for(i=0;i<NPROC;i++){
@@ -111,7 +111,7 @@ void swtch(){
         np = proc[0];
     }
     //debug_proc_list();
-    if (np!=current) {
+    if (np!=cu) {
         swtch_to(np);
     }
 }
@@ -124,8 +124,8 @@ void swtch_to(struct proc *to){
     // change ldt & tss
     tss.esp0 = (uint)to+0x1000;
     lldt(_LDT(to->p_pid));
-    from = current;
-    current = to;
+    from = cu;
+    cu = to;
     _do_swtch(&(from->p_contxt), &(to->p_contxt));
 }
 
@@ -150,8 +150,8 @@ int find_pid(){
  * return 0 on success
  * */
 int copy_mem_to(struct proc *to){
-    uint old_limit = get_seg_limit(&(current->p_ldt[1])); 
-    uint old_base  = get_seg_base(&(current->p_ldt[1])); 
+    uint old_limit = get_seg_limit(&(cu->p_ldt[1])); 
+    uint old_base  = get_seg_base(&(cu->p_ldt[1])); 
     uint new_base  = to->p_pid * 0x4000000;
     set_seg(&(to->p_ldt[1]), new_base, old_limit, RING3, STA_X | STA_R);
     set_seg(&(to->p_ldt[2]), new_base, old_limit, RING3, STA_W);
@@ -183,16 +183,16 @@ int copy_proc(struct trap *tf){
     }
 
     proc[nr] = p;
-    *p = *current;
+    *p = *cu;
     p->p_pid = nr;
-    p->p_ppid = current->p_pid;
+    p->p_ppid = cu->p_pid;
     // on sche
-    p->p_flag = current->p_flag;
-    p->p_cpu  = current->p_cpu;
-    p->p_pri  = current->p_pri;
-    p->p_nice = current->p_nice;
+    p->p_flag = cu->p_flag;
+    p->p_cpu  = cu->p_cpu;
+    p->p_pri  = cu->p_pri;
+    p->p_nice = cu->p_nice;
     // increase the reference count of inodes
-    p->p_cdir = current->p_cdir;
+    p->p_cdir = cu->p_cdir;
     p->p_cdir->i_count++;
     // init the new proc's kernel stack
     p->p_trap = ntf = ((struct trap *)(uint)p + 0x1000) - 1;
@@ -220,7 +220,7 @@ int copy_proc(struct trap *tf){
  * and make current as proc[0]
  */
 void sched_init(){
-    struct proc *p = current = proc[0] = (struct proc *)(uint) kstack0;
+    struct proc *p = cu = proc[0] = (struct proc *)(uint) kstack0;
     p->p_pid = 0;
     p->p_ppid = 0;
     p->p_stat = SRUN;
@@ -278,7 +278,7 @@ void debug_proc_list(){
 }
 
 void debug_proc(struct proc *p){
-    printf("%s ", (p==current)? "-":" " );
+    printf("%s ", (p==cu)? "-":" " );
     printf("pid:%d pri:%d cpu:%d nice:%d stat:%d esp0:%x eip:%x \n", p->p_pid, p->p_pri, p->p_cpu, p->p_nice, p->p_stat, p->p_contxt.esp, p->p_trap->eip);
 }
 

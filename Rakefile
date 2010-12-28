@@ -100,6 +100,7 @@ cfiles = [
   #
   'src/lib/string.c',
   'src/lib/bitmap.c',
+  'src/lib/unistd.c',
   #
   'src/kern/main.c'
 ]

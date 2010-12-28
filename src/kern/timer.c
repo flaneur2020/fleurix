@@ -55,8 +55,8 @@ uint time(){
 void do_timer(struct trap *tf){
     tick++;
     // on shedule
-    if (current->p_cpu+1 <= 127) {
-        current->p_cpu++;
+    if (cu->p_cpu+1 <= 127) {
+        cu->p_cpu++;
     }
 
     // per second

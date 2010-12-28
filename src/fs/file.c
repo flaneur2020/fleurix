@@ -15,7 +15,7 @@ struct file file[NFILE];
 
 /* -------------------------------------------------------------- */
 
-/* TODO: check file access permssion */
+/* TODO: check file access and permssion */
 int do_access(char *fn, uint acc){
 }
 
@@ -36,7 +36,7 @@ int do_open(char *path, uint mode){
         ip = namei(path, 0);
         if (ip == NULL){
             iput(ip);
-            current->p_error = ENFILE;
+            syserr(ENFILE);
             return -1;
         }
         // TODO: check access and special files
@@ -54,7 +54,23 @@ int do_open(char *path, uint mode){
     return fd;
 }
 
+/* TODO: have a reference with <the unix os design> */
 int do_close(int fd){
+    uint nr;
+    struct file *fp;
+
+    if ((fd>NOFILE) || (fd<0)){
+        syserr(EBADF);
+        return -1;
+    }
+
+    nr = cu->p_ofile[fd];
+    cu->p_ofile[fd] = 0;
+    fp = &file[nr];
+    if (fp == NULL) {
+        syserr(EBADF);
+        return -1;
+    }
 }
 
 /* -------------------------------------------------------------- */
@@ -70,9 +86,9 @@ int do_read(int fd, char *buf, int cnt){
     struct inode *ip;
     int r;
 
-    fp = current->p_ofile[fd];
+    fp = cu->p_ofile[fd];
     if ( fd<0 || fd>NOFILE || fp==NULL ) {
-        current->p_error = ENFILE;
+        cu->p_error = ENFILE;
         return -1;
     }
     // TODO: special files
@@ -92,9 +108,9 @@ int do_write(int fd, char *buf, int cnt){
     struct inode *ip;
     int r, off;
     
-    fp = current->p_ofile[fd];
+    fp = cu->p_ofile[fd];
     if ( fd<0 || fd>NOFILE || fp==NULL) {
-        current->p_error = ENFILE;
+        cu->p_error = ENFILE;
         return -1;
     }
     if (fp->f_mode & O_APPEND) {
@@ -154,7 +170,7 @@ int ufalloc(){
     int i;
     
     for(i=0; i<NOFILE; i++){
-        if (current->p_ofile[i]==0) {
+        if (cu->p_ofile[i]==0) {
             return i;
         }
     }
@@ -170,12 +186,12 @@ struct file* falloc(int fd){
 
     for(fp=&file[0]; fp<&file[NFILE]; fp++){
         if (fp->f_count==0) {
-            current->p_ofile[fd] = fp;
+            cu->p_ofile[fd] = fp;
             fp->f_count++;
             fp->f_offset = 0;
             return fp;
         }
     }
-    current->p_error = ENFILE;
+    cu->p_error = ENFILE;
     return NULL;
 }

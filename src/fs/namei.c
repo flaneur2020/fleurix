@@ -96,10 +96,10 @@ struct inode* _namei(char *path, uchar parent, uchar creat){
     // set it's root directory here.
     if (*path == '/') {
         wip = iget(rootdev, ROOTINO);
-        current->p_cdir = wip;
+        cu->p_cdir = wip;
     }
     else {
-        cdp = current->p_cdir;
+        cdp = cu->p_cdir;
         wip = iget(cdp->i_dev, cdp->i_num);
     }
 

@@ -148,7 +148,7 @@ void flush_idt(struct idt_desc idtd){
 void hwint_common(struct trap *tf) {
     void (*handler)(struct trap *tf);
     handler = hwint_routines[tf->int_no]; 
-    current->p_trap = tf;
+    cu->p_trap = tf;
     // trap
     if (tf->int_no < 32) {
         if (handler){
@@ -171,7 +171,7 @@ void hwint_common(struct trap *tf) {
     // if the re-schedule flag is set, make an task swtch.
     // and make sure only swtch on returning to user mode,
     // thus to keep the kernel nonpremtive.
-    setpri(current);
+    setpri(cu);
     if (runrun && (tf->cs & 3)==RING3) {
         swtch();
     }

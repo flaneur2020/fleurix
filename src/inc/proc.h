@@ -28,7 +28,8 @@ struct proc {
     int                 p_time;         /* on swap */
     uint                p_pid;          
     uint                p_ppid;         /* parent's pid */
-    uint                p_textp;
+    uint                p_uid;          /* uid */
+    uint                p_textp;        /* virtual addresses */
     uint                p_tsize;
     uint                p_stack;
     uint                p_brk;
@@ -43,7 +44,7 @@ struct proc {
 
 extern struct proc *proc[NPROC];
 
-extern struct proc *current;
+extern struct proc *cu;
 
 /* flag for re-scheduling */
 extern uint runrun; 

@@ -9,7 +9,6 @@ int errno = 0;
 
 static uint sys_routines[NSYSC] = {
     [NR_setup] = &sys_setup,
-    [NR_putn]  = &sys_putn,
     [NR_fork]  = &sys_fork,
     [NR_nice]  = &sys_nice,
     [NR_debug] = &sys_debug,
@@ -39,12 +38,22 @@ void sys_putn(struct trap *tf){
     printf("%d", tf->ebx);
 }
 
-/***********************************************************/
+/* ---------------------------------------------- */
 
-void syserr(uint err){
-    current->p_error = err;
+/* returns 1 on current is super user(aka. root) */
+uint suser(){
+    if (cu->p_uid == 0) {
+        return 1;
+    }
+    return 0;
 }
 
+/* returns a error code. */
+void syserr(uint err){
+    cu->p_error = err;
+}
+
+/* common handlers for all syscalls */
 void do_syscall(struct trap *r){
     //printf("do_syscall();\n");
     void (*fn)(struct trap *r);

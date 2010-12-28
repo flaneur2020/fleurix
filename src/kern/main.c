@@ -26,7 +26,13 @@ void main(){
     timer_init();       puts("* init timer\n");
     sched_init();       puts("* init sched\n");
     // proc[0] arises now
-    puts("* init user mode\n");
+    // mount root fs
+    puts("* mouting root fs \n");
+    do_mount(rootdev, NULL);
+    cu->p_cdir = iget(rootdev, ROOTINO);
+    unlk_ino(cu->p_cdir);
+
+    puts("* enter user mode\n");
     umode_init();
 
     /*
@@ -65,10 +71,6 @@ void sys_setup(struct trap *tf) {
     char *str, *path;
 
     // mount the root dev and set the current workint dirctory
-    do_mount(rootdev, NULL);
-    ip = iget(rootdev, ROOTINO);
-    current->p_cdir = ip; 
-    unlk_ino(ip);
 
     /*--------------------*/
 

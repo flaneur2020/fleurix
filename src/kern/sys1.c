@@ -11,6 +11,14 @@
 
 /* syscalls on fs */
 
+int sys_access(struct trap *tf){
+    char *path;
+    int mode;
+
+    path = tf->eax;
+    mode = tf->ebx;
+}
+
 int sys_open(struct trap *tf){
 }
 

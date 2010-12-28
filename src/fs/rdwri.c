@@ -24,7 +24,7 @@ int readi(struct inode *ip, char *buf, uint off, uint cnt){
 
     // file size limit 
     if ((off > ip->i_size) || (off+cnt < off)){
-        current->p_error = E2BIG;
+        cu->p_error = E2BIG;
         return -1;
     }
     if (off+cnt > ip->i_size) {
