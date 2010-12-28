@@ -36,7 +36,7 @@ struct inode {
 #define I_DIRTY  0x4    /* this inode has been modified*/
 #define I_MOUNT  0x8    /* - */
 
-/* formats */
+/* i_mode */
 #define S_IFMT  00170000
 #define S_IFREG  0100000 /* regular */
 #define S_IFBLK  0060000 /* blk device */
@@ -47,10 +47,18 @@ struct inode {
 #define S_ISGID  0002000
 #define S_ISVTX  0001000
 
+#define RWX_MODES 0000777	/* mode bits for RWX only */
+#define R_BIT    0000004	/* Rwx protection bit */
+#define W_BIT    0000002	/* rWx protection bit */
+#define X_BIT    0000001	/* rwX protection bit */
+
 /* directory entry */
+#define NAMELEN 12
+
 struct dirent {
     ushort  d_ino;
     char    d_name[NAMELEN];
+    char    __p[18]; /* a padding. each dirent is aligned with a 32 bytes boundary. */
 };
 
 #endif

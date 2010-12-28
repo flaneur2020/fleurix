@@ -81,6 +81,7 @@ int bzero(ushort dev, uint bn){
 int ialloc(ushort dev){
     uint nr, ino;
     int r;
+    struct inode *ip;
     struct super *sp;
     struct buf *bp;
 
@@ -96,7 +97,6 @@ int ialloc(ushort dev){
         bwrite(bp);
         brelse(bp);
         unlk_sp(sp);
-        // bzero(dev, sp->s_data_zone0 + bn);
         return ino;
     }
     unlk_sp(sp);

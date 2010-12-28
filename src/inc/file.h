@@ -5,6 +5,7 @@
 
 struct file {
     char            f_mode;
+    char            f_flag;
     char            f_count;
     uint            f_offset;
     struct inode   *f_ino;

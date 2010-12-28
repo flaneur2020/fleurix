@@ -23,13 +23,13 @@ int do_access(char *fn, uint acc){
 /*
  * 
  * */
-int do_open(char *path, uint mode){
+int do_open(char *path, uint flag, uint mode){
     struct inode *ip;
     struct file *fp;
     int fd;
 
     // TODO: on create a new file.
-    if (mode & O_CREAT){
+    if (flag & O_CREAT){
     }
     // an existing file.
     else {
@@ -45,11 +45,12 @@ int do_open(char *path, uint mode){
         unlk_ino(ip);
         return -1;
     }
-    if (mode & O_TRUNC){
+    if (flag & O_TRUNC){
         itrunc(ip);
     }
     unlk_ino(ip);
-    fp->f_mode = mode;
+    fp->f_mode = ip->i_mode;
+    fp->f_flag = flag;
     fp->f_ino = ip;
     return fd;
 }
@@ -133,7 +134,8 @@ int do_write(int fd, char *buf, int cnt){
 
 /* -------------------------------------------------------------- */
 
-int do_creat(){
+int do_creat(char *path, int mode){
+    return do_open(path, O_CREAT | O_TRUNC, mode);
 }
 
 int do_mknod(){
@@ -160,7 +162,9 @@ int do_unlink(char *path){
         return -1;
     }
 
-    printf("name: %s; path: %s\n", name, path);
+    ip->i_nlinks--;
+    iput(ip);
+    return 0;
 }
 
 /* -------------------------------------------------------------- */

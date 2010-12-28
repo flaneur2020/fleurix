@@ -29,6 +29,7 @@ struct proc {
     uint                p_pid;          
     uint                p_ppid;         /* parent's pid */
     uint                p_uid;          /* uid */
+    uint                p_gid;          /* gid */
     uint                p_textp;        /* virtual addresses */
     uint                p_tsize;
     uint                p_stack;

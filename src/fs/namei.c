@@ -14,6 +14,7 @@
  * fetch an inode number from a single directory file (via a locked inode, make sure
  * it's an directory).
  * returns 0 on fail.
+ * NOTE: minix v1's direntry is aligned with a 32bytes boundary.
  * */
 uint find_entry(struct inode* dip, char *name, uint len){
     struct buf *bp;

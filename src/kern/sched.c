@@ -229,6 +229,9 @@ void sched_init(){
     p->p_cpu = 0;
     p->p_pri = 0;
     p->p_nice = 20;
+    // on user
+    p->p_uid = 0;
+    p->p_gid = 0;
     // init tss
     tss.ss0  = KERN_DS;
     tss.esp0 = (uint)p + 0x1000;

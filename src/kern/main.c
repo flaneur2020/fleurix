@@ -74,17 +74,24 @@ void sys_setup(struct trap *tf) {
 
     /*--------------------*/
 
-    ip = namei("/dir/hello.txt", 1);
+    ino = ialloc(rootdev);
+    ip = iget(rootdev, ino);
+    ip->i_nlinks = 1;
+    ip->i_mode = S_IFREG | 0777;
+    ip->i_time = time();
+    ip->i_gid = 0xe8;
+    iupdate(ip);
+    dump_inode(ip);
+    iput(ip);
+    //
+    ip = namei("/12345678901234567890.txt", 1);
     if (ip==NULL){
         panic("bad ino");
     }
     iupdate(ip);
     iput(ip);
+    //dump_inode(ip);
     unlk_ino(ip);
-    ip = namei("/about.txt", 0);
-    printf("i_mode: %x\n", ip->i_mode);
-    ip = namei("/dir/hello.txt", 0);
-    printf("i_mode: %x\n", ip->i_mode);
     if (ip==NULL) {
         panic("damn");
     }

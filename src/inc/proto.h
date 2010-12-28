@@ -43,6 +43,8 @@ void iupdate(struct inode *ip);
 int balloc(ushort dev);
 int bfree(ushort dev, uint nr);
 int bzero(ushort dev, uint bn);
+int ialloc(ushort dev);
+void ifree(ushort dev, uint ino);
 
 // fs/namei.c
 struct inode* namei(char *path, uchar creat);
