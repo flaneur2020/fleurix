@@ -85,7 +85,7 @@ uint link_entry(struct inode *dip, char *name, uint len, uint ino){
 }
 
 /*
- * returns a locked inode.
+ * returns a locked inode. NULL on error.
  * */
 struct inode* _namei(char *path, uchar parent, uchar creat){
     struct inode *wip=NULL, *cdp=NULL;

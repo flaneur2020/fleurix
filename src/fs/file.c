@@ -17,19 +17,36 @@ struct file file[NFILE];
 
 /* TODO: check file access and permssion */
 int do_access(char *fn, uint acc){
+    return 1;
 }
 
 /* ------------------------------------------------------------- */
 /*
- * 
+ * open a file. flag indicated opened type like O_RDONLY, O_TRUNC, O_CREAT and blah. And 
+ * mode only used in the O_CREAT scenary, indicated the file (inode) type.
+ *
+ * each proc has got one user file table(p_ofile[NOFILE]), it's each entry is also a number,
+ * indicated the number in the system file table(file[NFILE]). when user opened a file, it 
+ * first allocate a user file table entry(aka. file descriptor), then attach it with a system
+ * file table entry. It's reference count is increased in fork() or dup().
  * */
 int do_open(char *path, uint flag, uint mode){
     struct inode *ip;
     struct file *fp;
     int fd;
 
-    // TODO: on create a new file.
+    // on create a new file.
     if (flag & O_CREAT){
+        ip = namei(path, 1);
+        // if file is not existing yet.
+        if (ip->i_nlinks==0) {
+            ip->i_mode = mode;
+            ip->i_uid = cu->p_uid;
+            ip->i_gid = cu->p_gid;
+            ip->i_time = time();
+            ip->i_nlinks++;
+            iupdate(ip);
+        }
     }
     // an existing file.
     else {
@@ -49,13 +66,16 @@ int do_open(char *path, uint flag, uint mode){
         itrunc(ip);
     }
     unlk_ino(ip);
-    fp->f_mode = ip->i_mode;
     fp->f_flag = flag;
     fp->f_ino = ip;
     return fd;
 }
 
-/* TODO: have a reference with <the unix os design> */
+/*
+ * close a user file discriptor.
+ * remove the entry in the user file table, and decrease the entry in system 
+ * file table's ref count. and iput the inode.
+ * */
 int do_close(int fd){
     uint nr;
     struct file *fp;
@@ -66,11 +86,18 @@ int do_close(int fd){
     }
 
     nr = cu->p_ofile[fd];
-    cu->p_ofile[fd] = 0;
-    fp = &file[nr];
-    if (fp == NULL) {
+    if (nr>NFILE || nr<0) {
         syserr(EBADF);
         return -1;
+    }
+    cu->p_ofile[fd] = 0;
+    fp = &file[nr];
+    iput(fp->f_ino);
+    fp->f_count--;
+    if (fp->f_count <= 0) {
+        fp->f_count = 0;
+        fp->f_flag = 0;
+        fp->f_offset = 0;
     }
 }
 
@@ -114,7 +141,7 @@ int do_write(int fd, char *buf, int cnt){
         cu->p_error = ENFILE;
         return -1;
     }
-    if (fp->f_mode & O_APPEND) {
+    if (fp->f_flag & O_APPEND) {
         off = fp->f_ino->i_size;
     }
     else {
@@ -134,17 +161,63 @@ int do_write(int fd, char *buf, int cnt){
 
 /* -------------------------------------------------------------- */
 
+/* 
+ * creat a new file if not existing yet. if existed, truncate it.
+ * this routine also returns a file descriptor just like do_open().
+ * */
 int do_creat(char *path, int mode){
     return do_open(path, O_CREAT | O_TRUNC, mode);
 }
 
-int do_mknod(){
+/*
+ * */
+int do_mknod(char *path, int mode, ushort dev){
 }
 
 /*
- * create a new link (directory entry) for the existing file, path1.
+ * link path1 to path2.
  * */
 int do_link(char *path1, char *path2){
+    struct inode *tip, *dip;
+    int ino, r;
+    char *name;
+
+    // TODO: check permission
+
+    // get the inode number.
+    tip = namei(path1, 0);
+    if (tip==NULL) {
+        syserr(ENOENT);
+        iput(tip);
+        return -1;
+    }
+    ino = tip->i_num;
+    tip->i_nlinks++;
+    unlk_ino(tip); // the next namei may deadlock. so unlock it.
+
+    // get the inode of the target's directory
+    dip = namei_parent(path2);
+    name = strrchr(path2, '/');
+    if (name==NULL) {
+        name = path2;
+    }
+    // if entry already exists, error.
+    r = find_entry(dip, name, strlen(name));
+    if (r!=0) {
+        syserr(EEXIST);
+        iput(tip);
+        iput(dip);
+        return -1;
+    }
+    // do link
+    lock_ino(tip);
+    r = link_entry(dip, name, strlen(name), tip->i_num);
+    if (r==0) {
+        panic(" bad link.");
+    }
+    iput(tip);
+    iput(dip);
+    return 0;
 }
 
 /*
@@ -193,6 +266,7 @@ struct file* falloc(int fd){
             cu->p_ofile[fd] = fp;
             fp->f_count++;
             fp->f_offset = 0;
+            fp->f_flag = 0;
             return fp;
         }
     }
