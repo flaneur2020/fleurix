@@ -215,28 +215,33 @@ int do_link(char *path1, char *path2){
     if (r==0) {
         panic(" bad link.");
     }
+    iupdate(tip); // ref count increased
     iput(tip);
     iput(dip);
     return 0;
 }
 
 /*
- * remove  
+ * remove.
  * returns 0 on success. Otherwise returns -1 and errno 
  * set to indicate the error.
  * */
 int do_unlink(char *path){
-    struct inode *ip;
+    struct inode *ip, *dip;
+    int ino;
     char *name;
 
-    ip = namei(path, 0);
-    if (ip == NULL) {
-        syserr(ENOENT);
-        return -1;
+    // get the inode of the target's directory
+    dip = namei_parent(path);
+    name = strrchr(path, '/');
+    if (name==NULL) {
+        name = path;
     }
-
+    ino = unlink_entry(dip, name, strlen(name));
+    ip = iget(dip->i_dev, ino);
     ip->i_nlinks--;
     iput(ip);
+    iput(dip);
     return 0;
 }
 

@@ -44,8 +44,39 @@ uint find_entry(struct inode* dip, char *name, uint len){
 }
 
 /*
- * assign a new directory entry with a given inode. the given inode number
- * equals 0, it's a remove.
+ * unlink a entry, like above.
+ * */
+int unlink_entry(struct inode *dip, char *name, int len){
+    struct buf *bp;
+    struct dirent *dep;
+    int i, j, bn=0, ino=0;
+
+    if ((dip->i_mode & S_IFMT)!=S_IFDIR) {
+        syserr(EFAULT);
+        return 0;
+    }
+    len = min(len, NAMELEN);
+
+    for(i=0; i<dip->i_size/BSIZE+1; i++){
+        bn = bmap(dip, i, 0);
+        bp = bread(dip->i_dev, bn);
+        dep = (struct dirent *)bp->b_data;
+        for(j=0; j<BSIZE/(sizeof(struct dirent))+1; j++) {
+            if (0==strncmp(name, dep[j].d_name, len)){
+                ino = dep[j].d_ino;
+                dep[j].d_ino = 0;
+                bwrite(bp);
+                brelse(bp);
+                return ino;
+            }
+        }
+        brelse(bp);
+    }
+    return 0;
+}
+
+/*
+ * assign a new directory entry with a given inode. 
  * note: this routine do NOT check the existence of the given name.
  * */
 uint link_entry(struct inode *dip, char *name, uint len, uint ino){
