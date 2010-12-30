@@ -152,7 +152,7 @@ int find_pid(){
 int copy_mem_to(struct proc *to){
     uint old_limit = get_seg_limit(&(cu->p_ldt[1])); 
     uint old_base  = get_seg_base(&(cu->p_ldt[1])); 
-    uint new_base  = to->p_pid * 0x4000000;
+    uint new_base  = to->p_pid * PROCSIZ;
     set_seg(&(to->p_ldt[1]), new_base, old_limit, RING3, STA_X | STA_R);
     set_seg(&(to->p_ldt[2]), new_base, old_limit, RING3, STA_W);
     // copy page tables

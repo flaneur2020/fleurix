@@ -12,10 +12,10 @@
 /* syscalls on fs */
 
 void sys_access(struct trap *tf){
-    char *path = tf->ebx;
+    char *path = va2pa(tf->ebx);
     int mode = tf->ecx;
 
-    printf("access();\n");
+    printf("access(); %x\n", path);
     //printf("path: %x\n", path);
 }
 

@@ -12,10 +12,6 @@
 #include <inode.h>
 #include <file.h>
 
-/*
- * NOTE: share the memory of proc[0] may raise some wired bugs.
- * */
-
 void main(){
     tty_init();         puts("* init tty\n");
     gdt_init();         puts("* init gdt\n");
@@ -49,8 +45,8 @@ void main(){
     }*/
     // in proc1
     if(fork()==0){
-        //setup();
-        //asm volatile("int $0x80"::"a"(0));
+        //setup(); // note: setup is inlined, or something unhappy may occurs.
+        access("abc",123);
     }
 
     for(;;);

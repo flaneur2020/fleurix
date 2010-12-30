@@ -15,10 +15,10 @@ struct idt_desc {
 } __attribute__((packed));     
 
 struct trap {
-    uint        gs, fs, es, ds;                             /* pushed the segs last */
-    uint        edi, esi, ebp, _esp, ebx, edx, ecx, eax;    /* pushed by 'pusha' */
-    uint        int_no, err_code;                           /* our 'push byte #' and ecodes do this */
-    uint        eip, cs, eflags, esp, ss;                   /* pushed by the processor automatically */ 
+    int        gs, fs, es, ds;                             /* pushed the segs last */
+    int        edi, esi, ebp, _esp, ebx, edx, ecx, eax;    /* pushed by 'pusha' */
+    int        int_no, err_code;                           /* our 'push byte #' and ecodes do this */
+    int        eip, cs, eflags, esp, ss;                   /* pushed by the processor automatically */ 
 } __attribute__((packed));
 
 /* constants on PIC */

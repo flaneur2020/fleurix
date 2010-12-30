@@ -1,5 +1,5 @@
 cinc   = '-Isrc/inc'
-cflag  = "-Wall -finline-functions -nostdinc -fno-builtin -fno-stack-protector"
+cflag  = "-O2 -Wall -finline-functions -nostdinc -fno-builtin -fno-stack-protector"
 pgrep  = "grep --color -e 'error' -e 'error' -e '^'"
 
 task :default => :bochs

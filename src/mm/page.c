@@ -85,8 +85,13 @@ void do_page_fault(struct trap *tf){
     // write protection raised prior than valid.
     if (tf->err_code & PFE_W) {
         do_wp_page(cr2, tf->err_code);
+        return;
     }
     //debug_regs(tf);
+    if (tf->err_code & PFE_U) {
+        panic("user bad mem access.");
+    }
+    printf("page fault: error code: %x\n", tf->err_code);
 }
 
 /**************************************************************/
@@ -103,7 +108,7 @@ uint alloc_page(){
             return i*0x1000;
         }
     }
-    panic("no availible page.\n");
+    panic("no free page.\n");
     return 0;
 }
 
@@ -163,7 +168,7 @@ int copy_vm(uint dst, uint src, uint limit){
         // increase the children's reference count.
         pa = la2pa(src+off);
         coremap[PPN(pa)]++;
-        put_page(pa, dst+off, PTE_P | PTE_U);
+        put_page(pa, dst+off, PTE_P | PTE_U); // note that PTE_W is off
     }
     flush_cr3(pgdir);
     return 0;
@@ -176,7 +181,7 @@ uint* find_pte(uint la){
     uint pde, *ptab, pte;
     pde = pgdir[PDX(la)];
     if (!(pde & PTE_P)) {
-        printf("%x: ", la);
+        printf("find_pte(0x%x): ", la);
         panic("invalid pde\n");
     }
     ptab = (uint *)PTE_ADDR(pde);
@@ -193,14 +198,20 @@ uint la2pa(uint la){
     return PTE_ADDR(pte) + POFF(la);
 }
 
+/* parse a virtual address(user address) to linear address.
+ * */
 uint va2la(uint va){
-    if (va > PROCSIZ) {
+    if (va > PROCSIZ)
         panic("bad virtual address");
-    }
-    return cu->p_pid*PROCSIZ + va;
+    return cu->p_pid*PROCSIZ + va%PROCSIZ;
 }
 
-/***************************************************************/
+/* translate a virtual address to physical address */
+uint va2pa(uint la){
+    return la2pa(va2la(la));
+}
+
+/* --------------------------------------------------- */
 
 void flush_cr3(uint addr){
     asm volatile("mov %%eax, %%cr3":: "a"(addr));

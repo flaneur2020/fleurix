@@ -5,7 +5,7 @@ typedef unsigned int    uint;
 #define PBSIZE  512         /* physical block size */
 #define BSIZE   1024        /* logical block size */
 #define PAGE    0x1000
-#define PROCSIZ 0x400000
+#define PROCSIZ 0x4000000
 #define LO_MEM  0x300000    /* kernel resides in 0~LO_MEM */
 #define HI_MEM  0x1000000   /* total 128mb physical memory */
 #define ROOTINO 1

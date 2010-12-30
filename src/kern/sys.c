@@ -8,11 +8,12 @@
 int errno = 0;
 
 static uint sys_routines[NSYSC] = {
-    [NR_debug] = &sys_debug,
-    [NR_setup] = &sys_setup,
+    [NR_debug]  = &sys_debug,
+    [NR_setup]  = &sys_setup,
     [NR_access] = &sys_access,
-    [NR_fork]  = &sys_fork,
-    [NR_nice]  = &sys_nice,
+    [NR_fork]   = &sys_fork,
+    [NR_nice]   = &sys_nice,
+    [NR_getpid] = &sys_getpid,
     &nosys,
 };
 
@@ -40,6 +41,11 @@ void sys_nice(struct trap *tf){
     if (n<-19) n=-19;
 }
 
+void sys_getpid(struct trap *tf){
+    printf("pid: %x\n", cu->p_pid);
+    tf->eax = cu->p_pid;
+}
+
 /* ---------------------------------------------- */
 
 /* returns 1 on current is super user(aka. root) */
@@ -48,6 +54,14 @@ uint suser(){
         return 1;
     }
     return 0;
+}
+
+/* get a char from userspace */
+char getuc(char *va){
+}
+
+/* put a char into userspace */
+char putuc(char *va){
 }
 
 /* returns a error code. maybe useless */
