@@ -193,6 +193,13 @@ uint la2pa(uint la){
     return PTE_ADDR(pte) + POFF(la);
 }
 
+uint va2la(uint va){
+    if (va > PROCSIZ) {
+        panic("bad virtual address");
+    }
+    return cu->p_pid*PROCSIZ + va;
+}
+
 /***************************************************************/
 
 void flush_cr3(uint addr){

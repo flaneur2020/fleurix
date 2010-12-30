@@ -8,16 +8,22 @@
 int errno = 0;
 
 static uint sys_routines[NSYSC] = {
+    [NR_debug] = &sys_debug,
     [NR_setup] = &sys_setup,
+    [NR_access] = &sys_access,
     [NR_fork]  = &sys_fork,
     [NR_nice]  = &sys_nice,
-    [NR_debug] = &sys_debug,
-    0,
-}; 
+    &nosys,
+};
 
 /***********************************************************/
 
+void nosys(struct trap *tf){
+    tf->eax = -ENOSYS;
+}
+
 void sys_debug(struct trap *tf){
+    printf("%d", tf->ebx);
 }
 
 void sys_fork(struct trap *tf){
@@ -34,10 +40,6 @@ void sys_nice(struct trap *tf){
     if (n<-19) n=-19;
 }
 
-void sys_putn(struct trap *tf){
-    printf("%d", tf->ebx);
-}
-
 /* ---------------------------------------------- */
 
 /* returns 1 on current is super user(aka. root) */
@@ -48,19 +50,21 @@ uint suser(){
     return 0;
 }
 
-/* returns a error code. */
+/* returns a error code. maybe useless */
 void syserr(uint err){
     cu->p_error = err;
 }
 
 /* common handlers for all syscalls */
-void do_syscall(struct trap *r){
-    //printf("do_syscall();\n");
-    void (*fn)(struct trap *r);
-    fn = sys_routines[r->eax];
+void do_syscall(struct trap *tf){
+    void (*fn)(struct trap *tf);
+    if (tf->eax > NSYSC) {
+        panic("bad syscall");
+    }
+    fn = sys_routines[tf->eax];
     
     if(fn){
-        (*fn)(r);
+        (*fn)(tf);
     }
 }
 

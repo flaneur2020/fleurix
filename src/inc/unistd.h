@@ -105,14 +105,21 @@ enum {
     NR_debug
 };
 
+void nosys       (struct trap *tf);
 void sys_setup   (struct trap *);
+void sys_access  (struct trap *);
 void sys_fork    (struct trap *);
-void sys_putn    (struct trap *);
 void sys_nice    (struct trap *);
 void sys_debug   (struct trap *);
 
-int open(const char *path, int mode, ...);
-int close(int fd);
-int access(const char *path, int mode);
+static inline _SYS1(int, debug, int);
+static inline _SYS1(int, close, int);
+static inline _SYS0(int, setup);
+static inline _SYS0(int, fork); 
+static inline _SYS1(int, exit, int); 
+static inline _SYS1(int, nice, int);
+static inline _SYS1(int, chdir, char*);
+static inline _SYS1(int, setuid, int);
+static inline _SYS2(int, access, char*, int);
 
 #endif

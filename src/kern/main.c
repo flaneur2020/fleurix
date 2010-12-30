@@ -40,19 +40,17 @@ void main(){
         while(1); // do nothing , don't pollute the stack.
     }
     else if(fork()){
-        putn(1);
-        while(1) putn(1);
+        debug(1);
+        while(1) debug(1);
     }
     else {
-        putn(2);
-        while(1) putn(2);
-    }
-    for(;;);
-    */
+        debug(2);
+        while(1) debug(2);
+    }*/
     // in proc1
     if(fork()==0){
-        // setup
-        asm volatile("int $0x80"::"a"(0));
+        //setup();
+        //asm volatile("int $0x80"::"a"(0));
     }
 
     for(;;);

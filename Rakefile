@@ -76,8 +76,12 @@ end
 hfiles = Dir['src/inc/*.h']
 
 cfiles = [
+  'src/lib/string.c',
+  'src/lib/bitmap.c',
+  #
   'src/kern/tty.c',
   'src/kern/sys.c',
+  'src/kern/sys1.c',
   'src/kern/sched.c',
   'src/kern/seg.c',
   'src/kern/trap.c',
@@ -95,12 +99,9 @@ cfiles = [
   'src/fs/namei.c',
   'src/fs/rdwri.c',
   'src/fs/file.c',
+  'src/fs/link.c',
   'src/fs/alloc.c',
   'src/fs/bmap.c',
-  #
-  'src/lib/string.c',
-  'src/lib/bitmap.c',
-  'src/lib/unistd.c',
   #
   'src/kern/main.c'
 ]
