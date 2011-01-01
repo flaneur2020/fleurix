@@ -167,7 +167,6 @@ struct inode* _namei(char *path, uchar parent, uchar creat){
         if (ino <= 0){
             if (creat == 0) {
                 iput(wip);
-                syserr(ENOENT);
                 return NULL;
             }
             // file is not found and creat is set, assign a new inode

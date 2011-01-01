@@ -26,4 +26,10 @@ extern struct file file[NFILE];
 #define O_TRUNC		0x20    //
 #define O_NONBLOCK	0x80    //
 
+/* access */
+#define F_OK	0
+#define X_OK	1
+#define W_OK	2
+#define R_OK	4
+
 #endif

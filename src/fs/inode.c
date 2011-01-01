@@ -147,7 +147,7 @@ void iupdate(struct inode *ip){
 
     sp = getsp(ip->i_dev);
     if (sp==NULL){
-        panic("error on reading a super");
+        panic("bad super");
     }
     // get the blk number where this inode lies in.
     bp = bread(ip->i_dev, IBLK(sp, ip->i_num));

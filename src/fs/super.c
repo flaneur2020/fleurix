@@ -65,7 +65,17 @@ int spload(struct super *sp){
     return 0;
 }
 
+/*
+ * write changes back to disk.
+ * */
 void spupdate(struct super *sp){
+    struct inode *ip;
+    struct buf *bp;
+    
+    bp = iget(sp->s_dev, 1);
+    memcpy(bp->b_data, sp, sizeof(struct d_super));
+    bwrite(bp);
+    brelse(bp);
 }
 
 /*****************************************************************/
