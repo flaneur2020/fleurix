@@ -2,7 +2,7 @@ cinc   = '-Isrc/inc'
 cflag  = "-O2 -Wall -finline-functions -nostdinc -fno-builtin -fno-stack-protector"
 pgrep  = "grep --color -e 'error' -e 'error' -e '^'"
 
-task :default => :bochs
+task :default => [:bochs]
 
 task :bochs => :build do
   sh "bochs -q -f .bochsrc"
@@ -29,6 +29,10 @@ end
 
 task :ctags do
   sh "ctags -R"
+end
+
+task :fsck do 
+  sh "fsck.minix -fl ./bin/rootfs.img"
 end
 
 # 

@@ -45,11 +45,17 @@ void main(){
     }*/
     // in proc1
     if(fork()==0){
-        //setup(); // note: setup is inlined, or something unhappy may occurs.
-        access("abc",123);
+        setup(); // note: setup is inlined, or something unhappy may occurs.
+        //access("abc",123);
     }
 
     for(;;);
+}
+
+void debug_link(){
+    int r;
+    r = do_unlink("/");
+    r = do_unlink("/about.txt");
 }
 
 /* TODO: just for debug right now.
@@ -68,25 +74,5 @@ void sys_setup(struct trap *tf) {
 
     /*--------------------*/
 
-    ino = ialloc(rootdev);
-    ip = iget(rootdev, ino);
-    ip->i_nlinks = 1;
-    ip->i_mode = S_IFREG | 0777;
-    ip->i_time = time();
-    ip->i_gid = 0xe8;
-    iupdate(ip);
-    dump_inode(ip);
-    iput(ip);
-    //
-    ip = namei("/12345678901234567890.txt", 1);
-    if (ip==NULL){
-        panic("bad ino");
-    }
-    iupdate(ip);
-    iput(ip);
-    //dump_inode(ip);
-    unlk_ino(ip);
-    if (ip==NULL) {
-        panic("damn");
-    }
+    debug_link();
 }

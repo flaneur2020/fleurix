@@ -86,7 +86,7 @@ uint link_entry(struct inode *dip, char *name, uint len, uint ino){
     int i, r, off;
 
     if ((dip->i_mode & S_IFMT)!=S_IFDIR) {
-        syserr(EFAULT);
+        syserr(ENOTDIR);
         return 0;
     }
     len = min(len, NAMELEN);
@@ -152,7 +152,16 @@ struct inode* _namei(char *path, uchar parent, uchar creat){
             return NULL;
         }
         tmp = strchr(path, '/');
-        len = (tmp==NULL) ? strlen(path): (tmp-path);
+        // if got the parent inode.
+        if (tmp==NULL) {
+            if (parent) {
+                return wip;
+            }
+            len = strlen(path);
+        }
+        else {
+            len = tmp-path;
+        }
         ino = find_entry(wip, path, len);
         // if not found
         if (ino <= 0){

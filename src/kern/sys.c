@@ -5,6 +5,18 @@
 
 #include <unistd.h>
 
+/*
+ * sys.c 
+ *
+ * this file implies the common handler of all syscalls - do_syscall();
+ * each syscall has got one syscall number, and a trap frame as parameters, 
+ * eax is it's number, and ebx, ecx, edx, as parameters, return value 
+ * stores in eax.
+ *
+ * commonly returns -errno on error.
+ *
+ * */
+
 int errno = 0;
 
 static uint sys_routines[NSYSC] = {

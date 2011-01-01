@@ -50,7 +50,7 @@ int bfree(ushort dev, uint nr){
     if ((nr < sp->s_data_zone0) || (nr >= sp->s_max_zone)) {
         panic("freeing a block not in data zone");
     }
-    bn = nr - sp->s_data_zone0;
+    bn = nr + 1 - sp->s_data_zone0;
     bp = bread(dev, BMAPBLK(sp, bn));
     if ((bp->b_data[bn/8] & (1<<(bn%8))) == 0){
         panic("freeing free block");

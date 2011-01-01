@@ -91,7 +91,8 @@ void do_page_fault(struct trap *tf){
     if (tf->err_code & PFE_U) {
         panic("user bad mem access.");
     }
-    printf("page fault: error code: %x\n", tf->err_code);
+    printf("page fault: %x \nerr_code %x\n", cr2, tf->err_code);
+    panic("~");
 }
 
 /**************************************************************/
