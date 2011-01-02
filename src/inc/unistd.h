@@ -14,13 +14,10 @@
         register int r;                         \
         asm volatile(                           \
             "int $0x80"                         \
-            :"=a"(r)                            \
+            :"=a"(r),                           \
+             "=b"(errno)                        \
             :"a"(NR_##FN)                       \
         );                                      \
-        if (r<0){                               \
-            errno = -r;                         \
-            return -1;                          \
-        }                                       \
         return r;                               \
     }
 
@@ -29,7 +26,8 @@
         register int r;                         \
         asm volatile(                           \
             "int $0x80"                         \
-            :"=a"(r)                            \
+            :"=a"(r),                           \
+             "=b"(errno)                        \
             :"a"(NR_##FN),                      \
              "b"((int)p1)                       \
         );                                      \
@@ -45,15 +43,12 @@
         register int r;                         \
         asm volatile(                           \
             "int $0x80"                         \
-            :"=a"(r)                            \
+            :"=a"(r),                           \
+             "=b"(errno)                        \
             :"a"(NR_##FN),                      \
              "b"((int)p1),                      \
              "c"((int)p2)                       \
         );                                      \
-        if (r<0){                               \
-            errno = -r;                         \
-            return -1;                          \
-        }                                       \
         return r;                               \
     }
 
@@ -62,16 +57,13 @@
         register int r;                         \
         asm volatile(                           \
             "int $0x80"                         \
-            :"=a"(r)                            \
+            :"=a"(r),                           \
+             "=b"(errno)                        \
             :"a"(NR_##FN),                      \
              "b"((int)p1),                      \
-             "c"((int)p2)                       \
+             "c"((int)p2),                      \
              "d"((int)p3)                       \
         );                                      \
-        if (r<0){                               \
-            errno = -r;                         \
-            return -1;                          \
-        }                                       \
         return r;                               \
     }
 
@@ -106,13 +98,13 @@ enum {
     NR_debug
 };
 
-void nosys       (struct trap *);
-void sys_setup   (struct trap *);
-void sys_access  (struct trap *);
-void sys_fork    (struct trap *);
-void sys_nice    (struct trap *);
-void sys_debug   (struct trap *);
-void sys_getpid  (struct trap *);
+int nosys       (struct trap *);
+int sys_setup   (struct trap *);
+int sys_access  (struct trap *);
+int sys_fork    (struct trap *);
+int sys_nice    (struct trap *);
+int sys_debug   (struct trap *);
+int sys_getpid  (struct trap *);
 
 static inline _SYS1(int, debug, int);
 static inline _SYS1(int, close, int);

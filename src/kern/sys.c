@@ -31,31 +31,32 @@ static uint sys_routines[NSYSC] = {
 
 /***********************************************************/
 
-void nosys(struct trap *tf){
-    tf->eax = -ENOSYS;
+int nosys(struct trap *tf){
+    
+    return;
 }
 
-void sys_debug(struct trap *tf){
+int sys_debug(struct trap *tf){
     printf("%d", tf->ebx);
 }
 
-void sys_fork(struct trap *tf){
+int sys_fork(struct trap *tf){
     int ret = copy_proc(tf);
     if (ret<0){
         panic("error fork()\n");
     }
-    tf->eax = ret;
+    return ret;
 }
 
-void sys_nice(struct trap *tf){
+int sys_nice(struct trap *tf){
     int n = tf->ebx & 0xff;
     if (n > 20) n = 20;
     if (n<-19) n=-19;
 }
 
-void sys_getpid(struct trap *tf){
+int sys_getpid(struct trap *tf){
     printf("pid: %x\n", cu->p_pid);
-    tf->eax = cu->p_pid;
+    return cu->p_pid;
 }
 
 /* ---------------------------------------------- */
@@ -68,14 +69,6 @@ uint suser(){
     return 0;
 }
 
-/* get a char from userspace */
-char getuc(char *va){
-}
-
-/* put a char into userspace */
-char putuc(char *va){
-}
-
 /* returns a error code. maybe useless */
 void syserr(uint err){
     cu->p_error = err;
@@ -83,14 +76,17 @@ void syserr(uint err){
 
 /* common handlers for all syscalls */
 void do_syscall(struct trap *tf){
-    void (*fn)(struct trap *tf);
+    int ret;
+    int (*func)(struct trap *tf);
+
     if (tf->eax > NSYSC) {
         panic("bad syscall");
     }
-    fn = sys_routines[tf->eax];
+    cu->p_error = 0;
+    func = sys_routines[tf->eax];
     
-    if(fn){
-        (*fn)(tf);
-    }
+    if(func != NULL)
+        ret = (*func)(tf);
+    tf->eax = ret;
+    tf->ebx = cu->p_error;
 }
-

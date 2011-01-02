@@ -64,7 +64,7 @@ void debug_mknod(){
  * we need two procs at least.
  * */
 char buf[512] = {0, };
-void sys_setup(struct trap *tf) {
+int sys_setup(struct trap *tf) {
     printf("...\n");
     int dev = DEVNO(1, 0);
     struct buf *bp;
@@ -78,4 +78,5 @@ void sys_setup(struct trap *tf) {
     /*--------------------*/
 
     debug_mknod();
+    return 0;
 }
