@@ -30,7 +30,7 @@ void main(){
 
     puts("* enter user mode\n");
     umode_init();
-
+    
     /*
     if (fork()){
         while(1); // do nothing , don't pollute the stack.
@@ -42,8 +42,8 @@ void main(){
     else {
         debug(2);
         while(1) debug(2);
-    }*/
-    // in proc1
+    }
+    */
     if(fork()==0){
         setup(); // note: setup is inlined, or something unhappy may occurs.
         //access("abc",123);

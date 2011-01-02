@@ -1,5 +1,5 @@
 cinc   = '-Isrc/inc'
-cflag  = "-O2 -Wall -finline-functions -nostdinc -fno-builtin -fno-stack-protector"
+cflag  = "-Wall -finline-functions -nostdinc -fno-builtin -fno-stack-protector"
 pgrep  = "grep --color -e 'error' -e 'error' -e '^'"
 
 task :default => [:bochs]
@@ -87,11 +87,11 @@ cfiles = [
   'src/kern/sys.c',
   'src/kern/sys1.c',
   'src/kern/sched.c',
+  'src/kern/fork.c',
+  'src/kern/page.c',
   'src/kern/seg.c',
   'src/kern/trap.c',
   'src/kern/timer.c',
-  #
-  'src/mm/page.c',
   #
   'src/drv/buf.c',
   'src/drv/conf.c',

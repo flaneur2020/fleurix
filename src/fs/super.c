@@ -54,13 +54,6 @@ int spload(struct super *sp){
         panic("not an availible s_dev");
         return -1;
     }
-    ip = iget(sp->s_dev, ROOTINO); 
-    if (ip==NULL) { 
-        panic("error root inode");
-        return -1;
-    }
-    ip->i_flag &= ~I_LOCK; // note that we do not iput.
-    sp->s_iroot = ip;
     sp->s_imnt = NULL;
     return 0;
 }

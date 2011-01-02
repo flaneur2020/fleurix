@@ -30,6 +30,8 @@ struct inode {
     uint    i_flag;
 };
 
+extern struct inode inode[NINODE];
+
 /* flags */
 #define I_LOCK   0x1    /* for synchronize */
 #define I_WANTED 0x2    /* - */

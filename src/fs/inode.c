@@ -10,7 +10,6 @@
 //
 #include <proto.h>
 
-
 struct inode inode[NINODE];
 
 /*

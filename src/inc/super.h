@@ -27,7 +27,6 @@ struct super {
     ushort  s_padding;      // seems useless
     /* the rest fields only lie in-core, for mount */
     short           s_dev;
-    struct inode   *s_iroot; // the root inode of this super block
     struct inode   *s_imnt;  // the mount point, like /mnt/dir
     uint            s_flag;
 };

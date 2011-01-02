@@ -56,7 +56,7 @@ struct file* falloc(int fd);
 /* panic */
 #define panic(str)  \
     do {            \
-        printf("\nPANIC %s:%d:%s(): %s\n", __FILE__, __LINE__, __func__, str);\
+        printf("\n%s:%s():%d: \nPANIC: %s\n", __FILE__, __func__, __LINE__, str);\
         asm volatile("cli");\
         for(;;);\
     } while(0)

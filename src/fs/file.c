@@ -12,7 +12,6 @@
 
 struct file file[NFILE];
 
-
 /* -------------------------------------------------------------- */
 
 /* check file access and permssion. mode is R_OK, W_OK and X_OK. 
@@ -23,12 +22,10 @@ struct file file[NFILE];
  *
  * returns 0 on OK and -1 on fail.
  * */
-int do_access(char *path, uint mode){
+int do_access(struct inode *ip, uint mode){
     struct super *sp;
-    struct inode *ip;
     uint m;
     
-    ip = namei(path, 0);
     if (ip==NULL) {
         syserr(EACCES);
         return -1;

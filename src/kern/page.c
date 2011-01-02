@@ -112,7 +112,7 @@ uint alloc_page(){
     panic("no free page.\n");
     return 0;
 }
-
+                                              
 /*
  * free a physical page. decrease the target inside coremap. 
  */

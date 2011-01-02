@@ -54,23 +54,23 @@ _found:
 }
 
 /*
- * TODO: umount();
+ * umount();
  * unmount an device.
  * */
 int do_umount(ushort dev){
     struct super *sp;
+    struct inode *ip;
 
-    for (sp=&mnt[0]; sp<&mnt[NMOUNT]; sp++){
-        if (sp->s_dev == dev) {
-            goto _found;
-        }
+    sp = getsp(dev);
+    for(ip=&inode[0]; ip<&inode[NINODE]; ip++){
+        if (ip->i_num!=0 && ip->i_dev==dev) {
+            syserr(EBUSY);
+            return -1;
+        } 
     }
-    // not found
-    return -1;
-
-_found:
     spupdate(sp);
     sp->s_dev = 0;
     sp->s_flag = 0;
     iput(sp->s_imnt);
+    return 0;
 }

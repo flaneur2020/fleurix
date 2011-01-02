@@ -81,10 +81,12 @@ int do_unlink(char *path){
     name = (name==NULL) ? path: (name+1);
     // on path=='/' 
     if (strlen(name)==0 || strlen(name) >= NAMELEN){
-        return -EPERM;
+        syserr(EPERM);
+        return -1;
     }
     if (strcmp(name, ".")==0 || strcmp(name, "..")==0){
-        return -EPERM;
+        syserr(EPERM);
+        return -1;
     }
 
     dip = namei_parent(path);
@@ -92,7 +94,8 @@ int do_unlink(char *path){
     // entry not found
     if (ino<=0) {
         iput(dip);
-        return -ENOENT;
+        syserr(EPERM);
+        return -1;
     }
     ip = iget(dip->i_dev, ino);
     // can't unlink a directory, undo something.
@@ -100,7 +103,8 @@ int do_unlink(char *path){
         link_entry(dip, name, strlen(name));
         iput(ip);
         iput(dip);
-        return -EPERM;
+        syserr(EPERM);
+        return -1;
     }
     ip->i_nlinks--;
     iput(ip);
