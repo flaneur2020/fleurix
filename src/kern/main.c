@@ -63,6 +63,7 @@ void debug_link(){
  * */
 char buf[512] = {0, };
 void sys_setup(struct trap *tf) {
+    printf("...\n");
     int dev = DEVNO(1, 0);
     struct buf *bp;
     int i, ino, fd, nr, r;

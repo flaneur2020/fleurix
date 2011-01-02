@@ -174,10 +174,12 @@ void lock_ino(struct inode *ip){
 
 /* remember this just free with malloc. */
 void unlk_ino(struct inode *ip){
+    cli();
     if (ip->i_flag & I_WANTED) {
         wakeup(ip);
     }
     ip->i_flag &= ~(I_LOCK | I_WANTED);
+    sti();
 }
 
 /*************************************************************/

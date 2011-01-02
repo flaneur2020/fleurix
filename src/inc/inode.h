@@ -35,6 +35,7 @@ struct inode {
 #define I_WANTED 0x2    /* - */
 #define I_DIRTY  0x4    /* this inode has been modified*/
 #define I_MOUNT  0x8    /* - */
+#define I_TEXT   0x10   /* this inode is a running executable */
 
 /* i_mode */
 #define S_IFMT  00170000

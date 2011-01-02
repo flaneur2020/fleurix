@@ -16,18 +16,59 @@ struct file file[NFILE];
 /* -------------------------------------------------------------- */
 
 /* check file access and permssion. mode is R_OK, W_OK and X_OK. 
+ * In the case of write, the read-only status of the file system is
+ * checked.
  * The super user is granted all permissions except for EXEC where
  * at least one of the EXEC bits must be on.
- * TODO:
+ *
+ * returns 0 on OK and -1 on fail.
  * */
 int do_access(char *path, uint mode){
+    struct super *sp;
     struct inode *ip;
+    uint m;
     
     ip = namei(path, 0);
     if (ip==NULL) {
-        return -EACCES;
+        syserr(EACCES);
+        return -1;
     }
-    return 1;
+
+    if (mode & W_OK) {
+        // fs is readonly
+        sp = getsp(ip->i_dev);
+        unlk_sp(sp);
+        if (sp->s_flag & S_RDONLY) {
+            syserr(EROFS);
+            return -1;
+        }
+        // this inode is running.
+        if (ip->i_flag & I_TEXT) {
+            return -1;
+        }
+    }
+    // super user is granted all permissions. but X_OK needs at least one bit on.
+    if (suser()){
+        if (mode & X_OK) {
+            if ((ip->i_mode & (X_OK|X_OK<<3|X_OK<<6))){
+                syserr(EACCES);
+                return -1;
+            }
+            return 0;
+        }
+    }
+    //
+    m = ip->i_mode & 0777;
+    if (cu->p_uid == ip->i_uid)
+        m >>= 6;
+    else if (cu->p_gid == ip->i_gid)
+        m >>= 3;
+    // 
+    if ((m & 07 & mode)==mode) {
+        return 0;
+    }
+    syserr(EACCES);
+    return -1;
 }
 
 /* ------------------------------------------------------------- */
@@ -174,7 +215,7 @@ int do_creat(char *path, int mode){
     return do_open(path, O_CREAT | O_TRUNC, mode);
 }
 
-/*
+/* TODO: 
  * */
 int do_mknod(char *path, int mode, ushort dev){
 }
@@ -190,6 +231,7 @@ int ufalloc(){
             return i;
         }
     }
+    syserr(ENFILE);
     return -1;
 }
 
@@ -208,5 +250,6 @@ struct file* falloc(int fd){
             return fp;
         }
     }
+    syserr(EMFILE);
     return NULL;
 }
