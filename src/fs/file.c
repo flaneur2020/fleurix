@@ -92,7 +92,7 @@ int do_open(char *path, uint flag, uint mode){
             ip->i_uid = cu->p_uid;
             ip->i_gid = cu->p_gid;
             ip->i_time = time();
-            ip->i_nlinks++;
+            ip->i_nlinks = 1;
             iupdate(ip);
         }
     }
@@ -215,9 +215,34 @@ int do_creat(char *path, int mode){
     return do_open(path, O_CREAT | O_TRUNC, mode);
 }
 
-/* TODO: 
+/* 
  * */
 int do_mknod(char *path, int mode, ushort dev){
+    struct inode *ip;
+
+    ip = namei(path, 1);
+    // if existing
+    if (ip==NULL) {
+        syserr(ENOENT);
+        iput(ip);
+        return -1;
+    }
+    if (ip->i_nlinks != 0){
+        syserr(EEXIST);
+        iput(ip);
+        return -1;
+    }
+    if (mode==S_IFBLK || mode==S_IFCHR) {
+        ip->i_zone[0] = dev;
+    }
+    ip->i_mode = mode;
+    ip->i_nlinks = 1;
+    ip->i_time = time();
+    ip->i_uid = cu->p_uid;
+    ip->i_gid = cu->p_gid;
+    iupdate(ip);
+    iput(ip);
+    return 0;
 }
 
 /* -------------------------------------------------------------- */

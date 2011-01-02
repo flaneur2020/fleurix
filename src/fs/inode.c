@@ -67,7 +67,7 @@ _loop:
             return ip;
         }
     }
-    // not caced, so seek one free slot
+    // not cached, so seek one free slot
     for(ip=&inode[0]; ip<&inode[NINODE]; ip++){
         // time to read disk
         if (ip->i_count==0) {

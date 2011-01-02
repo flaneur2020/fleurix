@@ -52,15 +52,12 @@ void main(){
     for(;;);
 }
 
-void debug_link(){
+void debug_mknod(){
     int r;
-    r = do_unlink("/");
-    r = do_unlink("/.txt");
-    do_link("/about.txt", "aboull.txt");
-    r = do_unlink("aboutll.txt");
-    r = do_unlink("about.txt");
-    r = do_unlink("aboull.txt");
-    
+
+    r = do_mknod("/xxdir", S_IFDIR, 0);
+    printf("%x\n", r);
+    r = do_mknod("/xxdir/hello", S_IFDIR, 0);
 }
 
 /* TODO: just for debug right now.
@@ -80,5 +77,5 @@ void sys_setup(struct trap *tf) {
 
     /*--------------------*/
 
-    debug_link();
+    debug_mknod();
 }

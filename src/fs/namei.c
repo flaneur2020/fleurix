@@ -77,7 +77,8 @@ int unlink_entry(struct inode *dip, char *name, int len){
 
 /*
  * assign a new directory entry with a given inode. 
- * note: this routine do NOT check the existence of the given name.
+ * note: this routine do NOT check the existence of the given name,
+ * and i_nlinks is not adjusted here.
  * */
 uint link_entry(struct inode *dip, char *name, uint len, uint ino){
     struct buf *bp;
@@ -100,17 +101,11 @@ uint link_entry(struct inode *dip, char *name, uint len, uint ino){
             break;
         }
     }
-    strncpy(de.d_name, name, len);
+    strncpy(de.d_name, name, len+1);
     de.d_ino = ino;
     r = writei(dip, &de, off, sizeof(struct dirent));
     if (r != sizeof(struct dirent)){
         panic("bad inode");
-    }
-    if (ino != 0) {
-        ip = iget(dip->i_dev, ino);
-        ip->i_nlinks++;
-        iupdate(ip);
-        iput(ip);
     }
     return ino;
 }
@@ -120,7 +115,7 @@ uint link_entry(struct inode *dip, char *name, uint len, uint ino){
  * */
 struct inode* _namei(char *path, uchar creat, uchar parent, char **name){
     struct inode *wip=NULL, *cdp=NULL;
-    uint ino, len;
+    ushort dev, ino, len;
     char* tmp;
 
     // if path starts from root
@@ -159,6 +154,7 @@ struct inode* _namei(char *path, uchar creat, uchar parent, char **name){
                 return wip;
             }
             len = strlen(path);
+            dev = wip->i_dev;
         }
         else {
             len = tmp-path;
@@ -166,7 +162,7 @@ struct inode* _namei(char *path, uchar creat, uchar parent, char **name){
         ino = find_entry(wip, path, len);
         // if not found
         if (ino <= 0){
-            if (creat == 0) {
+            if (creat==0) {
                 iput(wip);
                 return NULL;
             }
