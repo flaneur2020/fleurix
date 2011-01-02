@@ -84,8 +84,9 @@ cfiles = [
   'src/lib/bitmap.c',
   #
   'src/kern/tty.c',
-  'src/kern/sys.c',
+  'src/kern/sysent.c',
   'src/kern/sys1.c',
+  'src/kern/sys2.c',
   'src/kern/sched.c',
   'src/kern/fork.c',
   'src/kern/page.c',

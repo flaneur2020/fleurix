@@ -2,46 +2,37 @@
 #include <x86.h>
 #include <proto.h>
 #include <proc.h>
+
 #include <unistd.h>
 
-#include <buf.h>
-#include <inode.h>
-#include <super.h>
-#include <file.h>
+/*
+ * sys1.c
+ *
+ * syscalls on proc, time and misc.
+ *
+ * */
 
-/* syscalls on fs */
+/* --------------------------- */
 
-int sys_access(struct trap *tf){
-    char *path = va2pa(tf->ebx);
-    int mode = tf->ecx;
-
-    printf("access(); %x\n", path);
-    //printf("path: %x\n", path);
+int sys_debug(struct trap *tf){
+    printf("%d", tf->ebx);
 }
 
-int sys_open(struct trap *tf){
+int sys_fork(struct trap *tf){
+    int ret = copy_proc(tf);
+    if (ret<0){
+        panic("bad fork()\n");
+    }
+    return ret;
 }
 
-int sys_close(struct trap *tf){
+int sys_nice(struct trap *tf){
+    int n = tf->ebx & 0xff;
+    if (n > 20) n = 20;
+    if (n<-19) n=-19;
 }
 
-int sys_read(struct trap *tf){
-}
-
-int sys_write(struct trap *tf){
-}
-
-int sys_fstat(struct trap *tf){
-}
-
-int sys_link(struct trap *tf){
-}
-
-int sys_unlink(struct trap *tf){
-}
-
-int sys_mkdir(struct trap *tf){
-}
-
-int sys_mknod(struct trap *tf){
+int sys_getpid(struct trap *tf){
+    printf("pid: %x\n", cu->p_pid);
+    return cu->p_pid;
 }
