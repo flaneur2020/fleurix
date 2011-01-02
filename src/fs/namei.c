@@ -118,7 +118,7 @@ uint link_entry(struct inode *dip, char *name, uint len, uint ino){
 /*
  * returns a locked inode. NULL on error.
  * */
-struct inode* _namei(char *path, uchar parent, uchar creat){
+struct inode* _namei(char *path, uchar creat, uchar parent, char **name){
     struct inode *wip=NULL, *cdp=NULL;
     uint ino, len;
     char* tmp;
@@ -155,6 +155,7 @@ struct inode* _namei(char *path, uchar parent, uchar creat){
         // if got the parent inode.
         if (tmp==NULL) {
             if (parent) {
+                *name = path;
                 return wip;
             }
             len = strlen(path);
@@ -183,9 +184,9 @@ struct inode* _namei(char *path, uchar parent, uchar creat){
 }
 
 struct inode* namei(char *path, uchar creat){
-    return _namei(path, 0, creat);
+    return _namei(path, creat, 0, NULL);
 }
 
-struct inode* namei_parent(char *path){
-    return _namei(path, 1, 0);
+struct inode* namei_parent(char *path, char **name){
+    return _namei(path, 0, 1, name);
 }

@@ -55,7 +55,12 @@ void main(){
 void debug_link(){
     int r;
     r = do_unlink("/");
-    r = do_unlink("/about.txt");
+    r = do_unlink("/.txt");
+    do_link("/about.txt", "aboull.txt");
+    r = do_unlink("aboutll.txt");
+    r = do_unlink("about.txt");
+    r = do_unlink("aboull.txt");
+    
 }
 
 /* TODO: just for debug right now.

@@ -58,7 +58,6 @@ int copy_mem_to(struct proc *to){
 
 /*
  * main part of sys_fork()
- * TODO: increment the reference count of inodes.
  * */
 int copy_proc(struct trap *tf){
     uint nr; 
@@ -84,7 +83,7 @@ int copy_proc(struct trap *tf){
     p->p_cpu  = cu->p_cpu;
     p->p_pri  = cu->p_pri;
     p->p_nice = cu->p_nice;
-    // increase the reference count of inodes
+    // increase the reference count of inodes, and dup files
     p->p_cdir = cu->p_cdir;
     p->p_cdir->i_count++;
     // init the new proc's kernel stack
@@ -104,8 +103,11 @@ int copy_proc(struct trap *tf){
     return nr;
 }
 
+/* TODO: do_exit(). */
+int do_exit(){
+}
 
-/*******************************************************************************/
+/* ----------------------------------------------------------- */
 
 /* 
  * init proc[0] 

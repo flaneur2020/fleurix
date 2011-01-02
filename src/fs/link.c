@@ -20,21 +20,12 @@ int do_link(char *path1, char *path2){
     int ino, r;
     char *name;
 
-    // TODO: check permission
-    name = strrchr(path2, '/');
-    name = (name==NULL) ? path2: (name+1);
-    if (strlen(name)==0 || strlen(name) >= NAMELEN) {
-        return -ENOENT;
-    }
-    if (strcmp(name, ".")==0 || strcmp(name, "..")==0){
-        return -EPERM;
-    }
-
     // get the inode number.
     tip = namei(path1, 0);
     if (tip==NULL) {
         iput(tip);
-        return -ENOENT;
+        syserr(ENOENT);
+        return -1;
     }
     ino = tip->i_num;
     tip->i_nlinks++;
@@ -42,19 +33,22 @@ int do_link(char *path1, char *path2){
     unlk_ino(tip); // the next namei may deadlock. so unlock it.
 
     // get the inode of the target's directory
-    dip = namei_parent(path2);
+    dip = namei_parent(path2, &name);
+    if (strlen(name)==0 || strlen(name) >= NAMELEN) {
+        syserr(ENOENT);
+        goto _bad_name;
+    }
+    if (strcmp(name, ".")==0 || strcmp(name, "..")==0){
+        syserr(EPERM);
+        goto _bad_name;
+    }
     // if entry already exists, error.
     r = find_entry(dip, name, strlen(name));
     if (r!=0) {
-        // undo something 
-        lock_ino(tip);
-        tip->i_nlinks--;
-        iupdate(tip);
-        iput(tip);
-        iput(dip);
-        return -EEXIST;
+        syserr(EEXIST);
+        goto _bad_name;
     }
-    // do link
+    // create dir entry.
     lock_ino(tip);
     r = link_entry(dip, name, strlen(name), tip->i_num);
     if (r==0) {
@@ -64,6 +58,15 @@ int do_link(char *path1, char *path2){
     iput(tip);
     iput(dip);
     return 0;
+
+_bad_name:
+    // undo something 
+    lock_ino(tip);
+    tip->i_nlinks--;
+    iupdate(tip);
+    iput(tip);
+    iput(dip);
+    return -1;
 }
 
 /*
@@ -76,27 +79,17 @@ int do_unlink(char *path){
     int ino;
     char *name;
 
-    // get the inode of the target's directory
-    name = strrchr(path, '/');
-    name = (name==NULL) ? path: (name+1);
+    dip = namei_parent(path, &name);
     // on path=='/' 
-    if (strlen(name)==0 || strlen(name) >= NAMELEN){
-        syserr(EPERM);
-        return -1;
-    }
-    if (strcmp(name, ".")==0 || strcmp(name, "..")==0){
-        syserr(EPERM);
-        return -1;
-    }
+    if (strlen(name)==0 || strlen(name) >= NAMELEN)
+        goto _bad_name;
+    if (strcmp(name, ".")==0 || strcmp(name, "..")==0)
+        goto _bad_name;
 
-    dip = namei_parent(path);
     ino = unlink_entry(dip, name, strlen(name));
     // entry not found
-    if (ino<=0) {
-        iput(dip);
-        syserr(EPERM);
-        return -1;
-    }
+    if (ino<=0) 
+        goto _bad_name;
     ip = iget(dip->i_dev, ino);
     // can't unlink a directory, undo something.
     if ((ip->i_mode & S_IFMT) == S_IFDIR) {
@@ -110,5 +103,10 @@ int do_unlink(char *path){
     iput(ip);
     iput(dip);
     return 0;
+
+_bad_name:
+    iput(dip);
+    syserr(EPERM);
+    return -1;
 }
 

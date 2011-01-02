@@ -48,6 +48,7 @@ void ifree(ushort dev, uint ino);
 
 // fs/namei.c
 struct inode* namei(char *path, uchar creat);
+struct inode* namei_parent(char *path, char **name);
 
 // fs/file.c 
 struct file* falloc(int fd);
