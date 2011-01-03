@@ -125,7 +125,6 @@ int do_open(char *path, uint flag, uint mode){
  * file table's ref count. and iput the inode.
  * */
 int do_close(int fd){
-    uint nr;
     struct file *fp;
 
     if ((fd>NOFILE) || (fd<0)){
@@ -133,13 +132,12 @@ int do_close(int fd){
         return -1;
     }
 
-    nr = cu->p_ofile[fd];
-    if (nr>NFILE || nr<0) {
+    fp = cu->p_ofile[fd];
+    if (fp>&file[NFILE] || fp<&file[0]) {
         syserr(EBADF);
         return -1;
     }
-    cu->p_ofile[fd] = 0;
-    fp = &file[nr];
+    cu->p_ofile[fd] = NULL;
     iput(fp->f_ino);
     fp->f_count--;
     if (fp->f_count <= 0) {
@@ -147,6 +145,7 @@ int do_close(int fd){
         fp->f_flag = 0;
         fp->f_offset = 0;
     }
+    return 0;
 }
 
 int do_dup(){

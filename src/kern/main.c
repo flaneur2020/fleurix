@@ -63,10 +63,12 @@ void debug_open(){
     do_read(fd, buf, 20);
     buf[20] = '\0';
     printf("%s\n", buf);
+    do_close(fd);
     fd = do_open("/about.txt", O_RDONLY, 0);
     printf("fd: %d\n", fd);
     fd = do_open("/about2.txt", O_RDONLY, 0);
     printf("fd: %d\n", fd);
+    do_close(fd);
 }
 
 /* TODO: just for debug right now.
@@ -85,6 +87,6 @@ int sys_setup(struct trap *tf) {
 
     /*--------------------*/
 
-    debug_mknod();
+    debug_open();
     return 0;
 }
