@@ -52,18 +52,26 @@ void main(){
     for(;;);
 }
 
-void debug_mknod(){
-    int r;
+char buf[512] = {0, };
+void debug_open(){
+    int fd;
 
-    r = do_mknod("/xxdir", S_IFDIR, 0);
-    printf("%x\n", r);
-    r = do_mknod("/xxdir/hello", S_IFDIR, 0);
+    fd = do_open("/about.txt", O_RDONLY, 0);
+    if (fd < 0) {
+        panic("bad open");
+    }
+    do_read(fd, buf, 20);
+    buf[20] = '\0';
+    printf("%s\n", buf);
+    fd = do_open("/about.txt", O_RDONLY, 0);
+    printf("fd: %d\n", fd);
+    fd = do_open("/about2.txt", O_RDONLY, 0);
+    printf("fd: %d\n", fd);
 }
 
 /* TODO: just for debug right now.
  * we need two procs at least.
  * */
-char buf[512] = {0, };
 int sys_setup(struct trap *tf) {
     printf("...\n");
     int dev = DEVNO(1, 0);

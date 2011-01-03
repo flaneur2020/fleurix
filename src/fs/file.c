@@ -100,14 +100,15 @@ int do_open(char *path, uint flag, uint mode){
     else {
         ip = namei(path, 0);
         if (ip == NULL){
-            iput(ip);
-            return -ENFILE;
+            syserr(ENFILE);
+            return -1;
         }
         // TODO: check access and special files
     } 
-    if ((fd=ufalloc()<0) || (fp=falloc(fd))==NULL) {
+    if (((fd=ufalloc())<0) || (fp=falloc(fd))==NULL) {
         unlk_ino(ip);
-        return -EMFILE;
+        syserr(EMFILE);
+        return -1;
     }
     if (flag & O_TRUNC){
         itrunc(ip);
@@ -128,12 +129,14 @@ int do_close(int fd){
     struct file *fp;
 
     if ((fd>NOFILE) || (fd<0)){
-        return -EBADF;
+        syserr(EBADF);
+        return -1;
     }
 
     nr = cu->p_ofile[fd];
     if (nr>NFILE || nr<0) {
-        return -EBADF;
+        syserr(EBADF);
+        return -1;
     }
     cu->p_ofile[fd] = 0;
     fp = &file[nr];
@@ -164,7 +167,8 @@ int do_read(int fd, char *buf, int cnt){
 
     fp = cu->p_ofile[fd];
     if ( fd<0 || fd>NOFILE || fp==NULL ) {
-        return -ENFILE;
+        syserr(ENFILE);
+        return -1;
     }
     // TODO: special files
     lock_ino(fp->f_ino);
@@ -185,7 +189,8 @@ int do_write(int fd, char *buf, int cnt){
     
     fp = cu->p_ofile[fd];
     if ( fd<0 || fd>NOFILE || fp==NULL) {
-        return -ENFILE;
+        syserr(ENFILE);
+        return -1;
     }
     if (fp->f_flag & O_APPEND) {
         off = fp->f_ino->i_size;
@@ -252,7 +257,7 @@ int ufalloc(){
     int i;
     
     for(i=0; i<NOFILE; i++){
-        if (cu->p_ofile[i]==0) {
+        if (cu->p_ofile[i]==NULL) {
             return i;
         }
     }
@@ -268,8 +273,8 @@ struct file* falloc(int fd){
 
     for(fp=&file[0]; fp<&file[NFILE]; fp++){
         if (fp->f_count==0) {
+            fp->f_count = 1;
             cu->p_ofile[fd] = fp;
-            fp->f_count++;
             fp->f_offset = 0;
             fp->f_flag = 0;
             return fp;
