@@ -107,6 +107,7 @@ cfiles = [
   'src/fs/mount.c',
   'src/fs/namei.c',
   'src/fs/rdwri.c',
+  'src/fs/rdwr.c',
   'src/fs/open.c',
   'src/fs/file.c',
   'src/fs/link.c',

@@ -71,7 +71,12 @@ void spupdate(struct super *sp){
     brelse(bp);
 }
 
-/*****************************************************************/
+
+/* update all the fs */
+void update(){
+}
+
+/* ---------------------------------------------- */
 
 /* 
  * unlock(release) a super
