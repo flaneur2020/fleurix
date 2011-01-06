@@ -126,6 +126,49 @@ int do_write(int fd, char *buf, int cnt){
     return r;
 }
 
+/*
+ * reposition the opened file asscociated with the file descriptor fd 
+ * to the argument off, according to the directive whence below:
+ *  SEEK_SET: set the offset as the argument off
+ *  SEEK_CUR: set the offset to its current location plus off bytes.
+ *  SEEK_END: set the offset to its size plus off bytes.
+ * */
+int do_lseek(uint fd, int off, int whence){
+    struct file *fp;
+
+    fp = cu->p_ofile[fd];
+    if ((fd >= NOFILE) || (fp==NULL) || (fp->f_ino==NULL)) {
+        syserr(EBADF);
+        return -1;
+    }
+    if (fp->f_ino->i_mode & S_IFIFO) {
+        syserr(ESPIPE);
+        return -1;
+    }
+
+    if (whence==SEEK_SET) {
+        if (off < 0) 
+            goto _einval;
+        fp->f_offset = off;
+    }
+    if (whence==SEEK_CUR) { 
+        if (fp->f_offset+off < fp->f_offset) 
+            goto _einval;
+        fp->f_offset += off;
+    }
+    if (whence==SEEK_END) {
+        if (fp->f_ino->i_size+off < fp->f_ino->i_size)
+            goto _einval;
+        fp->f_offset = fp->f_ino->i_size + off;
+    }
+    return fp->f_offset;
+
+_einval:
+    syserr(EINVAL);
+    return -1;
+
+}
+
 /* -------------------------------------------------------------- */
 
 /* 
