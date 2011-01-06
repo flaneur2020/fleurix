@@ -52,7 +52,6 @@ int do_open(char *path, uint flag, uint mode){
     } 
     if (((fd=ufalloc())<0) || (fp=falloc(fd))==NULL) {
         unlk_ino(ip);
-        syserr(EMFILE);
         return -1;
     }
     if (flag & O_TRUNC){
@@ -78,7 +77,7 @@ int do_close(int fd){
     }
 
     fp = cu->p_ofile[fd];
-    if (fp>&file[NFILE] || fp<&file[0]) {
+    if (fp==NULL || fp>&file[NFILE] || fp<&file[0]) {
         syserr(EBADF);
         return -1;
     }
@@ -93,8 +92,38 @@ int do_close(int fd){
     return 0;
 }
 
-/* duplicate a fd. */
+/* duplicate a file descriptor, dup2 */
 int do_dup(int fd){
+    struct file *fp;
+    int newfd;
+
+    fp = cu->p_ofile[fd];
+    if (fd>=NOFILE || fp==NULL){
+        syserr(EBADF);
+        return -1;
+    }
+    if ((newfd=ufalloc())<0) {
+        return -1;
+    }
+    fp->f_ino->i_count++;
+    cu->p_ofile[newfd] = fp;
+    return newfd;
+}
+
+/* close the newfd. */
+int do_dup2(int fd, int newfd){
+    struct file *fp;
+
+    fp = cu->p_ofile[fd];
+    if (fd>=NOFILE || fp==NULL){
+        syserr(EBADF);
+        return -1;
+    }
+
+    do_close(newfd);
+    fp->f_ino->i_count++;
+    cu->p_ofile[newfd] = fp;
+    return newfd;
 }
 
 /* -------------------------------------------------------------- */

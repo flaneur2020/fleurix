@@ -54,21 +54,16 @@ void main(){
 
 char buf[512] = {0, };
 void debug_open(){
-    int fd;
+    int fd, r, fd2;
 
     fd = do_open("/about.txt", O_RDONLY, 0);
     if (fd < 0) {
         panic("bad open");
     }
-    do_read(fd, buf, 20);
-    buf[20] = '\0';
-    printf("%s\n", buf);
+    memset(buf, 0, 20); do_read(fd, buf, 20); buf[20] = '\0'; printf("%s\n", buf);
+    fd2 = do_dup(fd);
     do_close(fd);
-    fd = do_open("/about.txt", O_RDONLY, 0);
-    printf("fd: %d\n", fd);
-    fd = do_open("/about2.txt", O_RDONLY, 0);
-    printf("fd: %d\n", fd);
-    do_close(fd);
+    do_close(fd2);
 }
 
 /* TODO: just for debug right now.
