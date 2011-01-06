@@ -63,6 +63,8 @@ int copy_proc(struct trap *tf){
     uint nr; 
     struct proc *p;
     struct trap *ntf;
+    int fd;
+    struct file *fp;
     
     nr = find_pid();
     if (nr==0){
@@ -86,6 +88,13 @@ int copy_proc(struct trap *tf){
     // increase the reference count of inodes, and dup files
     p->p_cdir = cu->p_cdir;
     p->p_cdir->i_count++;
+    for (fd=0; fd<NOFILE; fd++){
+        fp = cu->p_ofile[fd];
+        if (fp != NULL) {
+            fp->f_ino->i_count++;
+            p->p_ofile[fd] = fp;
+        }
+    }
     // init the new proc's kernel stack
     p->p_trap = ntf = ((struct trap *)(uint)p + 0x1000) - 1;
     *ntf = *tf;
@@ -164,18 +173,18 @@ void umode_init(){
 
 /* --------------------------------------------------- */
 
-void debug_proc_list(){
+void dump_procs(){
     int i;
     struct proc *p;
     for(i=0; i<NPROC; i++){
         p = proc[i];
         if(p){
-            debug_proc(p);
+            dump_proc(p);
         }
     }
 }
 
-void debug_proc(struct proc *p){
+void dump_proc(struct proc *p){
     printf("%s ", (p==cu)? "-":" " );
     printf("pid:%d pri:%d cpu:%d nice:%d stat:%d esp0:%x eip:%x \n", p->p_pid, p->p_pri, p->p_cpu, p->p_nice, p->p_stat, p->p_contxt.esp, p->p_trap->eip);
 }

@@ -12,6 +12,8 @@
 #include <inode.h>
 #include <file.h>
 
+extern void _umode_init();
+
 void main(){
     tty_init();         puts("* init tty\n");
     gdt_init();         puts("* init gdt\n");
