@@ -26,13 +26,16 @@ int sys_fork(struct trap *tf){
     return ret;
 }
 
-int sys_nice(struct trap *tf){
-    int n = tf->ebx & 0xff;
-    if (n > 20) n = 20;
-    if (n<-19) n=-19;
+int sys_exit(struct trap *tf){
 }
 
-int sys_getpid(struct trap *tf){
-    printf("pid: %x\n", cu->p_pid);
-    return cu->p_pid;
+int sys_exec(struct trap *tf){
 }
+
+int sys_brk(struct trap *tf){
+}
+
+int sys_pause(struct trap *tf){
+}
+
+/* --------------------------------------- */

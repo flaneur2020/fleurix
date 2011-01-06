@@ -16,6 +16,8 @@ struct super *rootsp = NULL;
  * if did not got any free slot, just simply raise an error instead
  * of sleep until somebody frees like what getblk does.
  * if dev==rootdev, set a pointer rootsp for a quicker access.
+ * 
+ * TODO: mount flag.
  * */
 int do_mount(ushort dev, struct inode *ip){
     struct buf *bp;

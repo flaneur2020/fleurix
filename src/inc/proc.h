@@ -30,12 +30,15 @@ struct proc {
     uint                p_ppid;         /* parent's pid */
     uint                p_uid;          /* uid */
     uint                p_gid;          /* gid */
+    uint                p_euid;         /* effective uid */
+    uint                p_egid;         /* effective gid */
     uint                p_textp;        /* virtual addresses */
     uint                p_tsize;
     uint                p_stack;
-    uint                p_brk;
+    uint                p_brk;          /* - */
     uint                p_chan;         /* the event channel which proc is awaiting */
     uint                p_error;        /* return error code */
+    uint                p_umask;        /* umask for files */
     struct inode       *p_cdir;         /* current working dir */
     struct file        *p_ofile[NOFILE];/* file desciptors of the current opened files */
     struct contxt       p_contxt;       /* - */

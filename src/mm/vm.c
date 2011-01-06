@@ -8,7 +8,7 @@ uint alloc_page();
 uint* find_pte(uint la);
 
 /*
- * page.c
+ * vm.c
  *
  * this file indicated the codes on the initialization of the paging system and the
  * implemtion of copy-on-write, maybe demand paging is the next.

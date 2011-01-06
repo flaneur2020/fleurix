@@ -11,6 +11,15 @@
 
 /* syscalls on fs */
 
+/* 
+ * WARNING: DANGEROUS here! While passing data between kernel
+ * and user, a verification is nesscary. Just make a simulation 
+ * what the hardware does in user space, or it may cause corruption,
+ * even overlaps the kernel memory, be careful.
+ *
+ * TODO: so va2pa is not obsele.
+ * */
+
 int sys_access(struct trap *tf){
     char *path = va2pa(tf->ebx);
     int mode = tf->ecx;
@@ -39,14 +48,18 @@ int sys_close(struct trap *tf){
     return do_close(fd);
 }
 
+/* ------------------------------------------- */
+
+/* int read(int fd, char buf[], int cnt); */
 int sys_read(struct trap *tf){
     int fd = tf->ebx;
-    char *buf = va2pa(tf->ecx);
+    char *buf = va2pa(tf->ecx); 
     int cnt = tf->edx;
 
     return do_read(fd, buf, cnt);
 }
 
+/* int write(int fd, char buf[], int cnt); */
 int sys_write(struct trap *tf){
     int fd = tf->ebx;
     char *buf = va2pa(tf->ecx);
@@ -55,17 +68,48 @@ int sys_write(struct trap *tf){
     return do_write(fd, buf, cnt);
 }
 
+/* int lseek(int fd, unsigned int offset, int whence); */
+int sys_lseek(struct trap *tf){
+}
+
+/* -------------------------------------------- */
+
 int sys_link(struct trap *tf){
 }
 
 int sys_unlink(struct trap *tf){
 }
 
+int sys_mknod(struct trap *tf){
+}
+
+int sys_creat(struct trap *tf){
+}
+
+/* --------------------------------- */
+
+int sys_stat(struct trap *tf){
+}
+
 int sys_fstat(struct trap *tf){
 }
 
-int sys_mkdir(struct trap *tf){
+int sys_fcntl(struct trap *tf){
 }
 
-int sys_mknod(struct trap *tf){
+int sys_ioctl(struct trap *tf){
+}
+
+/* --------------------------------- */
+
+/* int dup(int oldfd); */
+int sys_dup(struct trap *tf){
+}
+
+/* int dup2(int oldfd, int newfd); */
+int sys_dup2(struct trap *tf){
+}
+
+/* int pipe(int fd[2]); */
+int sys_pipe(struct trap *tf){
 }
