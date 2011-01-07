@@ -8,6 +8,7 @@
 //
 #include <super.h>
 #include <inode.h>
+#include <stat.h>
 #include <file.h>
 
 struct file file[NFILE];
@@ -51,7 +52,7 @@ int do_open(char *path, uint flag, uint mode){
         // TODO: check access and special files
     } 
     if (((fd=ufalloc())<0) || (fp=falloc(fd))==NULL) {
-        unlk_ino(ip);
+        iput(ip);
         return -1;
     }
     if (flag & O_TRUNC){

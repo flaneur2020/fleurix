@@ -7,6 +7,7 @@
 #include <conf.h>
 //
 #include <super.h>
+#include <stat.h>
 #include <inode.h>
 
 struct super    mnt[NMOUNT] = {0, };

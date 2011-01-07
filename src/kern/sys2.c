@@ -25,7 +25,6 @@ int sys_access(struct trap *tf){
     int mode = tf->ecx;
     struct inode *ip;
 
-
     ip = namei(path, 0);
     if (ip==NULL) {
         syserr(ENOENT);

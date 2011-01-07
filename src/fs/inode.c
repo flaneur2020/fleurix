@@ -7,6 +7,7 @@
 //
 #include <super.h>
 #include <inode.h>
+#include <stat.h>
 //
 #include <proto.h>
 

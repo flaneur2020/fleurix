@@ -39,21 +39,7 @@ extern struct inode inode[NINODE];
 #define I_MOUNT  0x8    /* - */
 #define I_TEXT   0x10   /* this inode is a running executable */
 
-/* i_mode */
-#define S_IFMT  00170000
-#define S_IFREG  0100000 /* regular */
-#define S_IFBLK  0060000 /* blk device */
-#define S_IFDIR  0040000 /* directory */
-#define S_IFCHR  0020000 /* char device*/
-#define S_IFIFO  0010000 /* fifo */
-#define S_ISUID  0004000
-#define S_ISGID  0002000
-#define S_ISVTX  0001000
-
-#define RWX_MODES 0000777	/* mode bits for RWX only */
-#define R_BIT    0000004	/* Rwx protection bit */
-#define W_BIT    0000002	/* rWx protection bit */
-#define X_BIT    0000001	/* rwX protection bit */
+/* i_mode resides in stat.h */
 
 /* directory entry */
 #define NAMELEN 12

@@ -9,18 +9,18 @@
 #include <super.h>
 #include <inode.h>
 #include <file.h>
+#include <stat.h>
 
 struct file file[NFILE];
 
 /* -------------------------------------------------------------- */
 
+/* TODO: do_fcntl() */
 int do_fcntl(){
 }
 
-int do_fstat(){
-}
-
-int do_stat(){
+/* TODO: do_stat() */
+int do_stat(struct inode *ip, struct stat *sbuf){
 }
 
 /* -------------------------------------------------------------- */

@@ -8,6 +8,7 @@
 //
 #include <super.h>
 #include <inode.h>
+#include <stat.h>
 
 /* alloc one disk block in order to extend one file. returns 
  * its LBA.

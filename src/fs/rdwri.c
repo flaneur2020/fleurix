@@ -8,6 +8,7 @@
 //
 #include <super.h>
 #include <inode.h>
+#include <stat.h>
 
 /*
  * this file indicated the read/write operations of the inodes.

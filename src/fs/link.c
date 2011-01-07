@@ -9,6 +9,7 @@
 #include <super.h>
 #include <inode.h>
 #include <file.h>
+#include <stat.h>
 
 /*
  * link path1 to path2. 
