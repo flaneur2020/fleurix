@@ -109,7 +109,7 @@ cfiles = [
   'src/fs/rdwri.c',
   'src/fs/rdwr.c',
   'src/fs/open.c',
-  'src/fs/file.c',
+  'src/fs/fcntl.c',
   'src/fs/link.c',
   'src/fs/alloc.c',
   'src/fs/bmap.c',
