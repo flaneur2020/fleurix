@@ -29,13 +29,22 @@ int sys_getgid(struct trap *tf){
     return cu->p_gid;
 }
 
-int sys_setpgrp(struct trap *tf){
+int sys_setgid(struct trap *tf){
+    int gid = tf->ebx;
+
+    if ((gid==cu->p_gid) || suser()){
+        cu->p_gid = gid;
+        cu->p_rgid = gid;
+    }
 }
 
 int sys_setuid(struct trap *tf){
-}
+    int uid = tf->ebx;
 
-int sys_setgid(struct trap *tf){
+    if ((uid==cu->p_uid) || suser()) {
+        cu->p_uid = uid;
+        cu->p_ruid = uid;
+    }
 }
 
 /* -------------------------------- */
