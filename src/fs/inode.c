@@ -96,7 +96,7 @@ void iput(struct inode *ip){
         ip->i_count--;
     }
     if (ip->i_count==0){
-        if (ip->i_nlinks==0) {
+        if (ip->i_nlink==0) {
             itrunc(ip);
             ifree(ip->i_dev, ip->i_num);
         }
@@ -188,9 +188,9 @@ void dump_inode(struct inode *ip){
     printf("i_mode:%x\n", ip->i_mode);
     printf("i_uid:%x\n", ip->i_uid);
     printf("i_size:%x\n", ip->i_size);
-    printf("i_time:%x\n", ip->i_time);
+    printf("i_mtime:%x\n", ip->i_mtime);
     printf("i_gid:%x\n", ip->i_gid);
-    printf("i_nlinks:%x\n", ip->i_nlinks);
+    printf("i_nlink:%x\n", ip->i_nlink);
     printf("i_count:%x\n", ip->i_count);
     printf("i_dev:%x\n", ip->i_dev);
     printf("i_num:%x\n", ip->i_num);

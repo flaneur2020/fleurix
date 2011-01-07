@@ -12,7 +12,7 @@ struct file {
 
 extern struct file file[NFILE];
 
-/* fcntl */
+/* open/fcntl */
 #define O_ACCMODE	0x3
 
 #define O_RDONLY	0x0     // read only
@@ -25,6 +25,18 @@ extern struct file file[NFILE];
 #define O_NOCTTY	0x10    // 
 #define O_TRUNC		0x20    //
 #define O_NONBLOCK	0x80    //
+
+/* fcntl */
+#define F_DUPFD		0	/* dup */
+#define F_GETFD		1	/* seems only FD_CLOEXEC associated with this. */ 
+#define F_SETFD		2	
+#define F_GETFL		3	/* get f_flag */
+#define F_SETFL		4   /* set f_flag */
+#define F_GETLK		5	/* aquire a lock. (not implemented) */
+#define F_SETLK		6   
+#define F_SETLKW	7
+
+#define FD_CLOEXEC 1    /* close this file on exec. (not implemented) */
 
 /* seek */
 #define SEEK_SET 0

@@ -29,7 +29,7 @@ int do_link(char *path1, char *path2){
         return -1;
     }
     ino = tip->i_num;
-    tip->i_nlinks++;
+    tip->i_nlink++;
     iupdate(tip);
     unlk_ino(tip); // the next namei may deadlock. so unlock it.
 
@@ -63,7 +63,7 @@ int do_link(char *path1, char *path2){
 _bad_name:
     // undo something 
     lock_ino(tip);
-    tip->i_nlinks--;
+    tip->i_nlink--;
     iupdate(tip);
     iput(tip);
     iput(dip);
@@ -100,7 +100,7 @@ int do_unlink(char *path){
         syserr(EPERM);
         return -1;
     }
-    ip->i_nlinks--;
+    ip->i_nlink--;
     iput(ip);
     iput(dip);
     return 0;

@@ -33,12 +33,12 @@ int do_open(char *path, uint flag, uint mode){
     if (flag & O_CREAT){
         ip = namei(path, 1);
         // if file is not existing yet.
-        if (ip->i_nlinks==0) {
+        if (ip->i_nlink==0) {
             ip->i_mode = mode;
             ip->i_uid = cu->p_uid;
             ip->i_gid = cu->p_gid;
-            ip->i_time = time();
-            ip->i_nlinks = 1;
+            ip->i_mtime = time();
+            ip->i_nlink = 1;
             iupdate(ip);
         }
     }

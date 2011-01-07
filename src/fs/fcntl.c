@@ -15,12 +15,48 @@ struct file file[NFILE];
 
 /* -------------------------------------------------------------- */
 
-/* TODO: do_fcntl() */
-int do_fcntl(){
+/* TODO: add other commands */
+int do_fcntl(int fd, uint cmd, uint arg){
+    struct file *fp;
+    
+    fp = cu->p_ofile[fd];
+    if (fd>=NOFILE || fd<0 || fp==NULL){
+        syserr(EBADF);
+        return -1;
+    }
+
+    switch(cmd) {
+        // duplicate a fd, just as dup
+        case F_DUPFD:
+            return do_dup(fd);
+        case F_GETFL:
+            return fp->f_flag;
+        case F_SETFL:
+            fp->f_flag = arg;
+            return 0;
+        default:
+            return -1;
+    }
 }
 
-/* TODO: do_stat() */
+/* get a struct stat of an inode. a memory check is nessary. */
 int do_stat(struct inode *ip, struct stat *sbuf){
+    struct stat tmp;
+
+    tmp.st_dev = ip->i_dev;
+    tmp.st_ino = ip->i_num;
+    tmp.st_mode = ip->i_mode;
+    tmp.st_nlink = ip->i_nlink;
+    tmp.st_uid = ip->i_uid;
+    tmp.st_gid = ip->i_gid;
+    tmp.st_rdev = ip->i_zone[0];
+    tmp.st_mtime = ip->i_mtime;
+    tmp.st_ctime = ip->i_ctime;
+    tmp.st_atime = ip->i_atime;
+    tmp.st_size = ip->i_size;
+
+    *sbuf = tmp;
+    return 0;
 }
 
 /* -------------------------------------------------------------- */
@@ -101,7 +137,7 @@ int do_mknod(char *path, int mode, ushort dev){
         iput(ip);
         return -1;
     }
-    if (ip->i_nlinks != 0){
+    if (ip->i_nlink != 0){
         syserr(EEXIST);
         iput(ip);
         return -1;
@@ -110,8 +146,8 @@ int do_mknod(char *path, int mode, ushort dev){
         ip->i_zone[0] = dev;
     }
     ip->i_mode = mode;
-    ip->i_nlinks = 1;
-    ip->i_time = time();
+    ip->i_nlink = 1;
+    ip->i_mtime = time();
     ip->i_uid = cu->p_uid;
     ip->i_gid = cu->p_gid;
     iupdate(ip);

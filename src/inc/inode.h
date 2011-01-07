@@ -9,7 +9,7 @@ struct d_inode {
 	ushort  i_mode;     /* file type, protection, etc. */
 	ushort  i_uid;
 	uint    i_size;     /* current file size in bytes */
-	uint    i_time;
+	uint    i_mtime;
 	uchar   i_gid;
 	uchar   i_nlinks;   /* how many links to this file. */
 	ushort  i_zone[9];  /* zones number for direct, indirect and double indirect. */
@@ -19,11 +19,13 @@ struct inode {
 	ushort  i_mode;
 	ushort  i_uid;
 	uint    i_size;
-	uint    i_time;
+	uint    i_mtime;
 	uchar   i_gid;
-	uchar   i_nlinks;
+	uchar   i_nlink;
 	ushort  i_zone[9];
     /* the rest only lies in core */
+    ushort  i_atime;    /* not used yet */
+    ushort  i_ctime;    /* not used yet */
     ushort  i_count;    /* reference count*/
     ushort  i_dev;      /* dev number */
     uint    i_num;      /* inode number */
