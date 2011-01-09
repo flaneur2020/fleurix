@@ -14,10 +14,11 @@
 /* 
  * WARNING: DANGEROUS here! While passing data between kernel
  * and user, a verification is nesscary. Just make a simulation 
- * what the hardware does in user space, or it may cause corruption,
- * even overlaps the kernel memory, be careful.
+ * what the hardware does in user space, or it may cause corruption, 
+ * even overlaps the kernel memory, be careful. 
  *
- * TODO: so va2pa is not obsele.
+ * TODO: A verify_area() is nessary.
+ *
  * */
 
 int sys_access(struct trap *tf){

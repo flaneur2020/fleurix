@@ -13,6 +13,27 @@ _spin:
     jmp _spin
 
 ;;
+;; enter the x86's user mode via an IRET.
+;; 
+[global _umode]
+_umode:
+    sti
+    mov ax, 0x17
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+    mov eax, esp
+    push dword 0x17
+    push dword eax
+    pushf
+    push dword 0x0f
+    push _umode_ret
+    iret
+_umode_ret:
+    ret
+
+;;
 ;; on task switch
 ;; _do_swtch(struct contxt *old, struct contxt *new);
 ;;

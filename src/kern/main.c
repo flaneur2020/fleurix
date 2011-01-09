@@ -31,7 +31,7 @@ void main(){
     unlk_ino(cu->p_cdir);
 
     puts("* enter user mode\n");
-    umode_init();
+    _umode();
     
     /*
     if (fork()){

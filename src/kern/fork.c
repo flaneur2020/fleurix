@@ -149,28 +149,6 @@ void sched_init(){
     lldt(_LDT(p->p_pid));
 }
 
-/* move into user space(ring3) via an IRET and 
- * enable intrrupt.
- * */
-void umode_init(){
-    asm volatile( 
-        "sti;" 
-        "mov $0x17, %ax;"
-        "mov %ax, %ds;" 
-        "mov %ax, %es;" 
-        "mov %ax, %fs;"
-        "mov %ax, %gs;" 
-        "mov %esp, %eax;"
-        "pushl $0x17;"
-        "pushl %eax;"
-        "pushf;"
-        "pushl $0x0f;"
-        "push $1f;"
-        "iret;"
-        "1:"
-        );
-}
-
 /* --------------------------------------------------- */
 
 void dump_procs(){

@@ -15,6 +15,12 @@ struct file file[NFILE];
 
 /* -------------------------------------------------------------- */
 
+/*
+ * fcntl() performs one of the operations described below on the 
+ * open file descriptor fd. The operation is determined by cmd.
+ * Also there is an optional thrid argument, which associated with 
+ * the second argument cmd.
+ * */
 /* TODO: add other commands */
 int do_fcntl(int fd, uint cmd, uint arg){
     struct file *fp;
@@ -34,6 +40,11 @@ int do_fcntl(int fd, uint cmd, uint arg){
         case F_SETFL:
             fp->f_flag = arg;
             return 0;
+        case F_GETFD:
+        case F_SETFD:
+        case F_GETLK:
+        case F_SETLK:
+        case F_SETLKW:
         default:
             return -1;
     }
