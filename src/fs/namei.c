@@ -141,12 +141,13 @@ struct inode* _namei(char *path, uchar creat, uchar parent, char **name){
         if ((wip->i_num==ROOTINO) && (strncmp(path, "..", 2)==0)) {
             continue;
         }
-        // wip must be a directory, TODO: check access
+        // wip must be a directory
         if ((wip->i_mode & S_IFMT)!=S_IFDIR) {
             iput(wip);
             syserr(EISDIR);
             return NULL;
         }
+        // TODO: check access
         tmp = strchr(path, '/');
         // if got the parent inode.
         if (tmp==NULL) {

@@ -28,6 +28,12 @@ int do_read(int fd, char *buf, int cnt){
         syserr(ENFILE);
         return -1;
     }
+    // on write only
+    if (fp->f_flag & O_WRONLY) {
+        syserr(EBADF);
+        return -1;
+    }
+
     // TODO: special files
     lock_ino(fp->f_ino);
     r = readi(fp->f_ino, buf, fp->f_offset, cnt);
@@ -50,6 +56,12 @@ int do_write(int fd, char *buf, int cnt){
         syserr(ENFILE);
         return -1;
     }
+    // on read only
+    if (fp->f_flag & O_RDONLY) {
+        syserr(EBADF);
+        return -1;
+    }
+
     if (fp->f_flag & O_APPEND) {
         off = fp->f_ino->i_size;
     }
