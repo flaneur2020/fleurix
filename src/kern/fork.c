@@ -71,7 +71,7 @@ int copy_proc(struct trap *tf){
         panic("no pid availible.");
     }
 
-    p = (struct proc *) alloc_page(); 
+    p = (struct proc *) pgalloc(); 
     if (p==NULL){
         panic("no page availible.");
     }

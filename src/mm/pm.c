@@ -7,7 +7,7 @@
 
 /*
  * the map for page frames. Each physical page is associated with one reference
- * count, and it's free on 0. Only 0 can be allocated via alloc_page().  
+ * count, and it's free on 0. Only 0 can be allocated via pgalloc().  
  * Reference count is increased on a fork.
  *
  * note: the kernel pages(0~LO_MEM) are initialized as 100 (in page_init()) to 
@@ -19,7 +19,7 @@ uchar coremap[NPAGE] = {0, };
  * allocate an free physical page. 
  * tranverse coremap, if 0, set it 1 and return the address
  * */ 
-uint alloc_page(){
+uint pgalloc(){
     int i;
     for(i=0;i<NPAGE; i++){
         if(coremap[i]==0){
@@ -34,7 +34,7 @@ uint alloc_page(){
 /*
  * free a physical page. decrease the target inside coremap. 
  */
-int free_page(uint addr){
+int pgfree(uint addr){
     int n;
     n = addr/0x1000;
     if (n<NKPAGE || n>NPAGE) {
@@ -50,10 +50,10 @@ int free_page(uint addr){
 /*
  * map a linear address to physical address.  
  * */
-int put_page(uint pa, uint la, uint flag){
+int pgattach(uint pa, uint la, uint flag){
     uint pde = pgdir[PDX(la)];
     if (!(pde & PTE_P)){
-        pde = alloc_page();
+        pde = pgalloc();
         if (pde==0){
             panic("no availible frame");
         }

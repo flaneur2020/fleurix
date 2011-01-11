@@ -6,8 +6,9 @@
 #include <mm.h>
 
 uint la2pa(uint la);
-uint alloc_page();
+uint pgalloc();
 uint* find_pte(uint la);
+void do_pgfault(struct trap *tf);
 
 /*
  * vm.c
@@ -37,57 +38,6 @@ uint *pgdir = (uint *) 0x00000;
 /* --------------------------------------------------------- */
 
 /*
- * on swap...
- * */
-void do_no_page(uint la, uint err){
-}
-
-/* 
- * the handler of the read-only protection. here is the 'copy' action
- * of the implemtion of copy-on-write.
- * If this one is the last one who did the write, just mark the page as
- * write-able.
- * else allocate one page and associate inside the page table. 
- * */
-void do_wp_page(uint la, uint err){
-    uint pa, npa, *pte;
-
-    pa = la2pa(la);
-    // if it's the last one who did the write. 
-    if (coremap[PPN(pa)]==1) {
-        pte = find_pte(la);
-        *pte &= ~PTE_W;
-        flush_cr3(pgdir);
-        return;
-    }
-    // one page, decrease the reference count of the page frame.
-    coremap[PPN(pa)]--;
-    npa = alloc_page();
-    memcpy(npa, pa, 0x1000);
-    put_page(npa, la, PTE_P | PTE_U | PTE_W);
-    flush_cr3(pgdir);
-}
-
-/*
- * the common handler of all page faults, as a dispatcher.
- * */
-void do_page_fault(struct trap *tf){
-    uint cr2;
-    asm volatile("movl %%cr2, %0":"=a"(cr2));
-    // write protection raised prior than valid.
-    if (tf->err_code & PFE_W) {
-        do_wp_page(cr2, tf->err_code);
-        return;
-    }
-    //debug_regs(tf);
-    if (tf->err_code & PFE_U) {
-        panic("user bad mem access.");
-    }
-    printf("page fault: %x \nerr_code %x\n", cr2, tf->err_code);
-    panic("~");
-}
-
-/*
  * copy page tables, as a helper of copy_proc().
  * this also mark the parent proc's page tables as read only.
  * note: *important*, but you should never mark the proc[0]'s page
@@ -106,7 +56,7 @@ int copy_vm(uint dst, uint src, uint limit){
         // increase the children's reference count.
         pa = la2pa(src+off);
         coremap[PPN(pa)]++;
-        put_page(pa, dst+off, PTE_P | PTE_U); // note that PTE_W is off
+        pgattach(pa, dst+off, PTE_P | PTE_U); // note that PTE_W is off
     }
     flush_cr3(pgdir);
     return 0;
@@ -195,7 +145,7 @@ void page_init(){
     }
 
     // int handler
-    set_hwint(0x0E, do_page_fault);
+    set_hwint(0x0E, do_pgfault);
 
     // write page directory to cr3 and enable PE on cr0
     flush_cr3(pgdir);
