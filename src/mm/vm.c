@@ -22,7 +22,7 @@ void do_pgfault(struct trap *tf);
  *
  * This file is heavily associated with fork(). In the routine copy_mem_to(), it will copy 
  * the parent's page tables to the children, and mark each read-only, take an eye on the 
- * fact that *** the parent's page table is also marked read-only *** in routine copy_vm().
+ * fact that *** the parent's page table is also marked read-only *** in routine vmdup().
  * Hence each modification will raise an page fault, so do_wp_page() handled this and copy 
  * one page or just un-wp it(if it's the last one who does modify something).
  *
@@ -44,7 +44,7 @@ uint *pgdir = (uint *) 0x00000;
  * as read only.
  * note2: src, dst, and limit are deserved multiple of 0x1000
  * */
-int copy_vm(uint dst, uint src, uint limit){
+int vm_dup(uint dst, uint src, uint limit){
     uint off, la, pa, *pte;
     for(off=0; off<=limit; off+=0x1000){
         // find and mark the parent's page as read only.
@@ -62,7 +62,14 @@ int copy_vm(uint dst, uint src, uint limit){
     return 0;
 }
 
-/**************************************************************/
+/**/
+int vm_free(){
+}
+
+int vm_new(){
+}
+
+/* --------------------- */
 
 /* get the pointer to a pte. */
 uint* find_pte(uint la){
