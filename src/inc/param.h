@@ -8,6 +8,9 @@ typedef unsigned int    uint;
 #define PROCSIZ 0x4000000
 #define LO_MEM  0x300000    /* kernel resides in 0~LO_MEM */
 #define HI_MEM  0x1000000   /* total 128mb physical memory */
+
+#define KHEAP   ((void*)0x400000) /* kernel heap starts at 4mb. */
+
 #define ROOTINO 1
 
 #define NSYSC   64

@@ -15,6 +15,33 @@
  *
  * */
 
+void* kheap_end = KHEAP;
+
+/*
+ * the bucket table.
+ * */
+struct bktab bktab[] = {
+    32, NULL,
+    128, NULL,
+    256, NULL,
+    512, NULL,
+    1024, NULL,
+    4096, NULL
+};
+
+/*
+ * Allocate one physical page and attach it where grows the kernel 
+ * heap, and extends the kheap_end. No decrease yet.
+ * */
+void* kbrk(){
+}
+
+/* 
+ * Allocate one bucket.
+ * */
+struct bucket *bkalloc(){
+}
+
 void* kmalloc(uint size){
 }
 

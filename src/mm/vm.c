@@ -44,7 +44,7 @@ uint *pgdir = (uint *) 0x00000;
  * as read only.
  * note2: src, dst, and limit are deserved multiple of 0x1000
  * */
-int vm_dup(uint dst, uint src, uint limit){
+int vm_clone(uint dst, uint src, uint limit){
     uint off, la, pa, *pte;
     for(off=0; off<=limit; off+=0x1000){
         // find and mark the parent's page as read only.

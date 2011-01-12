@@ -48,7 +48,7 @@ int copy_mem_to(struct proc *to){
     set_seg(&(to->p_ldt[1]), new_base, old_limit, RING3, STA_X | STA_R);
     set_seg(&(to->p_ldt[2]), new_base, old_limit, RING3, STA_W);
     // copy page tables
-    int ret = copy_vm(new_base, old_base, old_limit);
+    int ret = vm_clone(new_base, old_base, old_limit);
     asm("hlt");
     if (ret!=0){
         return -1;
