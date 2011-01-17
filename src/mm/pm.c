@@ -3,54 +3,55 @@
 #include <proc.h>
 #include <proto.h>
 
-#include <mm.h>
+#include <page.h>
 
 /*
  * the map for page frames. Each physical page is associated with one reference
  * count, and it's free on 0. Only 0 can be allocated via pgalloc().  
  * Reference count is increased on a fork.
  *
- * note: the kernel pages(0~LO_MEM) are initialized as 100 (in page_init()) to 
- * prevent any allocation.
  * */
-uchar coremap[NPAGE] = {0, };
+struct page coremap[NPAGE];
 
 /* 
  * allocate an free physical page. 
- * tranverse coremap, if 0, set it 1 and return the address
+ * get the head of the freelist, remove it and increase the refcount.
  * */ 
-uint pgalloc(){
-    int i;
-    for(i=0;i<NPAGE; i++){
-        if(coremap[i]==0){
-            coremap[i]++;
-            return i*0x1000;
-        }
+struct page* pgalloc(){
+    struct page *pp;
+
+    if (pgfreelist.pg_next == NULL) {
+        panic("no free page.\n");
+        return NULL:
     }
-    panic("no free page.\n");
-    return 0;
+    
+    pp = pgfreelist.pg_next;
+    pp->pg_count = 1;
+    pgfreelist.pg_next = pp->pg_next;
+    return pp;
 }
 
 /*
- * free a physical page. decrease the target inside coremap. 
+ * free a physical page. decrease the reference count and put it back
+ * to the freelist. 
  */
-int pgfree(uint addr){
-    int n;
-    n = addr/0x1000;
-    if (n<NKPAGE || n>NPAGE) {
-        panic("error page.");
+int pgfree(struct page *pp){
+    if (pp->pg_count==0) {
+        panic("freeing a free page.");
     }
-    if(coremap[n]==0){
-        return 0;
+
+    pp->pg_count--;
+    if (pp->pg_count==0) {
+        pp->pg_next = pgfreelist.pg_next;
+        pgfreelist.pg_next = pp;
     }
-    coremap[n]--;
-    return n;
+    return pp->pg_num;
 }
 
 /*
  * map a linear address to physical address.  
  * */
-int pgattach(uint pa, uint la, uint flag){
+int pgattach(struct pte *pgdir, struct page *pp, uint vaddr, uint flag){
     uint pde = pgdir[PDX(la)];
     if (!(pde & PTE_P)){
         pde = pgalloc();
@@ -64,4 +65,21 @@ int pgattach(uint pa, uint la, uint flag){
     ptab[PTX(la)] = pa | flag;
     coremap[pa/0x1000]++;
     return 0;
+}
+
+/* initialize pages' free list. */
+int pm_init(){
+    struct page *pp, *ph;
+    int i;
+
+    pn = LO_MEM/PAGE + 1;
+    ph = &pgfreelist;
+    for (pp=&coremap[0]; pp<&coremap[NPAGE]; pp++) {
+        pp->pg_flag = 0;
+        pp->pg_count = 0;
+        pp->pg_num = pn++;
+        pp->pg_next = NULL;
+        ph->pg_next = pp;
+        ph = pp;
+    }
 }

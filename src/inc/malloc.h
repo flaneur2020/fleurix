@@ -12,9 +12,4 @@ struct bucket {
     struct bkentry      *bk_entry;      // the first free entry of this bucket, NULL on full.
 };
 
-struct bktab {
-    uint                bkt_size;
-    struct             *bkt_bucket;
-};
-
 #endif

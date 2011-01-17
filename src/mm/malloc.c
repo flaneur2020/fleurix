@@ -15,23 +15,22 @@
  *
  * */
 
-void* kheap_end = KHEAP;
+/*
+ * the bucket table, each slot got a different 2-powered size. 1 << 12 == 0x1000
+ * */
+struct bucket *bktab[12];
 
 /*
- * the bucket table.
+ * 
  * */
-struct bktab bktab[] = {
-    32, NULL,
-    128, NULL,
-    256, NULL,
-    512, NULL,
-    1024, NULL,
-    4096, NULL
-};
+void* kheap_end = KHEAP;
 
 /*
  * Allocate one physical page and attach it where grows the kernel 
  * heap, and extends the kheap_end. No decrease yet.
+ * Have a check of the 4mb boundary, on the edge, reserve the last 
+ * page as the middle page table, attach it into EVERY proc's page
+ * table.
  * */
 void* kbrk(){
 }

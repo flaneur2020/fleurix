@@ -69,6 +69,9 @@ int vm_free(){
 int vm_new(){
 }
 
+void vm_init(){
+}
+
 /* --------------------- */
 
 /* get the pointer to a pte. */

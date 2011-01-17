@@ -23,7 +23,7 @@ typedef unsigned int    uint;
 #define NOFILE  16
 #define NMOUNT  16
 #define NKPAGE  (LO_MEM/PAGE)
-#define NPAGE   (HI_MEM/PAGE)
+#define NPAGE   ((HI_MEM-LO_MEM)/PAGE)
 
 #define NINDBLK (BSIZE/sizeof(ushort))
 #define MAX_FILESIZ ((7+NINDBLK+NINDBLK*NINDBLK)*BSIZE)
