@@ -3,7 +3,7 @@
 #include <proc.h>
 #include <proto.h>
 
-#include <mm.h>
+#include <vm.h>
 
 /*
  * malloc.c
@@ -28,8 +28,8 @@ void* kheap_end = KHEAP;
 /*
  * Allocate one physical page and attach it where grows the kernel 
  * heap, and extends the kheap_end. No decrease yet.
- * Have a check of the 4mb boundary, on the edge, reserve the last 
- * page as the middle page table, attach it into EVERY proc's page
+ * Have a check of the 4mb boundary, reserve the last page as the 
+ * middle page table on the edge, attach it into EVERY proc's page
  * table.
  * */
 void* kbrk(){

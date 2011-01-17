@@ -72,7 +72,7 @@ static inline void outsl(uint port, void *addr, int cnt) {
     io_delay();
 }
 
-/**************************************************/
+/* -------------------------------------------- */
 
 /* load TSS into tr */
 static inline void ltr(uint n){
@@ -83,7 +83,20 @@ static inline void lldt(uint n){
     asm volatile("lldt %%ax"::"a"(n));
 }
 
-/**************************************************/
+/* flush the page directory */
+void lpgdir(uint pgdir){
+    asm volatile("mov %%eax, %%cr3":: "a"(pgdir));
+}
+
+/* set the cr0 bit and enable mmu */
+static inline void mmu_enable(){
+    uint cr0;
+    asm volatile("mov %%cr0, %0": "=r"(cr0));
+    cr0 |= 0x80000000; // set the paging bit.
+    asm volatile("mov %0, %%cr0":: "r"(cr0));
+}
+
+/* ------------------------------------------------- */
 
 
 /* load TSS into tr */
@@ -95,7 +108,7 @@ static inline void sti(){
     asm volatile("sti");
 }
 
-/**************************************************/
+/* ---------------------------------------------- */
 
 
 /*

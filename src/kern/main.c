@@ -12,13 +12,11 @@
 #include <inode.h>
 #include <file.h>
 
-extern void _umode_init();
-
 void main(){
     tty_init();         puts("* init tty\n");
     gdt_init();         puts("* init gdt\n");
     idt_init();         puts("* init idt\n");
-    page_init();        puts("* init paging\n");
+    vm_init();          puts("* init vm\n");
     buf_init();         puts("* init buf\n");
     hd_init();          puts("* init hd\n");
     timer_init();       puts("* init timer\n");

@@ -1,12 +1,21 @@
+#ifndef MMU_H
+#define MMU_H
+
 struct pte {
-    uint        present  :1;        // Page present in memory
-    uint        rw       :1;        // Read-only if clear, readwrite if set
-    uint        user     :1;        // Supervisor level only if clear
-    uint        accessed :1;        // Has the page been accessed since last refresh?
-    uint        dirty    :1;        // Has the page been written to since last refresh?
-    uint        always0  :7;        // Amalgamation of unused and reserved bits
-    uint        offset   :20;       // Frame address (shifted right 12 bits)
+    uint      pt_flag:12;
+    uint      pt_num:20;
 } __attribute__((packed));
+
+// Page table/directory entry flags.
+#define PTE_P		0x001	// Present
+#define PTE_W		0x002	// Writeable
+#define PTE_U		0x004	// User
+#define PTE_PWT		0x008	// Write-Through
+#define PTE_PCD		0x010	// Cache-Disable
+#define PTE_A		0x020	// Accessed
+#define PTE_D		0x040	// Dirty
+#define PTE_PS		0x080	// Page Size
+#define PTE_MBZ		0x180	// Bits must be zero
 
 /* 
  * A linear address 'la' has a three-part structure as follows:
@@ -26,17 +35,6 @@ struct pte {
 
 #define PTE_ADDR(pte)	((uint)(pte) & ~0xFFF)
 
-// Page table/directory entry flags.
-#define PTE_P		0x001	// Present
-#define PTE_W		0x002	// Writeable
-#define PTE_U		0x004	// User
-#define PTE_PWT		0x008	// Write-Through
-#define PTE_PCD		0x010	// Cache-Disable
-#define PTE_A		0x020	// Accessed
-#define PTE_D		0x040	// Dirty
-#define PTE_PS		0x080	// Page Size
-#define PTE_MBZ		0x180	// Bits must be zero
-
 /* CR2 stores the virtual address on which raised the page fault. 
  * error code stores inside the trap frame.
  * */
@@ -47,3 +45,5 @@ struct pte {
 #define PFE_U       0x004   // The fault was caused in User mode
 #define PFE_RSVD    0x008   // The Fault was caused by reserved bits set to 1 in a page directory
 #define PFE_I       0x010   // The Fault was caused on a instruction fetch.
+
+#endif

@@ -13,6 +13,10 @@
  * */
 struct page coremap[NPAGE];
 
+/* returns the page struct via a physical page number. */
+struct page* getpg(uint pn){
+}
+
 /* 
  * allocate an free physical page. 
  * get the head of the freelist, remove it and increase the refcount.
@@ -54,7 +58,7 @@ int pgfree(struct page *pp){
 int pgattach(struct pte *pgdir, struct page *pp, uint vaddr, uint flag){
     uint pde = pgdir[PDX(la)];
     if (!(pde & PTE_P)){
-        pde = pgalloc();
+        pde = (struct pte*)kmalloc(PAGE);
         if (pde==0){
             panic("no availible frame");
         }
