@@ -9,7 +9,7 @@ typedef unsigned int    uint;
 #define LO_MEM  0x300000    /* un-mappable memory */
 #define HI_MEM  0x1000000   /* 128mb physical memory availible */
 
-#define KHEAP    ((void*)LO_MEM) /* kernel's heap starts at 4mb. */
+#define KHEAP    LO_MEM /* kernel's heap starts at 4mb. */
 #define KMEM_END 0x4000000 /* kernel's address space. */
 
 #define ROOTINO 1

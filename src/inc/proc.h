@@ -3,6 +3,7 @@
 
 #include <inode.h>
 #include <file.h>
+#include <vm.h>
 
 /* the regs saved in a task switch. */
 struct contxt {
@@ -42,7 +43,7 @@ struct proc {
     struct inode       *p_cdir;         /* current working dir */
     struct file        *p_ofile[NOFILE];/* file desciptors of the current opened files */
     struct contxt       p_contxt;       /* - */
-    struct seg_desc     p_ldt[3];       /* on context swtch */
+    struct vm           p_vm;
     struct trap        *p_trap;         /* the initialize trap, initialized on fork */
 };
 

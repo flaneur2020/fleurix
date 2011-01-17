@@ -23,16 +23,36 @@ struct bucket *bktab[12];
 /*
  * 
  * */
-void* kheap_end = KHEAP;
+uint kheap_end = KHEAP;
 
 /*
  * Allocate one physical page and attach it where grows the kernel 
- * heap, and extends the kheap_end. No decrease yet.
+ * heap, then extends the kheap_end. No decrease yet.
  * Have a check of the 4mb boundary, reserve the last page as the 
  * middle page table on the edge, attach it into EVERY proc's page
  * table.
  * */
-void* kbrk(){
+uint kbrk(){
+    struct pte *pgdir;
+    struct pte *pmd;
+    struct page *pp;
+    
+    pgdir = cu->p_vm->vm_pgdir;
+    // if it's the last availible page on the 4mb boundary.
+    if (((kheap_end+PAGE) % (PAGE*1024))==0){
+        pmd = &pgdir[PDX(kheap_end)];
+        pp = pgalloc();
+        pmd->pt_num = pp->pg_num;
+        pmd->pt_flag = PTE_P | PTE_W;
+        lpgdir(pgdir);
+        kheap_end += PAGE;
+    }
+    pte = find_pte(kheap_end);
+    pp = pgalloc();
+    pte->pt_num = pp->pg_num;
+    pte->pt_flag = PTE_P | PTE_W;
+    kheap_end += PAGE;
+    return (kheap_end-PAGE);
 }
 
 /* 

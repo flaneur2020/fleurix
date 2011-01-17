@@ -15,6 +15,12 @@ struct page coremap[NPAGE];
 
 /* returns the page struct via a physical page number. */
 struct page* getpg(uint pn){
+    int nr;
+    nr = pn-LO_MEM/PAGE;
+    if (nr<0 || nr>=NPAGE ) {
+        panic("bad page number.");
+    }
+    return &coremap[nr];
 }
 
 /* 
