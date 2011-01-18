@@ -104,7 +104,7 @@ int do_exit(){
  * set the LDT and th ONLY TSS into GDT
  * and make current as proc[0]
  */
-void sched_init(){
+void proc0_init(){
     struct proc *p = cu = proc[0] = (struct proc *)(uint) kstack0;
     p->p_pid = 0;
     p->p_ppid = 0;

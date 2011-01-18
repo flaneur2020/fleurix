@@ -20,10 +20,14 @@ void main(){
     gdt_init();         puts("* init gdt\n");
     idt_init();         puts("* init idt\n");
     vm_init();          puts("* init vm\n");
+    proc0_init();       puts("* init sched\n");
 
-    struct page *pp;
-    pp = pgalloc();
-    printf("pp->pg_count: %d\n", pp->pg_count);
+    uint addr;
+    int i;
+    addr = kbrk();
+    for (i=0; i<1024; i++) {
+        printf("kbrk(): %x\n", kbrk());
+    };
 
     /* ------------------------------------------------- */
 
@@ -32,7 +36,6 @@ void main(){
     buf_init();         puts("* init buf\n");
     hd_init();          puts("* init hd\n");
     timer_init();       puts("* init timer\n");
-    sched_init();       puts("* init sched\n");
     // proc[0] arises now
     // mount root fs
     puts("* mouting root fs \n");

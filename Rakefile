@@ -102,6 +102,7 @@ cfiles = [
   'src/mm/pm.c',
   'src/mm/vm.c',
   'src/mm/pgfault.c',
+  'src/mm/malloc.c',
   #
   'src/fs/super.c',
   'src/fs/inode.c',

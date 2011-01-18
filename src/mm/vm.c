@@ -23,16 +23,15 @@ struct pte *pmd0 = (struct pte*)(0x0+PAGE);
 
 /* --------------------------------------------------------- */
 
-struct pte* find_pte(uint vaddr){
-    struct pte *pgdir;
-    struct pte *pmd;
+struct pte* find_pte(struct pte *pgdir, uint vaddr){
+    struct pte pde, *pmd;
 
-    pgdir = cu->p_vm.vm_pgdir;
-    pmd = &pgdir[PDX(vaddr)];
-    if ((pmd->pt_flag & PTE_P)==0) {
-        panic("no pmd");
+    pde = pgdir[PDX(vaddr)];
+    if ((pde.pt_flag & PTE_P)==0) {
+        panic("no pde");
         return NULL;
     }
+    pmd = (struct pte*)(pde.pt_num << 12);
     return &pmd[PTX(vaddr)];
 }
 

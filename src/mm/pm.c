@@ -81,6 +81,7 @@ int pm_init(){
         pp->pg_flag = 0;
         pp->pg_count = 0;
         pp->pg_num = pn++;
+        //
         pp->pg_next = NULL;
         ph->pg_next = pp;
         ph = pp;
