@@ -9,4 +9,9 @@ struct vm {
     struct pte  *vm_pgdir;
 };
 
+/*
+ * proc0's page directory, initialize the kernel's address space here.
+ * */
+extern struct pte *pgdir0;
+
 #endif

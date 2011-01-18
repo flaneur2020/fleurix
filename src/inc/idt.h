@@ -22,6 +22,7 @@ struct trap {
 } __attribute__((packed));
 
 /* constants on PIC */
+
 #define IRQ0 32
 #define IRQ_SLAVE 2
 
@@ -34,3 +35,4 @@ struct trap {
 #define PIC2_DATA (PIC2+1)
 
 #define PIC_EOI 0x20
+

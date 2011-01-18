@@ -116,6 +116,6 @@ _loop:
 }
 
 void tty_init(){
-    vidmem = (char *) 0xb8000;
+    vidmem = (short *) 0xb8000;
     cls();
 }

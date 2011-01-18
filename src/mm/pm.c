@@ -12,9 +12,10 @@
  *
  * */
 struct page coremap[NPAGE];
+struct page pgfreelist;
 
 /* returns the page struct via a physical page number. */
-struct page* getpg(uint pn){
+struct page* pgfind(uint pn){
     int nr;
     nr = pn-LO_MEM/PAGE;
     if (nr<0 || nr>=NPAGE ) {
@@ -32,12 +33,14 @@ struct page* pgalloc(){
 
     if (pgfreelist.pg_next == NULL) {
         panic("no free page.\n");
-        return NULL:
+        return NULL;
     }
     
+    cli();
     pp = pgfreelist.pg_next;
     pp->pg_count = 1;
     pgfreelist.pg_next = pp->pg_next;
+    sti();
     return pp;
 }
 
@@ -50,37 +53,27 @@ int pgfree(struct page *pp){
         panic("freeing a free page.");
     }
 
+    cli();
     pp->pg_count--;
     if (pp->pg_count==0) {
         pp->pg_next = pgfreelist.pg_next;
         pgfreelist.pg_next = pp;
     }
+    sti();
     return pp->pg_num;
 }
 
 /*
  * map a linear address to physical address.  
+ * TODO: pgattach().
  * */
 int pgattach(struct pte *pgdir, struct page *pp, uint vaddr, uint flag){
-    uint pde = pgdir[PDX(la)];
-    if (!(pde & PTE_P)){
-        pde = (struct pte*)kmalloc(PAGE);
-        if (pde==0){
-            panic("no availible frame");
-        }
-        // it's a pde, don't get confused.
-        pgdir[PDX(la)] = pde | PTE_P | PTE_W | PTE_U;
-    }
-    uint *ptab = (uint *)PTE_ADDR(pde);
-    ptab[PTX(la)] = pa | flag;
-    coremap[pa/0x1000]++;
-    return 0;
 }
 
 /* initialize pages' free list. */
 int pm_init(){
     struct page *pp, *ph;
-    int i;
+    uint i, pn;
 
     pn = LO_MEM/PAGE + 1;
     ph = &pgfreelist;

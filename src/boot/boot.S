@@ -6,11 +6,11 @@ align 4
 _start:
 
     ; read the rest sectors to 0x10000
-_reset_drive:
+_reset_drive.1:
     mov     ah, 0                ; RESET-command
     int     13h                  ; Call interrupt 13h
     or      ah, ah               ; Check for error code
-    jnz     _reset_drive         ; Try again if ah != 0
+    jnz     _reset_drive.1       ; Try again if ah != 0
 
     ; load kernel to 0x10000 = 1000h:0000h
     mov     ax, 1000h
@@ -25,7 +25,7 @@ _reset_drive:
     mov     dh, 0               ; Head = 0
     int     13h                 ; Call interrupt 13h
     or      ah, ah              ; Check for error code
-    jnz     _reset_drive        ; Try again if ah != 0
+    jnz     _reset_drive.1      ; Try again if ah != 0
 
     ;
     ; prepare to enter protect mode

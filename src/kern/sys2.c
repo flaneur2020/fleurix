@@ -22,9 +22,12 @@
  * */
 
 int sys_access(struct trap *tf){
-    char *path = va2pa(tf->ebx);
+    char *path = tf->ebx;
     int mode = tf->ecx;
     struct inode *ip;
+    int r;
+
+    r = vm_verify(path, 0);
 
     ip = namei(path, 0);
     if (ip==NULL) {
@@ -35,9 +38,12 @@ int sys_access(struct trap *tf){
 }
 
 int sys_open(struct trap *tf){
-    char *path = va2pa(tf->ebx);
+    char *path = tf->ebx;
     int flag = tf->ecx;
     int mode = tf->edx;
+    int r;
+
+    r = vm_verify(path, 0);
 
     return do_open(path, flag, mode);
 }
@@ -53,8 +59,11 @@ int sys_close(struct trap *tf){
 /* int read(int fd, char buf[], int cnt); */
 int sys_read(struct trap *tf){
     int fd = tf->ebx;
-    char *buf = va2pa(tf->ecx); 
     int cnt = tf->edx;
+    char *buf = tf->ecx; 
+    int r;
+
+    r = vm_verify(buf, cnt);
 
     return do_read(fd, buf, cnt);
 }
@@ -62,8 +71,11 @@ int sys_read(struct trap *tf){
 /* int write(int fd, char buf[], int cnt); */
 int sys_write(struct trap *tf){
     int fd = tf->ebx;
-    char *buf = va2pa(tf->ecx);
     int cnt = tf->edx;
+    char *buf = tf->ecx;
+    int r;
+
+    r = vm_verify(buf, cnt);
 
     return do_write(fd, buf, cnt);
 }

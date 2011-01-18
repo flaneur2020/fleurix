@@ -84,7 +84,7 @@ static inline void lldt(uint n){
 }
 
 /* flush the page directory */
-void lpgdir(uint pgdir){
+static inline void lpgdir(uint pgdir){
     asm volatile("mov %%eax, %%cr3":: "a"(pgdir));
 }
 

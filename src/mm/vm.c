@@ -3,11 +3,9 @@
 #include <proc.h>
 #include <proto.h>
 
-#include <mm.h>
+#include <page.h>
+#include <vm.h>
 
-uint la2pa(uint la);
-uint pgalloc();
-uint* find_pte(uint la);
 void do_pgfault(struct trap *tf);
 
 /*
@@ -29,9 +27,9 @@ struct pte* find_pte(uint vaddr){
     struct pte *pgdir;
     struct pte *pmd;
 
-    pgdir = cu->p_vm->vm_pgdir;
-    pmd = pgdir[PDX(vaddr)];
-    if ((pmd & PTE_P)==0) {
+    pgdir = cu->p_vm.vm_pgdir;
+    pmd = &pgdir[PDX(vaddr)];
+    if ((pmd->pt_flag & PTE_P)==0) {
         panic("no pmd");
         return NULL;
     }
@@ -43,7 +41,7 @@ struct pte* find_pte(uint vaddr){
 /*
  * Clone the kernel's address space first. 
  * */
-int vm_clone(struct pte *pdt, struct pte *pdf){
+int vm_clone(struct vm *to, struct vm *from){
 }
 
 /**/
@@ -53,12 +51,19 @@ int vm_free(){
 int vm_new(){
 }
 
-void vm_init(){
+/* Have a check of virtual memory area on getting a user space 
+ * pointer, x86 do not raise page fault on ring0, so simulate
+ * a write only access as what mmu does if nessary.
+ * On size==0, check the memory area as a string.
+ * */
+int vm_verify(char* addr, uint size){
 }
 
 /* --------------------------------------------------- */
 
-/**/
+/* Map the top 4mb virtual memory as physical memory. Initiliaze
+ * the page-level allocator, set the fault handler and misc.
+ * */
 void vm_init(){
     int pn;
 
@@ -66,7 +71,11 @@ void vm_init(){
         pmd0[pn].pt_flag = PTE_P | PTE_W;
         pmd0[pn].pt_num = pn;
     }
-    pgdir0[0].pt_num = PPN(pde0);
+    pgdir0[0].pt_num = PPN(pmd0);
+    //
+    for (pn=1; pn<1024; pn++) {
+        pgdir0[pn].pt_flag &= ~PTE_P;
+    }
     // init physical page allocator
     pm_init();
     // set fault handler

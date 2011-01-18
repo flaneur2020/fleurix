@@ -52,7 +52,7 @@ static char *fault_str[] = {
     "Reserved"
 };
 
-/**********************************************************************/
+/* ------------------------------------------------------------ */
 
 /*
  * Remap the irq and initialize the IRQ mask. 
@@ -92,7 +92,7 @@ void irq_enable(uchar irq){
     outb(PIC2+1, irq_mask >> 8);
 }
 
-/****************************************************************************/
+/* ------------------------------------------------------------------- */
 
 void idt_set_gate(uint nr, uint base, ushort sel, uchar type, uchar dpl) {
     idt[nr].base_lo    = (base & 0xFFFF);
@@ -127,13 +127,13 @@ void hwint_init(){
     set_hwint(0x80, &do_syscall);      // in syscall.c
 }
 
-void flush_idt(struct idt_desc idtd){
+void lidt(struct idt_desc idtd){
     asm volatile(
         "lidt %0"
         :: "m"(idtd));
 }
 
-/**********************************************************************/
+/* ------------------------------------------------------------------- */
 
 /*
  * The comman handler for all IRQ request as a dispatcher. Each irq 
@@ -207,6 +207,6 @@ void idt_init(){
     irq_init();
     // load intr vectors and lidt 
     hwint_init();
-    flush_idt(idt_desc);
+    lidt(idt_desc);
 }
 

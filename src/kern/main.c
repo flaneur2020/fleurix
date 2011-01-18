@@ -4,6 +4,9 @@
 #include <proc.h>
 #include <unistd.h>
 
+#include <page.h>
+#include <vm.h>
+
 #include <buf.h>
 #include <conf.h>
 #include <hd.h>
@@ -17,6 +20,15 @@ void main(){
     gdt_init();         puts("* init gdt\n");
     idt_init();         puts("* init idt\n");
     vm_init();          puts("* init vm\n");
+
+    struct page *pp;
+    pp = pgalloc();
+    printf("pp->pg_count: %d\n", pp->pg_count);
+
+    /* ------------------------------------------------- */
+
+    panic("trying a new vm now...");
+
     buf_init();         puts("* init buf\n");
     hd_init();          puts("* init hd\n");
     timer_init();       puts("* init timer\n");

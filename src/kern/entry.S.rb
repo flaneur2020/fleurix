@@ -18,13 +18,13 @@ _spin:
 [global _umode]
 _umode:
     sti
-    mov ax, 0x17
+    mov ax, 0x13
     mov ds, ax
     mov es, ax
     mov fs, ax
     mov gs, ax
     mov eax, esp
-    push dword 0x17
+    push dword 0x13
     push dword eax
     pushf
     push dword 0x0f
@@ -84,17 +84,12 @@ _hwint_common_stub:
     mov ax, 0x10
     mov ds, ax
     mov es, ax
-    mov ax, 0x17                    ; leave fs & gs to copy data between user & kernel mode. 
-    mov fs, ax
-    mov gs, ax
     mov eax, esp
     push eax                        ; esp is just the pointer to struct regs *.
     mov eax, hwint_common           ; calls hwint_common() in C
     call eax
     pop eax                         ; esp ignored
 _hwint_ret:
-    pop dword gs
-    pop dword fs
     pop dword es
     pop dword ds
     popa

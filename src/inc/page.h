@@ -6,7 +6,7 @@ struct page {
     struct page   *pg_next;
 };
 
-extern struct page *pgfreelist;
-extern struct coremap[NPAGE];
+extern struct page pgfreelist;
+extern struct page coremap[NPAGE];
 
 extern uint *pgdir;

@@ -3,7 +3,8 @@
 #include <proc.h>
 #include <proto.h>
 
-#include <mm.h>
+#include <page.h>
+#include <vm.h>
 
 /*
  * on swap...
@@ -19,22 +20,6 @@ void do_no_page(uint la, uint err){
  * else allocate one page and associate inside the page table. 
  * */
 void do_wp_page(uint la, uint err){
-    uint pa, npa, *pte;
-
-    pa = la2pa(la);
-    // if it's the last one who did the write. 
-    if (coremap[PPN(pa)]==1) {
-        pte = find_pte(la);
-        *pte &= ~PTE_W;
-        flush_cr3(pgdir);
-        return;
-    }
-    // one page, decrease the reference count of the page frame.
-    coremap[PPN(pa)]--;
-    npa = pgalloc();
-    memcpy(npa, pa, 0x1000);
-    pgattach(npa, la, PTE_P | PTE_U | PTE_W);
-    flush_cr3(pgdir);
 }
 
 /*
@@ -42,6 +27,7 @@ void do_wp_page(uint la, uint err){
  * */
 void do_pgfault(struct trap *tf){
     uint cr2;
+
     asm volatile("movl %%cr2, %0":"=a"(cr2));
     // write protection raised prior than valid.
     if (tf->err_code & PFE_W) {

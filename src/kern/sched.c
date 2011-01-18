@@ -108,14 +108,9 @@ void swtch(){
  * */
 void swtch_to(struct proc *to){
     struct proc *from;
-    // change ldt & tss
-    tss.esp0 = (uint)to+0x1000;
-    lldt(_LDT(to->p_pid));
+    tss.esp0 = (uint)to+PAGE;
     from = cu;
     cu = to;
+    lpgdir(to->p_vm.vm_pgdir);
     _do_swtch(&(from->p_contxt), &(to->p_contxt));
 }
-
-
-
-
