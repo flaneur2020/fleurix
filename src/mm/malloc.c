@@ -18,17 +18,18 @@
  * */
 
 /*
- * the bucket table, each slot got a different 2-powered size. 1 << 12 == 0x1000
+ * the bucket table, each slot got a different 2-powered size. 
+ * 1 << 3 == 32,  1 << 12 == 0x1000
  * */
-struct bktab bktab[] = {
-    {32, NULL}, 
-    {64, NULL}, 
-    {128, NULL}, 
-    {256, NULL}, 
-    {512, NULL}, 
-    {1024, NULL}, 
-    {2048, NULL}, 
-    {4096, NULL}
+struct bucket bktab[] = {
+    32, 0, 0, 0,
+    64, 0, 0, 0,
+    128, 0, 0, 0,
+    256, 0, 0, 0,
+    512, 0, 0, 0,
+    1024, 0, 0, 0,
+    2048, 0, 0, 0,
+    4096, 0, 0, 0
 };
 
 struct bucket bkfreelist = {0, };
@@ -59,31 +60,30 @@ uint kbrk(){
         // if the next pde is not present
         npde = pgdir[PDX(kheap_end+PAGE)];
         if ((npde.pt_flag & PTE_P)==0) {
-            // allocate attach the physical page to the 4mb boundary
-            pde = pgdir[PDX(kheap_end)];
-            pmd = (struct pte*)(pde.pt_num << 12);
-            pte = &pmd[PTX(kheap_end)];
+            // allocate attach the physical page to the 4mb boundary, make sure kheap_end accessible
+            pte = find_pte(pgdir, kheap_end);
             if ((pte->pt_flag & PTE_P)==0) {
                 pp = pgalloc();
                 pte->pt_num = pp->pg_num;
                 pte->pt_flag = PTE_P | PTE_W;
                 lpgdir(pgdir);
             }
+            // 
             npde.pt_num = PPN(kheap_end);
             npde.pt_flag = PTE_P | PTE_W;
             pgdir[PDX(kheap_end+PAGE)] = npde;
             lpgdir(pgdir);
             //
-            kheap_end += PAGE;
             // update each proc's page table
             for (i=0; i<NPROC; i++) {
                 if ((p=proc[i])!=NULL && p->p_vm.vm_pgdir!=NULL) {
-                    p->p_vm.vm_pgdir[PDX(kheap_end)] = pde;
+                    p->p_vm.vm_pgdir[PDX(kheap_end+PAGE)] = npde;
                 }
             }
+            kheap_end += PAGE;
         }
     }
-    pte = find_pte(pgdir, kheap_end+PAGE);
+    pte = find_pte(pgdir, kheap_end);
     if ((pte->pt_flag & PTE_P)==0) {
         pp = pgalloc();
         pte->pt_num = pp->pg_num;
@@ -95,6 +95,22 @@ uint kbrk(){
 }
 
 /* ---------------------------------------------------------- */
+
+inline int bkslot(int size){
+    int n,i; 
+
+    if (size <= 0)
+        return -1;
+    n = 16;
+    i = 0;
+    while((n <<= 1)<=4096) {
+        if (size <= n){
+            return i;
+        } 
+        i++;
+    }
+    return -1;
+}
 
 /* 
  * Allocate one bucket. All buckets are 
@@ -128,9 +144,57 @@ int bkfree(struct bucket *bk){
     sti();
 }
 
+int bkinit(struct bucket *bk, int size){
+    uint page;
+    int i;
+    struct bkentry *beh, *be;
+
+    page = kbrk(); 
+    bk->bk_page = page;
+    bk->bk_size = size;
+    bk->bk_entry = beh = (struct bkentry *)page;
+    for (i=0; i<PAGE/size; i++) {
+        be = (struct bkentry*)(page + i*size);
+        beh->bke_next = be; // #GPF here
+        be->bke_next = NULL;
+        beh = be;
+    }
+    return 0;
+}
+
 /* -------------------------------------------------------- */
 
 void* kmalloc(uint size){
+    struct bucket *bk, *bh;
+    struct bkentry *be, *beh;
+    int sn, i;
+    uint page;
+
+    sn = bkslot(size);
+    if (sn < 0) {
+        panic("kmalloc(): bad size");
+    }
+    
+    bh = &bktab[sn];
+    size = bh->bk_size;
+_find:
+    // tranverse each bucket
+    while(bh->bk_next != NULL){
+        bk = bh->bk_next;
+        // if this bucket have no free entry
+        if (bk->bk_entry == NULL) {
+            break;
+        }
+        // got free entry
+        be = bk->bk_entry;
+        bk->bk_entry = be->bke_next;
+        return (uint)be;
+    }
+    // have no free bucket.
+    bk = bkalloc();
+    bkinit(bk, size);
+    bh->bk_next = bk;
+    goto _find;
 }
 
 int kfree(void *addr){

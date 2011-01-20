@@ -80,8 +80,10 @@ uint get_seg_base(struct seg_desc *seg){
  * each proc have one ldt, and shared one tss.
  */
 void gdt_init(){
-    set_seg(&gdt[1], 0, 0xffffffff, 0, STA_X | STA_R);
-    set_seg(&gdt[2], 0, 0xffffffff, 0, STA_W);
+    set_seg(&gdt[1], 0, 0xffffffff, RING0, STA_X | STA_R);
+    set_seg(&gdt[2], 0, 0xffffffff, RING0, STA_W);
+    set_seg(&gdt[3], 0, 0xffffffff, RING3, STA_W);
+    set_seg(&gdt[4], 0, 0xffffffff, RING3, STA_W);
     gdt_desc.base   = &gdt;
     gdt_desc.limit  = (sizeof (struct seg_desc) * NSEG) - 1;
     // load gdt

@@ -22,11 +22,12 @@ void main(){
     vm_init();          puts("* init vm\n");
     proc0_init();       puts("* init sched\n");
 
-    uint addr;
+    uint *tmp;
     int i;
-    addr = kbrk();
-    for (i=0; i<1024; i++) {
-        printf("kbrk(): %x\n", kbrk());
+    for (i=0; i<0x1000; i++) {
+        tmp = kbrk();
+        *tmp = 1;
+        printf("%x\n", tmp);
     };
 
     /* ------------------------------------------------- */
