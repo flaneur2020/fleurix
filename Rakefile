@@ -61,9 +61,10 @@ file 'bin/kernel.img' => ['bin/boot.bin', 'bin/main.bin'] do
   sh "cat bin/boot.bin bin/main.bin > bin/kernel.img"
 end
 
-# 
-# boot.o
+# ---------------------------------------------------------------------
+#  the boot loader part
 #
+
 file 'bin/boot.o' => ['src/boot/boot.S'] do
   sh "nasm -f elf -o bin/boot.o src/boot/boot.S"
 end

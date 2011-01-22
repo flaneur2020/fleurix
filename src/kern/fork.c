@@ -118,7 +118,7 @@ void proc0_init(){
     p->p_uid = 0;
     p->p_gid = 0;
     // attach the page table
-    p->p_vm.vm_pgdir = pgdir0;
+    p->p_vm.vm_pgd = pgd0;
     // init tss
     tss.ss0  = KERN_DS;
     tss.esp0 = (uint)p + PAGE;

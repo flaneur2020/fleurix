@@ -111,6 +111,6 @@ void swtch_to(struct proc *to){
     tss.esp0 = (uint)to+PAGE;
     from = cu;
     cu = to;
-    lpgdir(to->p_vm.vm_pgdir);
+    lpgd(to->p_vm.vm_pgd);
     _do_swtch(&(from->p_contxt), &(to->p_contxt));
 }

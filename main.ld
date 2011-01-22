@@ -1,7 +1,7 @@
 ENTRY(main)
 SECTIONS {
     __begin__ = .;
-    .text 0x10000 : {
+    .text 0x100000 : {
         __code__ = .;
         bin/entry.o(.text) bin/main.o(.text) *(.text);
         . = ALIGN(4096);
@@ -18,5 +18,5 @@ SECTIONS {
         . = ALIGN(4096);
     }
     __end__ = .;
-    buffers = 0x100000;
+    buffers = 0x200000;
 }

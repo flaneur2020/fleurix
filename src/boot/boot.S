@@ -19,7 +19,7 @@ _reset_drive.1:
     mov     bx, 0000h           ; Destination address = 1000h:0000
 
     mov     ah, 02h             ; READ SECTOR-command
-    mov     al, 64              ; Number of sectors to read
+    mov     al, 64              ; Number of sectors to read (32kb) 
     mov     ch, 0               ; Cylinder = 0
     mov     cl, 02h             ; Sector = 2
     mov     dh, 0               ; Head = 0
@@ -67,10 +67,19 @@ _start_pm:
     mov     ax,  10h
     mov     ds,  ax
     mov     ss,  ax
+    mov     es,  ax
+    mov     gs,  ax
     ; move stack to 0xfffc! it grows downwards
     mov     esp, 0FFFCh
+
+    ; copy 0x10000 to 0x100000
+    cld
+    mov     esi, 10000h
+    mov     edi, 100000h
+    mov     ecx, 10000h ; copy 64kb
+    rep movsb
+
     ; jump to C!
-    ; jump to 0x10000!
     ; never return it should  be
     jmp     08h:010000h
 

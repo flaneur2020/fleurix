@@ -6,12 +6,12 @@
  * and misc on address space.
  * */
 struct vm {
-    struct pte  *vm_pgdir;
+    struct pde  *vm_pgd;
 };
 
 /*
  * proc0's page directory, initialize the kernel's address space here.
  * */
-extern struct pte *pgdir0;
+extern struct pde *pgd0;
 
 #endif

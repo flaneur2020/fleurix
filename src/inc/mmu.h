@@ -1,10 +1,17 @@
 #ifndef MMU_H
 #define MMU_H
 
+struct pde {
+    uint      pd_flag:9;
+    uint      pd_avl:3;
+    uint      pd_off:20;
+};
+
 struct pte {
-    uint      pt_flag:12;
-    uint      pt_num:20;
-} __attribute__((packed));
+    uint      pt_flag:9;
+    uint      pt_avl:3;
+    uint      pt_off:20;
+};
 
 // Page table/directory entry flags.
 #define PTE_P		0x001	// Present

@@ -17,7 +17,6 @@ struct page pgfreelist;
 /* returns the page struct via a physical page number. */
 struct page* pgfind(uint pn){
     int nr;
-    nr = pn-LO_MEM/PAGE;
     if (nr<0 || nr>=NPAGE ) {
         panic("bad page number.");
     }
@@ -75,7 +74,7 @@ int pm_init(){
     struct page *pp, *ph;
     uint i, pn;
 
-    pn = LO_MEM/PAGE + 1;
+    pn = 0;
     ph = &pgfreelist;
     for (pp=&coremap[0]; pp<&coremap[NPAGE]; pp++) {
         pp->pg_flag = 0;

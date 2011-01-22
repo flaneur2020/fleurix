@@ -84,13 +84,17 @@ static inline void lldt(uint n){
 }
 
 /* flush the page directory */
-static inline void lpgdir(uint pgdir){
+static inline void lpgd(uint pgdir){
     asm volatile("mov %%eax, %%cr3":: "a"(pgdir));
 }
 
 /* set the cr0 bit and enable mmu */
 static inline void mmu_enable(){
-    uint cr0;
+    uint cr0, cr4;
+    asm volatile("mov %%cr4, %0": "=r"(cr4));
+    cr4 |= 0x10; // set PSE, enable 4mb page
+    asm volatile("mov %0, %%cr4":: "r"(cr4));
+    //
     asm volatile("mov %%cr0, %0": "=r"(cr0));
     cr0 |= 0x80000000; // set the paging bit.
     asm volatile("mov %0, %%cr0":: "r"(cr0));

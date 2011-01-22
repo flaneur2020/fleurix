@@ -49,49 +49,6 @@ uint kheap_end = KHEAP;
  * table.
  * */
 uint kbrk(){
-    struct pte *pgdir, pde, npde, *pmd, *pte;
-    struct page *pp;
-    struct proc *p;
-    int i;
-    
-    pgdir = cu->p_vm.vm_pgdir;
-    // if it's the last availible page on the 4mb boundary.
-    if (((kheap_end+PAGE) % (PAGE*1024))==0){
-        // if the next pde is not present
-        npde = pgdir[PDX(kheap_end+PAGE)];
-        if ((npde.pt_flag & PTE_P)==0) {
-            // allocate attach the physical page to the 4mb boundary, make sure kheap_end accessible
-            pte = find_pte(pgdir, kheap_end);
-            if ((pte->pt_flag & PTE_P)==0) {
-                pp = pgalloc();
-                pte->pt_num = pp->pg_num;
-                pte->pt_flag = PTE_P | PTE_W;
-                lpgdir(pgdir);
-            }
-            // 
-            npde.pt_num = PPN(kheap_end);
-            npde.pt_flag = PTE_P | PTE_W;
-            pgdir[PDX(kheap_end+PAGE)] = npde;
-            lpgdir(pgdir);
-            //
-            // update each proc's page table
-            for (i=0; i<NPROC; i++) {
-                if ((p=proc[i])!=NULL && p->p_vm.vm_pgdir!=NULL) {
-                    p->p_vm.vm_pgdir[PDX(kheap_end+PAGE)] = npde;
-                }
-            }
-            kheap_end += PAGE;
-        }
-    }
-    pte = find_pte(pgdir, kheap_end);
-    if ((pte->pt_flag & PTE_P)==0) {
-        pp = pgalloc();
-        pte->pt_num = pp->pg_num;
-        pte->pt_flag = PTE_P | PTE_W;
-        lpgdir(pgdir);
-    }
-    kheap_end += PAGE;
-    return (kheap_end-PAGE);
 }
 
 /* ---------------------------------------------------------- */

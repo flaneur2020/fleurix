@@ -18,21 +18,22 @@ void do_pgfault(struct trap *tf);
  * the proc[0]'s page directory, as initialized, it will map the top 4map virtual memory 
  * as physical memory, by the first middle page table.
  * */
-struct pte *pgdir0 = (struct pte*)0x0;
+struct pde *pgd0 = (struct pde*)0x0;
 struct pte *pmd0 = (struct pte*)(0x0+PAGE);
 
 /* --------------------------------------------------------- */
 
-struct pte* find_pte(struct pte *pgdir, uint vaddr){
-    struct pte pde, *pmd;
+struct pte* find_pte(struct pte *pgd, uint vaddr){
+    struct pde *pde; 
+    struct pte *pt;
 
-    pde = pgdir[PDX(vaddr)];
-    if ((pde.pt_flag & PTE_P)==0) {
+    pde = &pgd[PDX(vaddr)];
+    if ((pde->pd_flag & PTE_P)==0) {
         panic("no pde");
         return NULL;
     }
-    pmd = (struct pte*)(pde.pt_num << 12);
-    return &pmd[PTX(vaddr)];
+    pt = (struct pte*)(pde->pd_off << 12);
+    return &pt[PTX(vaddr)];
 }
 
 /* --------------------------------------------------------- */
@@ -66,20 +67,20 @@ int vm_verify(char* addr, uint size){
 void vm_init(){
     int pn;
 
-    for (pn=0; pn<1024; pn++) {
-        pmd0[pn].pt_flag = PTE_P | PTE_W;
-        pmd0[pn].pt_num = pn;
+    // map the entire physical memory into the kernel's address space.
+    for (pn=0; pn<PMEM/(PAGE*1024); pn++) {
+        pgd0[pn].pd_off = pn << 10;
+        pgd0[pn].pd_flag = PTE_PS | PTE_P | PTE_W; // note: set it 4mb via a PTE_S
     }
-    pgdir0[0].pt_num = PPN(pmd0);
     //
-    for (pn=1; pn<1024; pn++) {
-        pgdir0[pn].pt_flag &= ~PTE_P;
+    for (pn=PMEM/(PAGE*1024); pn<1024; pn++) {
+        pgd0[pn].pd_flag &= ~PTE_P;
     }
     // init physical page allocator
     pm_init();
     // set fault handler
     set_hwint(0x0E, do_pgfault);
     // load page directory and enable the MMU.
-    lpgdir((uint)pgdir0);
+    lpgd((uint)pgd0);
     mmu_enable();
 }
