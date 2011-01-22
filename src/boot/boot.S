@@ -69,8 +69,8 @@ _start_pm:
     mov     ss,  ax
     mov     es,  ax
     mov     gs,  ax
-    ; move stack to 0xfffc! it grows downwards
-    mov     esp, 0FFFCh
+    ; move stack to 0x2000, temporily
+    mov     esp, 2000h
 
     ; copy 0x10000 to 0x100000
     cld
@@ -81,7 +81,7 @@ _start_pm:
 
     ; jump to C!
     ; never return it should  be
-    jmp     08h:010000h
+    jmp     08h:100000h
 
 _hang: 
     jmp     _hang

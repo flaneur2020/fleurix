@@ -34,21 +34,10 @@ struct bucket bktab[] = {
 
 struct bucket bkfreelist = {0, };
 
-/*
- * 
- * */
-uint kheap_end = KHEAP;
-
-/*
- * The page-level allocator used by kmalloc() and bkalloc(), for 
- * allocating non-reusable pages.
- * Allocate one physical page and attach it where grows the kernel 
- * heap, then extends the kheap_end. No decrease yet.
- * Have a check of the 4mb boundary, reserve the last page as the 
- * middle page table on the edge, attach it into EVERY proc's page
- * table.
- * */
 uint kbrk(){
+    struct page *pp;
+    pp = pgalloc();
+    return pp->pg_num << 12;
 }
 
 /* ---------------------------------------------------------- */

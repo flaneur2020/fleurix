@@ -5,8 +5,8 @@
 #include <buf.h>
 #include <conf.h>
 
-/* buf bodies. Make it start at 0x100000 alright!  */
-extern char buffers[NBUF][BSIZE];
+/* buf bodies. */
+char buffers[NBUF][BSIZE] __attribute__((aligned(BSIZE)));
 
 /* buf heads */
 struct buf   buff[NBUF];

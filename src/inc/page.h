@@ -9,4 +9,6 @@ struct page {
 extern struct page pgfreelist;
 extern struct page coremap[NPAGE];
 
-extern uint *pgdir;
+#define PG_RSVD     0x2 // reserved pages, like kernel memory & bios
+#define PG_DMAP     0x4 // TODO: directed mapped to physical addresses
+

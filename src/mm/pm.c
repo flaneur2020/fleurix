@@ -37,8 +37,8 @@ struct page* pgalloc(){
     
     cli();
     pp = pgfreelist.pg_next;
-    pp->pg_count = 1;
     pgfreelist.pg_next = pp->pg_next;
+    pp->pg_count = 1;
     sti();
     return pp;
 }
@@ -74,12 +74,30 @@ int pm_init(){
     struct page *pp, *ph;
     uint i, pn;
 
-    pn = 0;
+    // mark the reserved pages
+    // 640 - 1mb is system reserved, BIOS and blah
+    // 1mb - __kend__ is kernel reserved.
+    for (pn=0; pn<3; pn++) {
+        coremap[pn].pg_num = pn;
+        coremap[pn].pg_flag = PG_RSVD;
+        coremap[pn].pg_count = 100;
+    }
+    for (pn=640*1024/PAGE; pn<PPN(&__kend__); pn++){
+        coremap[pn].pg_num = pn;
+        coremap[pn].pg_flag = PG_RSVD;
+        coremap[pn].pg_count = 100;
+    }
+
+    // link all the free pages into freelist.
     ph = &pgfreelist;
-    for (pp=&coremap[0]; pp<&coremap[NPAGE]; pp++) {
+    for (pn=0; pn<NPAGE; pn++) {
+        pp = &coremap[pn];
+        if ((pp->pg_flag & PG_RSVD) || (pp->pg_count > 0))  {
+            continue;
+        }
+        pp->pg_num = pn;
         pp->pg_flag = 0;
         pp->pg_count = 0;
-        pp->pg_num = pn++;
         //
         pp->pg_next = NULL;
         ph->pg_next = pp;

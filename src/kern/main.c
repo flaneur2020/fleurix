@@ -23,7 +23,15 @@ void main(){
     proc0_init();       puts("* init sched\n");
 
     /* ------------------------------------------------- */
+    int i, *r;
+    struct page *pp;
+    for (i=0; i<0x1000; i++){
+        r = (int *)kmalloc(32);
+        printf("kmalloc(): %x \n", r); 
+        *r = 1; // writing to 0x11000 may raise a #GPF
+    }
 
+    for(;;);
     panic("trying a new vm now...");
 
     buf_init();         puts("* init buf\n");

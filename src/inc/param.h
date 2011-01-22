@@ -14,7 +14,7 @@ typedef unsigned int    uint;
 
 #define NSYSC   64
 #define NPROC   64
-#define NSEG    (4+NPROC+1)
+#define NSEG    6
 #define NBUF    (0x200000/BSIZE) /* buffers take 2mb */
 #define NBLKDEV 2
 #define NINODE  128
@@ -28,5 +28,7 @@ typedef unsigned int    uint;
 #define MAX_FILESIZ ((7+NINDBLK+NINDBLK*NINDBLK)*BSIZE)
 
 #define NULL ((void*)0)
+
+extern char __kend__;
 
 #include <lib.h>
