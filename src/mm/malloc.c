@@ -110,6 +110,10 @@ int bkinit(struct bucket *bk, int size){
 
 /* -------------------------------------------------------- */
 
+/* 
+ * kmalloc().
+ * 
+ * */
 void* kmalloc(uint size){
     struct bucket *bk, *bh;
     struct bkentry *be, *beh;
@@ -121,27 +125,50 @@ void* kmalloc(uint size){
         panic("kmalloc(): bad size");
     }
     
-    bh = &bktab[sn];
+    bk = bh = &bktab[sn];
     size = bh->bk_size;
 _find:
     // tranverse each bucket
-    while(bh->bk_next != NULL){
-        bk = bh->bk_next;
-        // if this bucket have no free entry
-        if (bk->bk_entry == NULL) {
-            break;
-        }
+    while((bk = bk->bk_next) != NULL){
         // got free entry
-        be = bk->bk_entry;
-        bk->bk_entry = be->bke_next;
-        return (uint)be;
+        if (bk->bk_entry != NULL) {
+            be = bk->bk_entry;
+            bk->bk_entry = be->bke_next;
+            return (void*)be;
+        }
     }
-    // have no free bucket.
+    // have no free bucket and no free entry
     bk = bkalloc();
     bkinit(bk, size);
+    bk->bk_next = bh->bk_next;
     bh->bk_next = bk;
     goto _find;
 }
 
-int kfree(void *addr){
+/*
+ * 
+ * */
+int kfree(void* addr, uint size){
+    int sn;
+    uint page;
+    struct bucket *bh, *bk;
+    struct bkentry *be;
+
+    sn = bkslot(size);
+    if (sn < 0) {
+        panic("kfree(): bad size");
+    }
+    page = PPN(addr) << 12;
+    
+    bk = bh = &bktab[sn];
+    size = bh->bk_size;
+    be = (struct bkentry *)addr;
+    while((bk = bk->bk_next) != NULL) {
+        if (bk->bk_page == page) {
+            be->bke_next = bk->bk_entry;
+            bk->bk_entry = be;
+            return 0;
+        }
+    }
+    panic("kfree(): not avail addr");
 }

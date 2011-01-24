@@ -18,7 +18,7 @@ void do_pgfault(struct trap *tf);
  * the proc[0]'s page directory, as initialized, it will map the top 4map virtual memory 
  * as physical memory, by the first middle page table.
  * */
-struct pde *pgd0 = (struct pde*)0x2000;
+struct pde pgd0[1024] __attribute__((aligned(4096)));
 
 /* --------------------------------------------------------- */
 

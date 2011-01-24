@@ -12,6 +12,6 @@ struct vm {
 /*
  * proc0's page directory, initialize the kernel's address space here.
  * */
-extern struct pde *pgd0;
+extern struct pde pgd0[];
 
 #endif
