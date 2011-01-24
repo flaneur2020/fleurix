@@ -10,12 +10,13 @@
 
 /*
  * proc.c 2010 fleurer
- * this file implies the initilize of proc[0] and routine fork(), 
+ * this file implies the initilization of proc[0] and the implementation 
+ * of fork(), 
  *
  * */
 
-// one page size
-uchar kstack0[PAGE] = {0, };        
+/* the kernel stack of proc0, one page size */
+uchar kstack0[PAGE] __attribute__((aligned(PAGE)));        
 
 struct proc *proc[NPROC] = {NULL, };
 struct proc *cu = NULL;
@@ -40,35 +41,42 @@ int find_pid(){
     return 0;
 }
 
-/*
- * main part of sys_fork()
+/* Spawn a kernel thread.    
+ * This is not quite cool, but we have to do some initialization in
+ * kernel's address space, the approach in linux0.11 is not quite 
+ * ease here for the fact that trap occured in the kernel space do 
+ * not refering the esp in TSS.
+ *
+ * This initialized a struct proc, and replaced the body of fork().  
  * */
-int copy_proc(struct trap *tf){
-    uint nr; 
-    struct proc *p;
-    struct trap *ntf;
+struct proc* kspawn(void (*func)()){
+    uint nr;
     int fd;
     struct file *fp;
-    
+    struct proc *p;
+
     nr = find_pid();
-    if (nr==0){
-        panic("no pid availible.");
+    if (nr == 0) {
+        panic("no free pid");
     }
 
-    p = (struct proc *) pgalloc(); 
-    if (p==NULL){
-        panic("no page availible.");
+    p = (struct proc *) kmalloc(PAGE);
+    if (p==NULL) {
+        panic("no free page");
     }
-
     proc[nr] = p;
-    *p = *cu;
-    p->p_pid = nr;
+    p->p_stat = SSLEEP; // set SRUN later.
+    p->p_pid  = nr;
     p->p_ppid = cu->p_pid;
-    // on sche
     p->p_flag = cu->p_flag;
     p->p_cpu  = cu->p_cpu;
     p->p_pri  = cu->p_pri;
     p->p_nice = cu->p_nice;
+    //
+    p->p_uid  = cu->p_uid;
+    p->p_gid  = cu->p_gid;
+    p->p_ruid = cu->p_ruid;
+    p->p_rgid = cu->p_rgid;
     // increase the reference count of inodes, and dup files
     p->p_cdir = cu->p_cdir;
     p->p_cdir->i_count++;
@@ -79,18 +87,30 @@ int copy_proc(struct trap *tf){
             p->p_ofile[fd] = fp;
         }
     }
-    // init the new proc's kernel stack
-    p->p_trap = ntf = (struct trap *)((uint)p + PAGE) - 1;
+    // share kernel's address space.
+    vm_clone(&p->p_vm, &cu->p_vm);
+    p->p_contxt.eip = func;
+    p->p_contxt.esp = (uint)p+PAGE;
+    p->p_stat = SRUN;
+    return p;
+}
+
+/*
+ * main part of sys_fork().
+ * note that the fact that ALL process swtching occurs in kernel
+ * space, hence fork() just returns to _hwint_ret(in entry.S.rb),
+ * and initialize a kernel stack just as intrrupt occurs here.
+ * */
+int copy_proc(struct trap *tf){
+    struct proc *p;
+    struct trap *ntf;
+
+    p = kspawn(&_hwint_ret);
+    ntf = (struct trap *)((uint)p+PAGE) - 1;
     *ntf = *tf;
     ntf->eax = 0; // this is why fork() returns 0.
-    // init the new proc's contxt for the first swtch.
-    memset(&(p->p_contxt), 0, sizeof(struct contxt));
-    p->p_contxt.eip = &_hwint_ret;
-    p->p_contxt.esp = p->p_trap;
-    //
-    vm_clone(p->p_vm, cu->p_vm);
-    p->p_stat = SRUN;
-    return nr;
+    p->p_contxt.esp = ntf;
+    return p->p_pid;
 }
 
 /* TODO: do_exit(). */
@@ -122,8 +142,6 @@ void proc0_init(){
     // init tss
     tss.ss0  = KERN_DS;
     tss.esp0 = (uint)p + PAGE;
-    set_tss(&gdt[TSS0], &tss);
-    ltr(_TSS);
     // init its ldt
 }
 
@@ -142,7 +160,7 @@ void dump_procs(){
 
 void dump_proc(struct proc *p){
     printf("%s ", (p==cu)? "-":" " );
-    printf("pid:%d pri:%d cpu:%d nice:%d stat:%d esp0:%x eip:%x \n", p->p_pid, p->p_pri, p->p_cpu, p->p_nice, p->p_stat, p->p_contxt.esp, p->p_trap->eip);
+    printf("pid:%d pri:%d cpu:%d nice:%d stat:%d esp0:%x eip:%x \n", p->p_pid, p->p_pri, p->p_cpu, p->p_nice, p->p_stat, p->p_contxt.esp, p->p_contxt.eip);
 }
 
 

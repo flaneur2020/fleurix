@@ -49,6 +49,8 @@ _do_swtch:
 [extern hwint_common]
 
 ;; 
+;; hard coded, take an eye on what you does.
+;;
 ;; this routine is called on each isr & irq is raised. store the current cpu state on the kernel stack.
 ;; kernel stack is pointed by the esp0 field inside tss.
 ;; 
@@ -58,6 +60,8 @@ _hwint_common_stub:
     pusha
     push dword ds
     push dword es
+    push dword fs
+    push dword gs
     mov ax, 0x10
     mov ds, ax
     mov es, ax
@@ -67,6 +71,8 @@ _hwint_common_stub:
     call eax
     pop eax                         ; esp ignored
 _hwint_ret:
+    pop dword gs
+    pop dword fs
     pop dword es
     pop dword ds
     popa

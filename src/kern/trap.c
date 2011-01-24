@@ -105,24 +105,26 @@ void idt_set_gate(uint nr, uint base, ushort sel, uchar type, uchar dpl) {
     idt[nr].sys        = 0;
 }
 
-static inline void set_syst_gate(uint nr, uint base){
+static inline void syst_gate(uint nr, uint base){
     idt_set_gate(nr, base, KERN_CS, STS_TRG, RING3);
 }
-static inline void set_intr_gate(uint nr, uint base){
+static inline void intr_gate(uint nr, uint base){
     idt_set_gate(nr, base, KERN_CS, STS_IG, RING0);
 }
-static inline void set_trap_gate(uint nr, uint base){
+static inline void trap_gate(uint nr, uint base){
     idt_set_gate(nr, base, KERN_CS, STS_TRG, RING0);
 }
 
 void hwint_init(){
     int i;
-    for(i=0;  i<32; i++){ set_trap_gate(i, _hwint[i]); }
-    for(i=32; i<48; i++){ set_intr_gate(i, _hwint[i]); }
-    set_syst_gate(0x03, _hwint[0x03]); // int3
-    set_syst_gate(0x04, _hwint[0x04]); // overflow
-    set_syst_gate(0x05, _hwint[0x05]); // bound
-    set_syst_gate(0x80, _hwint[0x80]); // syscall
+    for(i=0;  i<32; i++)
+        trap_gate(i, _hwint[i]);
+    for(i=32; i<48; i++) 
+        intr_gate(i, _hwint[i]);
+    syst_gate(0x03, _hwint[0x03]); // int3
+    syst_gate(0x04, _hwint[0x04]); // overflow
+    syst_gate(0x05, _hwint[0x05]); // bound
+    syst_gate(0x80, _hwint[0x80]); // syscall
     // Each handler handled in his file.  
     set_hwint(0x80, &do_syscall);      // in syscall.c
 }
@@ -147,8 +149,8 @@ void lidt(struct idt_desc idtd){
  * */
 void hwint_common(struct trap *tf) {
     void (*handler)(struct trap *tf);
+
     handler = hwint_routines[tf->int_no]; 
-    cu->p_trap = tf;
     // trap
     if (tf->int_no < 32) {
         if (handler){

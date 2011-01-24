@@ -33,10 +33,6 @@ struct proc {
     uint                p_gid;          /* effective gid */
     uint                p_ruid;         /* real uid */
     uint                p_rgid;         /* real gid */
-    uint                p_textp;        /* virtual addresses */
-    uint                p_tsize;
-    uint                p_stack;
-    uint                p_brk;          /* - */
     uint                p_chan;         /* the event channel which proc is awaiting */
     uint                p_error;        /* return error code */
     uint                p_umask;        /* umask for files */
@@ -44,7 +40,6 @@ struct proc {
     struct file        *p_ofile[NOFILE];/* file desciptors of the current opened files */
     struct contxt       p_contxt;       /* - */
     struct vm           p_vm;
-    struct trap        *p_trap;         /* the initialize trap, initialized on fork */
 };
 
 extern struct proc *proc[NPROC];

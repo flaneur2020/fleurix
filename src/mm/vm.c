@@ -41,6 +41,14 @@ struct pte* find_pte(struct pte *pgd, uint vaddr){
  * Clone the kernel's address space first. 
  * */
 int vm_clone(struct vm *to, struct vm *from){
+    int i;
+
+    to->vm_pgd = (struct pde*)kmalloc(PAGE);
+    // dup the kernel's address space first
+    for (i=0; i<PMEM/(PAGE*1024); i++) {
+        to->vm_pgd[i] = from->vm_pgd[i];
+    }
+    return 0;
 }
 
 /**/

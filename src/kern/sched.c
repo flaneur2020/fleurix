@@ -47,7 +47,7 @@ void setpri(struct proc *p){
     n = p->p_cpu/16 + PUSER + p->p_nice;
     if (n >= 127) n=127;
     if (n <= -126) n=-126;
-    if (p->p_pri < cu->p_pri){
+    if ((p!=cu) && p->p_pri < cu->p_pri){
         runrun = 1;
     }
     p->p_pri = n;
@@ -95,6 +95,7 @@ void swtch(){
         }
     }
     if (np==NULL){
+        n = proc[0]->p_pri;
         np = proc[0];
     }
     //debug_proc_list();
@@ -108,7 +109,7 @@ void swtch(){
  * */
 void swtch_to(struct proc *to){
     struct proc *from;
-    tss.esp0 = (uint)to+PAGE;
+    tss.esp0 = (uint)to + PAGE; 
     from = cu;
     cu = to;
     lpgd(to->p_vm.vm_pgd);

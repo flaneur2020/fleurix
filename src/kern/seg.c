@@ -21,7 +21,7 @@
 struct seg_desc     gdt[NSEG] = {0, };
 struct gdt_desc     gdt_desc;
 
-/******************************************************************/
+/* ------------------------------------------------------ */
 
 void set_seg(struct seg_desc *seg, uint base, uint limit, uint dpl, uint type){
     seg->limit_lo = ((limit) >> 12) & 0xffff;
@@ -52,41 +52,23 @@ void set_tss(struct seg_desc *seg, uint base){
     seg->s = 0;
 }
 
-/******************************************************************/
-
-void set_seg_limit(struct seg_desc *seg, uint limit){
-    seg->limit_lo = ((limit) >> 12) & 0xffff;
-    seg->limit_hi = (uint) (limit) >> 28;
-}
-
-void set_seg_base(struct seg_desc *seg, uint base){
-    seg->base_lo  = (base) & 0xffff;
-    seg->base_mi  = ((base) >> 16) & 0xff;
-    seg->base_hi  = (base) >> 24;
-}
-
-uint get_seg_limit(struct seg_desc *seg){
-    return (seg->limit_lo | seg->limit_hi << 16)<<12;
-}
-
-uint get_seg_base(struct seg_desc *seg){
-    return (seg->base_lo | seg->base_mi << 16 | seg->base_hi << 24);
-}
-
-/******************************************************************/
+/* ------------------------------------------------------ */
 
 /* 
  * refill the gdt(the ex-gdt initialized in boot/boot.S)
- * each proc have one ldt, and shared one tss.
+ * one tss is shared among all processes.
  */
 void gdt_init(){
     set_seg(&gdt[1], 0, 0xffffffff, RING0, STA_X | STA_R);
     set_seg(&gdt[2], 0, 0xffffffff, RING0, STA_W);
     set_seg(&gdt[3], 0, 0xffffffff, RING3, STA_X | STA_R);
     set_seg(&gdt[4], 0, 0xffffffff, RING3, STA_W);
+    set_tss(&gdt[TSS0], &tss);
     gdt_desc.base   = &gdt;
     gdt_desc.limit  = (sizeof (struct seg_desc) * NSEG) - 1;
     // load gdt
     asm volatile( "lgdt %0" :: "m"(gdt_desc));
+    // load tss
+    ltr(_TSS);
 }
 
