@@ -27,11 +27,14 @@ void main(){
     buf_init();         puts("* init buf\n");
     hd_init();          puts("* init hd\n");
     timer_init();       puts("* init timer\n");
+    keybd_init();       puts("* init keybd\n");
     sti();
-
+    // 
+    puts("abc\b");
+    for(;;);
     kspawn(&init);
     for(;;){
-        printk("0");
+        printf("0");
         swtch();
     }
 }
@@ -39,7 +42,7 @@ void main(){
 void init(){
     //do_exec("");
     for(;;) {
-        printk("1");
+        printf("1");
         swtch();
     }
 }

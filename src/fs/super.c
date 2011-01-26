@@ -100,12 +100,12 @@ void putsp(struct super *sp){
 
 /* debug */
 void dump_super(struct super *sp){
-    printk("s_max_inode:%d\n",    sp->s_max_inode);
-    printk("s_max_zone:%d\n",     sp->s_max_zone);
-    printk("s_nimap_blk:%d\n",  sp->s_nimap_blk);
-    printk("s_nzmap_blk:%d\n",  sp->s_nzmap_blk);
-    printk("s_zone0:%d\n",        sp->s_data_zone0);
-    printk("s_log_bz:%d\n",       sp->s_log_bz);
-    printk("s_max_size:%d\n",   sp->s_max_size);
-    printk("s_magic:%x\n",        sp->s_magic);
+    printf("s_max_inode:%d\n",    sp->s_max_inode);
+    printf("s_max_zone:%d\n",     sp->s_max_zone);
+    printf("s_nimap_blk:%d\n",  sp->s_nimap_blk);
+    printf("s_nzmap_blk:%d\n",  sp->s_nzmap_blk);
+    printf("s_zone0:%d\n",        sp->s_data_zone0);
+    printf("s_log_bz:%d\n",       sp->s_log_bz);
+    printf("s_max_size:%d\n",   sp->s_max_size);
+    printf("s_magic:%x\n",        sp->s_magic);
 }

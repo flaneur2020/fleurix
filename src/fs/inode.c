@@ -81,7 +81,7 @@ _loop:
         }
     }
     // if not found (no free slot) 
-    printk("inode table overflow.\n");
+    printf("inode table overflow.\n");
     return NULL;
 }
 
@@ -185,19 +185,19 @@ void unlk_ino(struct inode *ip){
 /*************************************************************/
 
 void dump_inode(struct inode *ip){
-    printk("i_mode:%x\n", ip->i_mode);
-    printk("i_uid:%x\n", ip->i_uid);
-    printk("i_size:%x\n", ip->i_size);
-    printk("i_mtime:%x\n", ip->i_mtime);
-    printk("i_gid:%x\n", ip->i_gid);
-    printk("i_nlink:%x\n", ip->i_nlink);
-    printk("i_count:%x\n", ip->i_count);
-    printk("i_dev:%x\n", ip->i_dev);
-    printk("i_num:%x\n", ip->i_num);
-    printk("i_flag:%x\n", ip->i_flag);
+    printf("i_mode:%x\n", ip->i_mode);
+    printf("i_uid:%x\n", ip->i_uid);
+    printf("i_size:%x\n", ip->i_size);
+    printf("i_mtime:%x\n", ip->i_mtime);
+    printf("i_gid:%x\n", ip->i_gid);
+    printf("i_nlink:%x\n", ip->i_nlink);
+    printf("i_count:%x\n", ip->i_count);
+    printf("i_dev:%x\n", ip->i_dev);
+    printf("i_num:%x\n", ip->i_num);
+    printf("i_flag:%x\n", ip->i_flag);
     int i=0;
     for(i=0;i<9;i++){
-        printk("i_zone[%d]: %x\n", i, ip->i_zone[i]);
+        printf("i_zone[%d]: %x\n", i, ip->i_zone[i]);
     }
 
     /*
@@ -207,5 +207,5 @@ void dump_inode(struct inode *ip){
     bp = bread(rootdev, nr);
     dump_buf(bp);
     brelse(bp);
-    printk("\n"); */
+    printf("\n"); */
 }

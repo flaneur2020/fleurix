@@ -77,6 +77,6 @@ void timer_init(){
     //
     irq_enable(0);
     set_hwint(IRQ0+0, &do_timer);
-    // printk("current cmos time: %d\n", cmos_time());
+    // printf("current cmos time: %d\n", cmos_time());
 }
 

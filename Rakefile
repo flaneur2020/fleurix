@@ -103,6 +103,7 @@ cfiles = [
   'src/blk/hd.c',
   #
   'src/chr/vga.c',
+  'src/chr/keybd.c',
   #
   'src/mm/pm.c',
   'src/mm/vm.c',

@@ -2,6 +2,14 @@
 #include <x86.h>
 #include <proto.h>
 
+/* 
+ * vga.c
+ *
+ * This file indicated how to display text on the terminal, no 
+ * xxx_init() needed. And you can take printf() almost every
+ * where among this kernel.
+ * */
+
 struct vchar {
     char    vc_char:8;
     char    vc_color:4;
@@ -9,7 +17,7 @@ struct vchar {
 };
 
 /* VGA is a memory mapping device, you may view it as an 80x25 array
- * whom located at 0x8b000(in ../../main.ld).
+ * whom located at 0x8b000(in main.ld).
  * */
 extern struct vchar vgamem[25][80];
 
@@ -20,6 +28,7 @@ extern struct vchar vgamem[25][80];
 
 static int px=0, py=0;
 
+/* adjust the position of cursor */
 void flush_csr(){
     uint pos = py * 80 + px;
     outb(0x3D4, 14);
@@ -28,6 +37,7 @@ void flush_csr(){
     outb(0x3D5, pos);
 }
 
+/* clear screen */
 void cls(){
     memsetw(vgamem, VC_BLANK, 80*25);
     px = 0;
@@ -35,6 +45,7 @@ void cls(){
     flush_csr();
 }
 
+/* scroll up one line. */
 void scroll(void) {
     if(py >= 25) {
         uint pos = py-25+1;
@@ -48,7 +59,10 @@ void scroll(void) {
 
 void putch(char c){
     if(c == '\b') {
-        if(px != 0) px--;
+        if(px > 0) {
+            px--;
+            vgamem[py][px].vc_char = ' ';
+        }
     }
     else if(c == '\t') {
         px = (px + 8) & ~(8 - 1);
@@ -91,9 +105,10 @@ void printn(uint n, uint b){
     putch( ntab[m] );
 }
 
-// a simpler printk
-// refer to unix v6
-void printk(char *fmt, ...){
+/* a simpler printf
+ * refer to unix v6 
+ * */
+void printf(char *fmt, ...){
     char c, *s;
     uint *adx = (uint*)(void*)&fmt + 1;
 _loop:

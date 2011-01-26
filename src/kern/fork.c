@@ -159,8 +159,8 @@ void dump_procs(){
 }
 
 void dump_proc(struct proc *p){
-    printk("%s ", (p==cu)? "-":" " );
-    printk("pid:%d pri:%d cpu:%d nice:%d stat:%d esp0:%x eip:%x \n", p->p_pid, p->p_pri, p->p_cpu, p->p_nice, p->p_stat, p->p_contxt.esp, p->p_contxt.eip);
+    printf("%s ", (p==cu)? "-":" " );
+    printf("pid:%d pri:%d cpu:%d nice:%d stat:%d esp0:%x eip:%x \n", p->p_pid, p->p_pri, p->p_cpu, p->p_nice, p->p_stat, p->p_contxt.esp, p->p_contxt.eip);
 }
 
 

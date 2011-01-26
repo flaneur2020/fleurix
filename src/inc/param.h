@@ -28,6 +28,7 @@ typedef unsigned int    uint;
 #define MAX_FILESIZ ((7+NINDBLK+NINDBLK*NINDBLK)*BSIZE)
 
 #define NULL ((void*)0)
+#define NUL  0
 
 extern char __kend__;
 

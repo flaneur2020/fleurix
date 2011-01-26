@@ -56,7 +56,7 @@ void do_syscall(struct trap *tf){
     int ret;
     int (*func)(struct trap *tf);
 
-    printk("syscall called\n");
+    printf("syscall called\n");
     if (tf->eax > NSYSC) {
         panic("bad syscall");
     }
