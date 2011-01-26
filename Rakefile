@@ -1,6 +1,9 @@
 cinc   = '-Isrc/inc'
-cflag  = "-Wall -finline-functions -nostdinc -fno-builtin -fno-stack-protector"
-pgrep  = "grep --color -e 'error' -e 'error' -e '^'"
+cflag  = %w{
+  -Wall 
+  -nostdinc -fno-builtin -fno-stack-protector
+  -finline-functions -finline-small-functions -findirect-inlining -finline-functions -finline-functions-called-once 
+} * ' '
 
 task :default => [:bochs]
 
@@ -96,9 +99,9 @@ cfiles = [
   'src/kern/trap.c',
   'src/kern/timer.c',
   #
-  'src/drv/buf.c',
-  'src/drv/conf.c',
-  'src/drv/hd.c',
+  'src/blk/buf.c',
+  'src/blk/conf.c',
+  'src/blk/hd.c',
   #
   'src/mm/pm.c',
   'src/mm/vm.c',

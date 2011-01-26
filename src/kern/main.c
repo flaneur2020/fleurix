@@ -18,7 +18,7 @@
 void init();
 
 void main(){
-    tty_init();         puts("* init tty\n");
+    cls();
     gdt_init();         puts("* init gdt\n");
     idt_init();         puts("* init idt\n");
     vm_init();          puts("* init vm\n");

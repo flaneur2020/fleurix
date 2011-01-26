@@ -114,8 +114,3 @@ _loop:
     adx++;
     goto _loop;
 }
-
-void tty_init(){
-    vidmem = (short *) 0xb8000;
-    cls();
-}
