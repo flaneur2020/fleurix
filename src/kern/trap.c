@@ -157,7 +157,7 @@ void hwint_common(struct trap *tf) {
             handler(tf);
         }
         else {
-            printf("hwint_common: unhandled exception: %s \n", fault_str[tf->int_no]);
+            printk("hwint_common: unhandled exception: %s \n", fault_str[tf->int_no]);
             debug_regs(tf);
             for(;;);
         }
@@ -186,17 +186,17 @@ void set_hwint(int nr, void (*handler)(struct trap *tf)){
 /***********************************************************************************/
 
 void debug_regs(struct trap *tf){
-    printf("gs = %x, fs = %x, es = %x, ds = %x\n", tf->gs, tf->fs, tf->es, tf->ds);
-    printf("edi = %x, esi = %x, ebp = %x \n",tf->edi, tf->esi, tf->ebp);
-    printf("ebx = %x, edx = %x, ecx = %x, eax = %x \n",tf->ebx, tf->edx, tf->ecx, tf->eax);
-    printf("int_no = %x, err_code = %x\n", tf->int_no, tf->err_code);
-    printf("eip = %x, cs = %x, eflags = %x\n", tf->eip, tf->cs, tf->eflags);
-    printf("esp = %x, ss = %x \n", tf->esp, tf->ss);
+    printk("gs = %x, fs = %x, es = %x, ds = %x\n", tf->gs, tf->fs, tf->es, tf->ds);
+    printk("edi = %x, esi = %x, ebp = %x \n",tf->edi, tf->esi, tf->ebp);
+    printk("ebx = %x, edx = %x, ecx = %x, eax = %x \n",tf->ebx, tf->edx, tf->ecx, tf->eax);
+    printk("int_no = %x, err_code = %x\n", tf->int_no, tf->err_code);
+    printk("eip = %x, cs = %x, eflags = %x\n", tf->eip, tf->cs, tf->eflags);
+    printk("esp = %x, ss = %x \n", tf->esp, tf->ss);
     uint cr2, kern_ss;
     asm("mov %%cr2, %%eax":"=a"(cr2));
-    printf("cr2 = %x, ", cr2);
+    printk("cr2 = %x, ", cr2);
     asm("mov %%ss, %%eax":"=a"(kern_ss));
-    printf("kern_ss = %x\n", kern_ss);
+    printk("kern_ss = %x\n", kern_ss);
 }
 
 /***********************************************************************************/

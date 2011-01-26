@@ -87,7 +87,6 @@ cfiles = [
   'src/lib/string.c',
   'src/lib/bitmap.c',
   #
-  'src/kern/tty.c',
   'src/kern/sysent.c',
   'src/kern/sys1.c',
   'src/kern/sys2.c',
@@ -102,6 +101,8 @@ cfiles = [
   'src/blk/buf.c',
   'src/blk/conf.c',
   'src/blk/hd.c',
+  #
+  'src/chr/vga.c',
   #
   'src/mm/pm.c',
   'src/mm/vm.c',
@@ -127,7 +128,7 @@ sfiles = [
   'src/kern/entry.S'
 ]
 
-ofiles = (cfiles + sfiles).map{|fn| 'bin/'+File.basename(fn).ext('o') }
+ofiles = (sfiles + cfiles).map{|fn| 'bin/'+File.basename(fn).ext('o') }
 
 cfiles.each do |fn_c|
   fn_o = 'bin/'+File.basename(fn_c).ext('o')

@@ -17,5 +17,6 @@ SECTIONS {
         *(.bss);
         . = ALIGN(4096);
     }
+    vgamem = 0xb8000;
     __kend__ = .;
 }

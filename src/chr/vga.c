@@ -2,21 +2,26 @@
 #include <x86.h>
 #include <proto.h>
 
-/*
- * width 80
- * height 25
- *
+struct vchar {
+    char    vc_char:8;
+    char    vc_color:4;
+    char    vc_bgcolor:4;
+};
+
+/* VGA is a memory mapping device, you may view it as an 80x25 array
+ * whom located at 0x8b000(in ../../main.ld).
  * */
+extern struct vchar vgamem[25][80];
 
-#define VID_WHITE 0x07 // white on black text
-#define VID_BLANK (' ' | (VID_WHITE << 8)) // white on black text
+#define VGA_WHITE 0x07
+#define VGA_BLACK 0x00
 
-static short *vidmem = (short *) 0xb8000;
-static int   csr_x = 0;
-static int   csr_y = 0;
+#define VC_BLANK (' '|VGA_WHITE<<8)
+
+static int px=0, py=0;
 
 void flush_csr(){
-    uint pos = csr_y * 80 + csr_x;
+    uint pos = py * 80 + px;
     outb(0x3D4, 14);
     outb(0x3D5, pos >> 8);
     outb(0x3D4, 15);
@@ -24,47 +29,45 @@ void flush_csr(){
 }
 
 void cls(){
-    int i;
-    for(i = 0; i < 25; i++) {
-        memsetw(vidmem+i*80, VID_BLANK, 80);
-    }
-    csr_x = 0;
-    csr_y = 0;
+    memsetw(vgamem, VC_BLANK, 80*25);
+    px = 0;
+    py = 0;
     flush_csr();
 }
 
 void scroll(void) {
-    if(csr_y >= 25) {
-        uint pos = csr_y - 25 + 1;
-        memcpy(vidmem, vidmem + pos * 80, (25 - pos) * 80 * 2);
-        memsetw(vidmem + (25 - pos) * 80, VID_BLANK, 80);
-        csr_y = 25 - 1;
+    if(py >= 25) {
+        uint pos = py-25+1;
+        memcpy(vgamem, &vgamem[pos][0], (25-pos)*80*sizeof(struct vchar));
+        memsetw(&vgamem[25-pos][0], VC_BLANK, 80);
+        py = 25-1;
     }
 }
 
+/* ----------------------------------------------------- */
+
 void putch(char c){
     if(c == '\b') {
-        if(csr_x != 0) csr_x--;
+        if(px != 0) px--;
     }
     else if(c == '\t') {
-        csr_x = (csr_x + 8) & ~(8 - 1);
+        px = (px + 8) & ~(8 - 1);
     }
     else if(c == '\r') {
-        csr_x = 0;
+        px = 0;
     }
     else if(c == '\n') {
-        csr_x = 0;
-        csr_y++;
+        px = 0;
+        py++;
     }
     else if(c >= ' ') {
-        short *vchar = vidmem + (csr_y * 80 + csr_x);
-        *vchar = c | VID_WHITE << 8;
-        csr_x++;
+        vgamem[py][px].vc_char = c;
+        px++;
     }
 
-    if(csr_x >= 80) {
-        csr_x = 0;
-        csr_y++;
+    if(px >= 80) {
+        px = 0;
+        py++;
     }
     scroll();
     flush_csr();
@@ -88,9 +91,9 @@ void printn(uint n, uint b){
     putch( ntab[m] );
 }
 
-// a simpler printf
+// a simpler printk
 // refer to unix v6
-void printf(char *fmt, ...){
+void printk(char *fmt, ...){
     char c, *s;
     uint *adx = (uint*)(void*)&fmt + 1;
 _loop:

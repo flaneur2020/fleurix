@@ -240,11 +240,11 @@ void dump_buf(struct buf *bp){
     for(i=0; i<255; i++){
         c = bp->b_data[i];
         if (c>31 && c<127){
-            printf("%c", c);
+            printk("%c", c);
         }
         else {
-            printf("%x", c);
+            printk("%x", c);
         }
     }
-    printf("\n");
+    printk("\n");
 }

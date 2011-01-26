@@ -38,7 +38,7 @@ void do_pgfault(struct trap *tf){
     if (tf->err_code & PFE_U) {
         panic("user bad mem access.");
     }
-    printf("page fault: %x \nerr_code %x\n", cr2, tf->err_code);
+    printk("page fault: %x \nerr_code %x\n", cr2, tf->err_code);
     panic("~");
 }
 

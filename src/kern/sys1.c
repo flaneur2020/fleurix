@@ -15,7 +15,7 @@
 /* --------------------------- */
 
 int sys_debug(struct trap *tf){
-    printf("%d", tf->ebx);
+    printk("%d", tf->ebx);
 }
 
 int sys_fork(struct trap *tf){
