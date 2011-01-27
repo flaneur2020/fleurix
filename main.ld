@@ -1,5 +1,7 @@
 ENTRY(main)
 SECTIONS {
+    __bios__ = 0xa0000;
+    vgamem = 0xb8000;
     .text 0x100000 : {
         __kbegin__ = .;
         __code__ = .;
@@ -17,6 +19,5 @@ SECTIONS {
         *(.bss);
         . = ALIGN(4096);
     }
-    vgamem = 0xb8000;
     __kend__ = .;
 }

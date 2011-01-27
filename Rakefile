@@ -104,6 +104,7 @@ cfiles = [
   #
   'src/chr/vga.c',
   'src/chr/keybd.c',
+  'src/chr/tty.c',
   #
   'src/mm/pm.c',
   'src/mm/vm.c',

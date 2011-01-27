@@ -30,6 +30,7 @@ private_colormap: enabled=0
 fullscreen: enabled=0
 screenmode: name="sample"
 keyboard_mapping: enabled=0, map=
+keyboard_type: at
 
 debug_symbols: file=main.sym
 

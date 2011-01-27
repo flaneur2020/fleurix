@@ -39,5 +39,32 @@ static uchar keybd_map[256] = {
   [0xD2] KEY_INS,   [0xD3] KEY_DEL
 };
 
+static uchar shift_map[256] = {
+  NUL,  033,  '!',  '@',  '#',  '$',  '%',  '^',  // 0x00
+  '&',  '*',  '(',  ')',  '_',  '+',  '\b', '\t',
+  'Q',  'W',  'E',  'R',  'T',  'Y',  'U',  'I',  // 0x10
+  'O',  'P',  '{',  '}',  '\n', NUL,  'A',  'S',
+  'D',  'F',  'G',  'H',  'J',  'K',  'L',  ':',  // 0x20
+  '"',  '~',  NUL,  '|',  'Z',  'X',  'C',  'V',
+  'B',  'N',  'M',  '<',  '>',  '?',  NUL,  '*',  // 0x30
+  NUL,  ' ',  NUL,  NUL,  NUL,  NUL,  NUL,  NUL,
+  NUL,  NUL,  NUL,  NUL,  NUL,  NUL,  NUL,  '7',  // 0x40
+  '8',  '9',  '-',  '4',  '5',  '6',  '+',  '1',
+  '2',  '3',  '0',  '.',  NUL,  NUL,  NUL,  NUL,  // 0x50
+  [0x9C] '\n',      // KP_Enter
+  [0xB5] '/',       // KP_Div
+  [0xC8] KEY_UP,    [0xD0] KEY_DN,
+  [0xC9] KEY_PGUP,  [0xD1] KEY_PGDN,
+  [0xCB] KEY_LF,    [0xCD] KEY_RT,
+  [0x97] KEY_HOME,  [0xCF] KEY_END,
+  [0xD2] KEY_INS,   [0xD3] KEY_DEL
+};
+
+/* status of shift, ctrl & alt */
+#define SHIFT    0x1
+#define CTRL     0x2
+#define ALT      0x4
+#define E0ESC    0x8
+#define CAPSLOCK 0x10
 
 #endif

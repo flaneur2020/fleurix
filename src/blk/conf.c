@@ -14,3 +14,7 @@ struct bdevsw   bdevsw[NBLKDEV] = {
     { &nulldev, &nulldev, &hd_request, &hdtab } 
 };
 
+struct cdevsw   cdevsw[NCHRDEV] = {
+    { 0, }, /* NODEV */
+};
+

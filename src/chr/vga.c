@@ -16,15 +16,15 @@ struct vchar {
     char    vc_bgcolor:4;
 };
 
-/* VGA is a memory mapping device, you may view it as an 80x25 array
- * whom located at 0x8b000(in main.ld).
- * */
-extern struct vchar vgamem[25][80];
-
 #define VGA_WHITE 0x07
 #define VGA_BLACK 0x00
 
 #define VC_BLANK (' '|VGA_WHITE<<8)
+
+/* VGA is a memory mapping interface, you may view it as an 80x25 array
+ * which located at 0x8b000 (defined in main.ld).
+ * */
+extern struct vchar vgamem[25][80];
 
 static int px=0, py=0;
 

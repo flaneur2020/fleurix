@@ -17,6 +17,8 @@ typedef unsigned int    uint;
 #define NSEG    6
 #define NBUF    (0x200000/BSIZE) /* buffers take 2mb */
 #define NBLKDEV 2
+#define NCHRDEV 2
+#define NCCS    17
 #define NINODE  128
 #define NFILE   128
 #define NOFILE  16
