@@ -1,15 +1,32 @@
 #ifndef TTY_H
 #define TTY_H
 
-#define NCCS 17
-#define TTY_BUFSIZ 1024
+/* down blow might be confusing, but they've got no account with each other. */
+#define CBSIZE   500 // size of a cblock. 
+#define CANBSIZ  512 // size of a canonical buffer, the limit of each line input.
 
-struct clist {
-    char    *c_head;
-    char    *c_tail;
-    char     c_buf[TTY_BUFSIZ];
+//
+struct cblock {
+    struct cblock  *cb_next;
+    struct cblock  *cb_prev;
+    uint            cb_start;
+    uint            cb_end;
+    char            cb_char[CBSIZE];
 };
 
+/*
+ * Each clist is a queue of struct cblock, and each cblock
+ * has a fixed-size array of characters with two offsets
+ * which indicates the range from cb_start to cb_end.
+ * */
+struct clist {
+    uint            c_count; /* the total characters count this stored. */
+    struct cblock  *c_first; 
+    struct cblock  *c_last;
+};
+
+/*
+ * */
 struct tty {
     int     t_flag;
     int     t_dev;

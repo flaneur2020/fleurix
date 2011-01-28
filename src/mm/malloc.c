@@ -22,14 +22,14 @@
  * 1 << 3 == 32,  1 << 12 == 0x1000
  * */
 struct bucket bktab[] = {
-    32, 0, 0, 0,
-    64, 0, 0, 0,
-    128, 0, 0, 0,
-    256, 0, 0, 0,
-    512, 0, 0, 0,
-    1024, 0, 0, 0,
-    2048, 0, 0, 0,
-    4096, 0, 0, 0
+    32, 0, NULL, NULL,
+    64, 0, NULL, NULL,
+    128, 0, NULL, NULL,
+    256, 0, NULL, NULL,
+    512, 0, NULL, NULL,
+    1024, 0, NULL, NULL,
+    2048, 0, NULL, NULL,
+    4096, 0, NULL, NULL
 };
 
 struct bucket bkfreelist = {0, };

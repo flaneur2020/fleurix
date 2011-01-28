@@ -57,10 +57,16 @@ void scroll(void) {
 
 /* ----------------------------------------------------- */
 
-void putch(char c){
+void putch(char c) {
     if(c == '\b') {
         if(px > 0) {
             px--;
+            vgamem[py][px].vc_char = ' ';
+        }
+        else {
+            if (py>0) 
+                py--;
+            px = 79;
             vgamem[py][px].vc_char = ' ';
         }
     }
