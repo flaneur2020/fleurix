@@ -74,7 +74,7 @@ _pop:
             cl->c_last = NULL;
         }
         kfree(cb, sizeof(struct cblock));
-        goto _pop;;
+        goto _pop;
     }
 
     ch = cb->cb_char[cb->cb_start];

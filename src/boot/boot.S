@@ -3,29 +3,72 @@
 align 4
 
 [global _start]
+
+    jmp _start
+
+;; read_sect(sn, *buf), load a sector to memory.
+;; input : si - logical sector number(starts at 0)
+;;         di - *buf
+;;
+_read_sect:
+    push    cx
+    push    bx
+    mov     ax, si              ; disk sector number
+    mov     bx, di              ; buffer address.
+    ; ch = cylinder = sn / 36
+    mov     cl, 36              
+    div     cl                  
+    mov     ch, al              
+    ; dh = head = (sn%36)/18
+    mov     al, ah
+    mov     ah, 0
+    mov     cl, 18
+    div     cl
+    mov     dh, al
+    ; cl = sector = (ln%36)%18+1
+    mov     cl, ah 
+    inc     cl
+    ; dl = drive = 0; 
+    mov     dl, 0
+    ; raise int 13h 
+    mov     ax, 201h
+    int     13h
+    pop     bx
+    pop     cx
+    ret
+
+;; -----------------------------------------------------------------------
+;;
+;; bootloader starts here
+;; 
+
 _start:
-
-    ; read the rest sectors to 0x10000
-_reset_drive.1:
-    mov     ah, 0                ; RESET-command
-    int     13h                  ; Call interrupt 13h
-    or      ah, ah               ; Check for error code
-    jnz     _reset_drive.1       ; Try again if ah != 0
-
-    ; load kernel to 0x10000 = 1000h:0000h
-    mov     ax, 1000h
-    mov     es, ax
+    xor     ax, ax
     mov     ds, ax
-    mov     bx, 0000h           ; Destination address = 1000h:0000
+    mov     ss, ax
+    mov     sp, 0x2000
 
-    mov     ah, 02h             ; READ SECTOR-command
-    mov     al, 72              ; Number of sectors to read 
-    mov     ch, 0               ; Cylinder = 0
-    mov     cl, 02h             ; Sector = 2
-    mov     dh, 0               ; Head = 0
-    int     13h                 ; Call interrupt 13h
-    or      ah, ah              ; Check for error code
-    jnz     _reset_drive.1      ; Try again if ah != 0
+_reset_drive:
+    mov     ah, 0                ; RESET-command
+    int     0x13                 ; Call interrupt 13h
+    or      ah, ah               ; Check for error code
+    jnz     _reset_drive         ; Try again if ah != 0
+
+    ;
+    ; load kernel to 0x10000 (es:bx = 0x1000: 0000)
+    ;
+    mov     ax, 0x1000
+    mov     es, ax               ; es = 1000h
+    mov     di, 0                ; 
+    mov     si, 1                ; 
+    mov     cx, 128              ; read 128 sectors, 64kb
+_read_sect_loop:
+    call    _read_sect
+    inc     si
+    add     di, 0x200
+    dec     cx
+    jnz     _read_sect_loop
+
 
     ;
     ; prepare to enter protect mode
@@ -33,16 +76,16 @@ _reset_drive.1:
 
     ; Enable the A20
 seta20.1:
-    in      al, byte 0x64
-    test    al, byte 0x2
+    in      al, 0x64
+    test    al, 0x2
     jnz     seta20.1
-    mov     al, byte 0xd1
+    mov     al, 0xd1
     out     byte 0x64, al
 seta20.2:
-    in      al, byte 0x64
-    test    al, byte 0x2
+    in      al, 0x64
+    test    al, 0x2
     jnz     seta20.2
-    mov     al, byte 0xdf
+    mov     al, 0xdf
     out     byte 0x60, al
 
     ; clear registers
@@ -62,7 +105,10 @@ seta20.2:
     ; jump, set seg registers as selector
     jmp     08h:_start_pm
 
+;; -------------------------------------------------------------
+
 [bits 32]
+
 _start_pm:
     mov     ax,  10h
     mov     ds,  ax
