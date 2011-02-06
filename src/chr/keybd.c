@@ -57,11 +57,11 @@ int do_keybd_intr(struct trap *tf){
 
     // check shift, ctrl and alt
     if (m = shift(sc)) {
-        if (sc & 0x80) {
+        if (sc & 0x80) 
             mode &= ~m;
-            return 0;
-        }
-        mode |= m;
+        else 
+            mode |= m;
+        return 0;
     }
     map = (mode & SHIFT)? shift_map: keybd_map;
     ch = map[sc & 0x7f];

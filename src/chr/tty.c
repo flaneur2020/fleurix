@@ -71,6 +71,7 @@ int tty_canon(struct tty *tp){
             break;
         default:
             putq(&tp->t_canq, ch);
+            break;
         }
     }
 }
