@@ -31,30 +31,24 @@ void main(){
     hd_init();          puts("* init hd\n");
     timer_init();       puts("* init timer\n");
     keybd_init();       puts("* init keybd\n");
+    puts("\n--- fleurix ---\n\n");
     sti();
-    // 
-    int i;
-    char str[] = "abc";
-    for (i=0; i<79; i++) {
-        cl_putc(&tty0.t_rawq, str[i%3]);
-    }
-    char ch;
-    for (i=0; i<256; i++) {
-        printf("%c", cl_getc(&tty0.t_rawq));
-    }
     //
-    for(;;);
     kspawn(&init);
     for(;;){
-        printf("0");
         swtch();
     }
 }
 
 void init(){
     //do_exec("");
+    static char buf[128] = {0, };
     for(;;) {
-        printf("1");
+        int i;
+        printf("$ ");
+        memset(buf, 0, 128);
+        tty_read(&tty0, buf, 128);
+        printf("  %s\n", buf);
         swtch();
     }
 }

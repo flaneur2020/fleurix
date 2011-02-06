@@ -8,104 +8,153 @@
 
 struct tty tty0;
 
-/* only used in tty_canon() */
-char canonb[CANBSIZ];
-
 /* ---------------------------------------------- */
 
 /*
- * Append a character into clist.
+ * Append a character into a tty buf.
  * */
-int cl_putc(struct clist *cl, char ch){
-    struct cblock *cb;
-
-    // if this clist is null
-    if (cl->c_last == NULL) {
-        cb = (struct cblock*)kmalloc(sizeof(struct cblock));
-        cb->cb_next = NULL;
-        cb->cb_start = 0;
-        cb->cb_end = 0;
-        //
-        cl->c_first = cb;
-        cl->c_last = cb;
-        cl->c_count = 0;
+int putq(struct qbuf *qb, char ch){
+    // this buffer has been full now.
+    if (qb->q_count == QBUFSIZ) {
+        return -1;
     }
-    // find a availible cblock
-    cb=cl->c_last;
-_find:
-    for (; cb; cb=cb->cb_next) {
-        if (cb->cb_end < CBSIZE-1) {
-            cb->cb_char[cb->cb_end] = ch;
-            cb->cb_end++;
-            //
-            cl->c_count++;
-            return 0;
-        }
-    }
-    // no free cblock, allocate and append one
-    cb = (struct cblock*)kmalloc(sizeof(struct cblock));
-    cb->cb_next = NULL;
-    cb->cb_start = 0;
-    cb->cb_end = 0;
-    //
-    cl->c_last->cb_next = cb;
-    cl->c_last = cb;
-    goto _find;
+    qb->q_char[qb->q_end] = ch;
+    qb->q_end = (qb->q_end + 1) % QBUFSIZ;
+    qb->q_count++;
+    return 0;
 }
 
-/* Get the first character from a clist. 
- * cblocks only freed here.
+/* Get the first character from a tty buf. 
  * */
-char cl_getc(struct clist *cl){
-    struct cblock *cb;
+char getq(struct qbuf *qb){
     char ch;
-
-    if (cl->c_first==NULL) {
+    // if this buffer is empty
+    if (qb->q_count == 0) {
         return -1;
     }
-
-_pop:
-    cb = cl->c_first;
-    if (cb==NULL) 
-        return -1;
-    if (cb->cb_start == cb->cb_end) {
-        cl->c_first = cb->cb_next;
-        if (cb == cl->c_last) {
-            cl->c_last = NULL;
-        }
-        kfree(cb, sizeof(struct cblock));
-        goto _pop;
-    }
-
-    ch = cb->cb_char[cb->cb_start];
-    cb->cb_start++;
+    ch = qb->q_char[qb->q_start];
+    qb->q_start = (qb->q_start + 1) % QBUFSIZ;
+    qb->q_count--;
     return ch;
 }
 
+/* Erase the last character of a tty buf */
+char eraseq(struct qbuf *qb){
+    // if this buffer is empty
+    if (qb->q_count == 0) {
+        return -1;
+    }
+    qb->q_end = (qb->q_end-1 + QBUFSIZ) % QBUFSIZ;
+    qb->q_count--;
+    return 0;
+}
+
+/* ---------------------------------------------- */
+
+/* take characterers from raw list, make some parse & erase and place
+ * it into canon list. */
+int tty_canon(struct tty *tp){
+    char ch;
+    
+    // if raw mode
+    if (tp->t_flag & TTY_RAW) {
+        while ((ch=getq(&tp->t_rawq)) >= 0) {
+            putq(&tp->t_canq, ch);
+        }
+        return 0;
+    }
+    // canon mode
+    while ((ch=getq(&tp->t_rawq)) >= 0) {
+        switch(ch){
+        case CERASE:
+            eraseq(&tp->t_canq);
+            break;
+        default:
+            putq(&tp->t_canq, ch);
+        }
+    }
+}
+
+/* output characters with buffering */
+int tty_output(struct tty *tp, char ch){
+    putq(&tp->t_outq, ch);
+}
+
+/*
+ * Place a character on raw TTY input queue, if a carriage character 
+ * arrives, wake up the awaitors.
+ * */
+int tty_input(struct tty *tp, char ch){
+    uint cnt;
+
+    putq(&tp->t_rawq, ch);
+    cnt = tp->t_canq.q_count;
+    tty_canon(tp);
+
+    if (tp->t_flag & TTY_ECHO) {
+        if (ch == CERASE) {
+            if (cnt <= 0) {
+                return 0;
+            }
+        }
+        tty_output(tp, ch);
+        tty_start(tp);
+    }
+
+    if (tp->t_flag & TTY_RAW){
+        // TODO
+    }
+    if (ch==CEOF || ch=='\n') {
+        eraseq(&tp->t_canq);
+        wakeup(tp);
+        return 0;
+    }
+}
+
+/* ---------------------------------------- */
+
+int tty_start(struct tty *tp){
+    int (*putc)(char);
+    char ch;
+
+    putc = tp->t_putc;
+    while((ch=getq(&tp->t_outq)) >= 0){
+        putc(ch);
+    }
+}
+
 /* ---------------------------------------------- */
 
 /*
- * Place a character on raw TTY input queue, do
+ * If the list is not full, wait until
  * */
-int tty_input(struct tty *tp, char ch){
-    putch(ch);
+int tty_read(struct tty *tp, char *buf, uint cnt){
+    struct qbuf qb;
+    char ch;
+    int i;
+
+    // if no data on canonical list
+    if (tp->t_canq.q_count < cnt) {
+        sleep(tp, PRITTY);
+    }
+    // 
+    for (i=0; i<cnt; i++) {
+        if ((ch=getq(&tp->t_canq)) < 0)
+            break;
+        buf[i] = ch;
+    }
+    return i+1;
 }
 
-int tty_canon(struct tty *tp){
-}
-
-int tty_output(struct tty *tp, char ch){
-}
-
-/* ---------------------------------------------- */
-
-int ttread(struct tty *tp){
-}
-
-int ttwrite(struct tty *tp){
+int tty_write(struct tty *tp, char *buf, uint cnt){
 }
 
 /* ---------------------------------------------- */
 
 void tty_init(){
+    tty0.t_flag = TTY_ECHO;
+    tty0.t_putc = &putch;
+    tty0.t_rawq.q_count = 0;
+    tty0.t_canq.q_count = 0;
+    tty0.t_outq.q_count = 0;
 }

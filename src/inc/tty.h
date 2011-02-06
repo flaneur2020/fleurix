@@ -1,28 +1,16 @@
 #ifndef TTY_H
 #define TTY_H
 
-/* down blow might be confusing, but they've got no account with each other. */
-#define CBSIZE   500 // size of a cblock. 
-#define CANBSIZ  512 // size of a canonical buffer, the limit of each line input.
-
-//
-struct cblock {
-    struct cblock  *cb_next;
-    struct cblock  *cb_prev;
-    uint            cb_start;
-    uint            cb_end;
-    char            cb_char[CBSIZE];
-};
+#define QBUFSIZ  1024 // size of a line buffer, and the limit of each line input.
 
 /*
- * Each clist is a queue of struct cblock, and each cblock
- * has a fixed-size array of characters with two offsets
- * which indicates the range from cb_start to cb_end.
+ * A cycle queue.
  * */
-struct clist {
-    uint            c_count; /* the total characters count this stored. */
-    struct cblock  *c_first; 
-    struct cblock  *c_last;
+struct qbuf {
+    uint            q_start;
+    uint            q_end;
+    uint            q_count;
+    char            q_char[QBUFSIZ];
 };
 
 /*
@@ -30,17 +18,24 @@ struct clist {
 struct tty {
     int     t_flag;
     int     t_dev;
-    struct clist    t_rawq;
-    struct clist    t_canq;
-    struct clist    t_outq;
+    int     (*t_putc)(char);
+    struct qbuf    t_rawq;
+    struct qbuf    t_canq;
+    struct qbuf    t_outq;
 };
 
 extern struct tty tty0;
 
+/* flags */
+#define TTY_CANON   0x0    /* if not raw, it's a canon */
+#define TTY_RAW     0x1
+#define TTY_ECHO    0x2
+#define TTY_WANTED  0x10
+
 /* control characters */
 #define CINTR   003  /* ctrl-C */
 #define CQUIT   034  /* ctrl-\ */
-#define CERASE  0177 /* DEL, BS */
+#define CERASE  '\b' /* DEL, BS */
 #define CKILL   025  /* ctrl-X */
 #define CEOF    004  /* ctrl-D */
 #define CEOL    00

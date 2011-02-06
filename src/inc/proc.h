@@ -70,6 +70,7 @@ extern uint runrun;
 #define	PSWP	  (-100)
 #define	PINOD	  (-90)
 #define	PRIBIO	  (-50)
+#define PRITTY    (-45)
 #define	PPIPE	  1
 #define	PWAIT	  40
 #define	PSLEP	  90

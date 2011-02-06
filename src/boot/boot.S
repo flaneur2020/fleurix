@@ -1,9 +1,6 @@
-[bits 16]
-
 align 4
 
-[global _start]
-
+[bits 16]
     jmp _start
 
 ;; read_sect(sn, *buf), load a sector to memory.
@@ -42,6 +39,7 @@ _read_sect:
 ;; bootloader starts here
 ;; 
 
+[global _start]
 _start:
     xor     ax, ax
     mov     ds, ax
