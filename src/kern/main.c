@@ -47,8 +47,8 @@ void init(){
         int i;
         printf("$ ");
         memset(buf, 0, 128);
-        tty_read(&tty0, buf, 128);
-        printf("  %s\n", buf);
+        i = tty_read(&tty0, buf, 128);
+        tty_write(&tty0, buf, i);
         swtch();
     }
 }

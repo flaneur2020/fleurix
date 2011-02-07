@@ -55,6 +55,7 @@ char eraseq(struct qbuf *qb){
  * it into canon list. */
 int tty_canon(struct tty *tp){
     char ch;
+    int i;
     
     // if raw mode
     if (tp->t_flag & TTY_RAW) {
@@ -66,6 +67,11 @@ int tty_canon(struct tty *tp){
     // canon mode
     while ((ch=getq(&tp->t_rawq)) >= 0) {
         switch(ch){
+        case '\t':
+            for(i=0; i < (((tp->t_col+4)&~3)-tp->t_col); i++)
+                putq(&tp->t_canq, ' ');
+            return 0;
+            break;
         case CERASE:
             eraseq(&tp->t_canq);
             break;
@@ -148,6 +154,11 @@ int tty_read(struct tty *tp, char *buf, uint cnt){
 }
 
 int tty_write(struct tty *tp, char *buf, uint cnt){
+    int i;
+    for (i=0; i<cnt; i++) {
+        tty_output(tp, buf[i]);
+    }
+    tty_start(tp);
 }
 
 /* ---------------------------------------------- */

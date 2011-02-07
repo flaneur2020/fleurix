@@ -2,6 +2,8 @@
 #include <x86.h>
 #include <proto.h>
 
+#include <tty.h>
+
 /* 
  * vga.c
  *
@@ -26,7 +28,8 @@ struct vchar {
  * */
 extern struct vchar vgamem[25][80];
 
-static int px=0, py=0;
+static int py=0;
+#define px (tty0.t_col)
 
 /* adjust the position of cursor */
 void flush_csr(){
@@ -71,7 +74,7 @@ void putch(char c) {
         }
     }
     else if(c == '\t') {
-        px = (px + 8) & ~(8 - 1);
+        px = (px + 4) & ~3;
     }
     else if(c == '\r') {
         px = 0;
