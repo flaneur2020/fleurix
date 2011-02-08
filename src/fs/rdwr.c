@@ -38,15 +38,15 @@ int do_read(int fd, char *buf, int cnt){
     ip = fp->f_ino;
     lock_ino(fp->f_ino);
     switch(ip->i_mode & S_IFMT) {
-    case S_IFBLK:
-        // TODO:
-    case S_IFCHR:
-        r = tty_read(&tty[MINOR(ip->i_dev)], buf, cnt);
-        break;
-    case S_IFDIR:
-    case S_IFREG:
-    default:
-        r = readi(ip, buf, fp->f_offset, cnt);
+        case S_IFBLK:
+            // TODO:
+        case S_IFCHR:
+            r = tty_read(&tty[MINOR(ip->i_dev)], buf, cnt);
+            break;
+        case S_IFDIR:
+        case S_IFREG:
+        default:
+            r = readi(ip, buf, fp->f_offset, cnt);
     }
     if (r < 0){
         unlk_ino(ip);
