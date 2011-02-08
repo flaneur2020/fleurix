@@ -17,10 +17,11 @@ struct qbuf {
  * */
 struct tty {
     int     t_flag;
-    int     t_dev;
+    int     t_dev;  // device number.
+    int     t_col;  // position x of the cursor
+    int     t_row;  // position y of the cursor
     int     (*t_putc)(char);
-    int     t_col;
-    struct qbuf    t_rawq;
+    struct qbuf    t_rawq; 
     struct qbuf    t_canq;
     struct qbuf    t_outq;
 };

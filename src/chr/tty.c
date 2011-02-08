@@ -68,7 +68,8 @@ int tty_canon(struct tty *tp){
     while ((ch=getq(&tp->t_rawq)) >= 0) {
         switch(ch){
         case '\t':
-            for(i=0; i < (((tp->t_col+4)&~3)-tp->t_col); i++)
+            // expand tab into spaces
+            for(i=0; i<4-(tp->t_col%4); i++)
                 putq(&tp->t_canq, ' ');
             return 0;
             break;
@@ -84,7 +85,19 @@ int tty_canon(struct tty *tp){
 
 /* output characters with buffering */
 int tty_output(struct tty *tp, char ch){
-    putq(&tp->t_outq, ch);
+    int i;
+    // 
+    switch(ch){
+    case '\t':
+        // expand tab into spaces
+        for(i=0; i<4-(tp->t_col%4); i++) 
+            putq(&tp->t_outq, ' ');
+        break;
+    default:
+        putq(&tp->t_outq, ch);
+        break;
+    }
+    return 0;
 }
 
 /*
@@ -120,6 +133,7 @@ int tty_input(struct tty *tp, char ch){
 
 /* ---------------------------------------- */
 
+/* output actually starts here. */
 int tty_start(struct tty *tp){
     int (*putc)(char);
     char ch;
