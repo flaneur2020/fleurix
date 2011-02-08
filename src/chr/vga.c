@@ -28,8 +28,8 @@ struct vchar {
  * */
 extern struct vchar vgamem[25][80];
 
-#define px (tty0.t_col)
-#define py (tty0.t_row)
+#define px (tty[0].t_col)
+#define py (tty[0].t_row)
 
 /* adjust the position of cursor */
 void flush_csr(){

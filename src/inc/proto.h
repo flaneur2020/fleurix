@@ -1,4 +1,8 @@
 /** */ 
+
+#include <inode.h>
+#include <tty.h>
+
 // tty.c
 void    tty_init();
 void    cls();
@@ -52,6 +56,10 @@ struct inode* namei_parent(char *path, char **name);
 
 // fs/file.c 
 struct file* falloc(int fd);
+
+// chr/tty.c
+int tty_read(struct tty *tp, char *buf, uint cnt);
+int tty_write(struct tty *tp, char *buf, uint cnt);
 
 /* --------------------------------------------------- */
 /* panic */

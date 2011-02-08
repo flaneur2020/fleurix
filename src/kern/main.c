@@ -41,16 +41,13 @@ void main(){
 }
 
 void init(){
-    //do_exec("");
-    static char buf[128] = {0, };
-    for(;;) {
-        int i;
-        printf("$ ");
-        memset(buf, 0, 128);
-        i = tty_read(&tty0, buf, 128);
-        tty_write(&tty0, buf, i);
-        swtch();
-    }
+    int fd;
+    static char buf[255] = {0, };
+    do_mount(rootdev, NULL);
+
+    fd = do_open("/dev/tty0", O_RDONLY);
+    do_read(fd, buf, 127);
+    for(;;);
 }
 
 /*

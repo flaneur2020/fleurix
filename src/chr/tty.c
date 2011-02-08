@@ -6,7 +6,7 @@
 #include <tty.h>
 #include <keybd.h>
 
-struct tty tty0;
+struct tty tty[1];
 
 /* ---------------------------------------------- */
 
@@ -178,9 +178,9 @@ int tty_write(struct tty *tp, char *buf, uint cnt){
 /* ---------------------------------------------- */
 
 void tty_init(){
-    tty0.t_flag = TTY_ECHO;
-    tty0.t_putc = &putch;
-    tty0.t_rawq.q_count = 0;
-    tty0.t_canq.q_count = 0;
-    tty0.t_outq.q_count = 0;
+    tty[0].t_flag = TTY_ECHO;
+    tty[0].t_putc = &putch;
+    tty[0].t_rawq.q_count = 0;
+    tty[0].t_canq.q_count = 0;
+    tty[0].t_outq.q_count = 0;
 }

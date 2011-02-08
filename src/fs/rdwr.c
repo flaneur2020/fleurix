@@ -4,6 +4,7 @@
 #include <proc.h>
 // 
 #include <buf.h>
+#include <tty.h>
 #include <conf.h>
 //
 #include <super.h>
@@ -34,15 +35,25 @@ int do_read(int fd, char *buf, int cnt){
         return -1;
     }
 
-    // TODO: special files
+    ip = fp->f_ino;
     lock_ino(fp->f_ino);
-    r = readi(fp->f_ino, buf, fp->f_offset, cnt);
+    switch(ip->i_mode & S_IFMT) {
+    case S_IFBLK:
+        // TODO:
+    case S_IFCHR:
+        r = tty_read(&tty[MINOR(ip->i_dev)], buf, cnt);
+        break;
+    case S_IFDIR:
+    case S_IFREG:
+    default:
+        r = readi(ip, buf, fp->f_offset, cnt);
+    }
     if (r < 0){
-        unlk_ino(fp->f_ino);
+        unlk_ino(ip);
         return -1;
     }
     fp->f_offset += cnt;
-    unlk_ino(fp->f_ino);
+    unlk_ino(ip);
     return r;
 }
 
@@ -61,16 +72,26 @@ int do_write(int fd, char *buf, int cnt){
         syserr(EBADF);
         return -1;
     }
-
+    //
     if (fp->f_flag & O_APPEND) {
         off = fp->f_ino->i_size;
     }
     else {
         off = fp->f_offset;
     }
-    // TODO: special files
-    lock_ino(fp->f_ino);
-    r = writei(fp->f_ino, buf, off, cnt);
+    //
+    ip = fp->f_ino;
+    lock_ino(ip);
+    switch(ip->i_mode & S_IFMT) {
+    case S_IFBLK:
+        // TODO
+    case S_IFCHR:
+        r = tty_write(&tty[MINOR(ip->i_dev)], buf, cnt);
+    case S_IFDIR:
+    case S_IFREG:
+    default:
+        r = writei(ip, buf, off, cnt);
+    }
     if (r < 0){
         unlk_ino(fp->f_ino);
         return -1;

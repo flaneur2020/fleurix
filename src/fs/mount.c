@@ -13,6 +13,7 @@
 struct super *rootsp = NULL;
 
 /* load a super block in-core. and associate with an in-core inode (locked).
+ * on mounting the root filesystem, do_mount(rootdev, NULL);
  *
  * if did not got any free slot, just simply raise an error instead
  * of sleep until somebody frees like what getblk does.

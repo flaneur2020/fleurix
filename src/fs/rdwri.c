@@ -48,8 +48,7 @@ int readi(struct inode *ip, char *buf, uint off, uint cnt){
 }
 
 /*
- * write data to inode.
- * 
+ * write data to a regular file.
  * */
 int writei(struct inode *ip, char *buf, uint off, uint cnt){
     struct buf *bp;

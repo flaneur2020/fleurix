@@ -51,6 +51,10 @@ int do_keybd_intr(struct trap *tf){
     }
     sc = inb(KB_DATA);
 
+    // ignore capslock yet.
+    if ((sc & 0x7f) == 0x3A) 
+        return 0;
+
     // check E0ESC
     if (sc == 0xE0) 
         mode |= E0ESC;
@@ -79,8 +83,8 @@ int do_keybd_intr(struct trap *tf){
     }
 
     // on pressed 
-    if ((sc & 0x80)==0) {
-        tty_input(&tty0, ch);
+    if ((sc & 0x80)==0 && ch!=NULL) {
+        tty_input(&tty[0], ch);
     }
     // on released
     else {

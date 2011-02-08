@@ -17,7 +17,7 @@ struct cdevsw {
     int             (*d_sgtty)();
 };
 
-extern struct cdevsw    cdevsw[];
+extern struct cdevsw    cdevsw[NCHRDEV];
 
 #define MAJOR(num) ((uchar)((num>>8)&0xFF))
 #define MINOR(num) ((uchar)((num)&0xFF))

@@ -4,6 +4,7 @@
 #include <proc.h>
 
 #include <buf.h>
+#include <tty.h>
 #include <conf.h>
 #include <hd.h>
 
@@ -16,5 +17,6 @@ struct bdevsw   bdevsw[NBLKDEV] = {
 
 struct cdevsw   cdevsw[NCHRDEV] = {
     { 0, }, /* NODEV */
+    { &nulldev, &nulldev, &tty_read, &tty_write, &nulldev}
 };
 

@@ -26,7 +26,7 @@ struct tty {
     struct qbuf    t_outq;
 };
 
-extern struct tty tty0;
+extern struct tty tty[NTTY];
 
 /* flags */
 #define TTY_CANON   0x0    /* if not raw, it's a canon */
