@@ -23,7 +23,7 @@ void main(){
     cls();
     gdt_init();         puts("* init gdt\n");
     idt_init();         puts("* init idt\n");
-    vm_init();          puts("* init vm\n");
+    mm_init();          puts("* init mm\n");
     //
     proc0_init();       puts("* init proc0\n");
     buf_init();         puts("* init buf\n");
@@ -44,14 +44,9 @@ void init(){
     int fd;
     static char buf[255] = {0, };
     do_mount(rootdev, NULL);
+    
+    do_execvp("/bin/hello", NULL);
 
-    fd = do_open("/dev/tty0", O_RDONLY);
-    while (1) {
-        printf("$ ");
-        memset(buf, 0, 127);
-        do_read(fd, buf, 127);
-        printf("%s\n", buf);
-    }
     for(;;);
 }
 

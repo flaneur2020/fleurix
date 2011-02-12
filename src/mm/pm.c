@@ -1,9 +1,20 @@
 #include <param.h>
 #include <x86.h>
-#include <proc.h>
 #include <proto.h>
-
+#include <proc.h>
+#include <unistd.h>
+//
 #include <page.h>
+#include <vm.h>
+//
+#include <buf.h>
+#include <conf.h>
+#include <hd.h>
+//
+#include <super.h>
+#include <inode.h>
+#include <file.h>
+
 
 /*
  * the map for page frames. Each physical page is associated with one reference
@@ -24,7 +35,7 @@ struct page* pgfind(uint pn){
 }
 
 /* 
- * allocate an free physical page. 
+ * allocate an free physical page. (always success)
  * get the head of the freelist, remove it and increase the refcount.
  * */ 
 struct page* pgalloc(){
@@ -63,10 +74,16 @@ int pgfree(struct page *pp){
 }
 
 /*
- * map a linear address to physical address.  
- * TODO: pgattach().
+ * map a linear address to physical address, and flush the TLB.
  * */
-int pgattach(struct pte *pgdir, struct page *pp, uint vaddr, uint flag){
+int pgattach(struct pde *pgd, uint vaddr, struct page *pp, uint flag){
+    struct pte *pte;
+
+    pte = find_pte(pgd, vaddr, 1);
+    pte->pt_off = pp->pg_num;
+    pte->pt_flag = flag;
+    lpgd(pgd);
+    return 0;
 }
 
 /* initialize pages' free list. */
@@ -75,8 +92,8 @@ int pm_init(){
     uint i, pn;
 
     // mark the reserved pages
-    // 640 - 1mb is system reserved, BIOS and blah
-    // 1mb - __kend__ is kernel reserved.
+    // 640kb ~ 1mb is system reserved, BIOS and blah
+    // 1mb ~ __kend__ is kernel reserved.
     for (pn=0; pn<3; pn++) {
         coremap[pn].pg_num = pn;
         coremap[pn].pg_flag = PG_RSVD;
@@ -87,7 +104,6 @@ int pm_init(){
         coremap[pn].pg_flag = PG_RSVD;
         coremap[pn].pg_count = 100;
     }
-
     // link all the free pages into freelist.
     ph = &pgfreelist;
     for (pn=0; pn<NPAGE; pn++) {
@@ -103,4 +119,28 @@ int pm_init(){
         ph->pg_next = pp;
         ph = pp;
     }
+}
+
+/* Map the top 4mb virtual memory as physical memory. Initiliaze
+ * the page-level allocator, set the fault handler and misc.
+ * */
+void mm_init(){
+    int pn;
+
+    // map the entire physical memory into the kernel's address space.
+    for (pn=0; pn<PMEM/(PAGE*1024); pn++) {
+        pgd0[pn].pd_off = pn << 10;
+        pgd0[pn].pd_flag = PTE_PS | PTE_P | PTE_W; // note: set it 4mb via a PTE_S
+    }
+    //
+    for (pn=PMEM/(PAGE*1024); pn<1024; pn++) {
+        pgd0[pn].pd_flag &= ~PTE_P;
+    }
+    // init physical page allocator
+    pm_init();
+    // set fault handler
+    set_hwint(0x0E, do_pgfault);
+    // load page directory and enable the MMU.
+    lpgd((uint)pgd0);
+    mmu_enable();
 }

@@ -181,6 +181,8 @@ struct inode* _namei(char *path, uchar creat, uchar parent, char **name){
     return wip;
 }
 
+/* returns NULL on error.
+ * */
 struct inode* namei(char *path, uchar creat){
     return _namei(path, creat, 0, NULL);
 }

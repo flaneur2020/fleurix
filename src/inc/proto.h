@@ -1,5 +1,7 @@
-/** */ 
+#ifndef PROTO_H
+#define PROTO_H
 
+#include <idt.h>
 #include <inode.h>
 #include <tty.h>
 
@@ -17,10 +19,8 @@ void    idt_init();
 uint    get_seg_limit(struct seg_desc *seg);
 extern  struct seg_desc     gdt[];
 
-// page.c
-uint    palloc();
-int     pfree(uint addr);
-
+// mp.c
+void do_pgfault(struct trap *tf);
 
 // timer.c
 void    do_timer();
@@ -73,3 +73,4 @@ int tty_write(struct tty *tp, char *buf, uint cnt);
 #define max(a, b) (((a)>(b))?(a):(b))
 #define min(a, b) (((a)<(b))?(a):(b))
 
+#endif

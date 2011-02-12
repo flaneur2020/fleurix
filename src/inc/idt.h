@@ -1,3 +1,6 @@
+#ifndef IDT_H
+#define IDT_H
+
 struct gate_desc {
     uint        base_lo :16;        // low address
     uint        sel     :16;        // selector
@@ -36,3 +39,4 @@ struct trap {
 
 #define PIC_EOI 0x20
 
+#endif

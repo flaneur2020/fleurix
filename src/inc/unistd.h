@@ -116,5 +116,7 @@ static inline _SYS1(int, chdir, char*);
 static inline _SYS1(int, setuid, int);
 static inline _SYS0(int, getpid);
 static inline _SYS2(int, access, char*, int);
+static inline _SYS3(int, write, int, char*, int);
+static inline _SYS3(int, open, char*, int, int);
 
 #endif

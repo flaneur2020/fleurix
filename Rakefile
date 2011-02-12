@@ -6,6 +6,7 @@ cflag  = %w{
 } * ' '
 
 mkdir_p 'bin'
+mkdir_p 'bin/usr'
 mkdir_p 'root/bin'
 mkdir_p 'root/dev'
 
@@ -37,7 +38,7 @@ task :todo do
 end
 
 task :ctags do
-  sh "ctags -R ."
+  sh "(cd src; ctags -R .)"
 end
 
 task :fsck do 
@@ -129,17 +130,38 @@ end
 
 # ----------------------------------------------------------------------
 
-usr_cfiles = Dir['usr/*.c']
-usr_ofiles = usr_cfiles.map{|fn| 'bin/'+File.basename(fn).ext('o') }
-usr_efiles = usr_cfiles.map{|fn| 'root/bin/'+File.basename(fn).ext('') }
+usr_cfiles = %w{
+  usr/hello.c
+}
+usr_ofiles = usr_cfiles.map{|fn| 'bin/usr/'+File.basename(fn).ext('o') }
+usr_efiles = usr_cfiles.map{|fn| 'bin/usr/'+File.basename(fn).ext('') }
+
+ulib_cfiles = []
+ulib_sfiles = %w{
+  usr/entry.S
+}
+ulib_ofiles = (ulib_cfiles+ulib_sfiles).map{|fn| 'bin/usr/'+File.basename(fn).ext('o') }
+
+task :ulib => ulib_ofiles
 
 task :usr => usr_efiles
 
+ulib_sfiles.each do |fn_s|
+  fn_o = 'bin/usr/'+File.basename(fn_s).ext('o')
+  file fn_o => fn_s do
+    sh "nasm -f elf -o #{fn_o} #{fn_s}"
+  end
+end
+
 usr_cfiles.each do |fn_c|
-  fn_o = 'bin/'+File.basename(fn_c).ext('o')
-  fn_e = 'root/bin/'+File.basename(fn_c).ext('')
-  file fn_e => fn_c do 
+  fn = File.basename(fn_c).ext('')
+  fn_o = 'bin/usr/'+fn.ext('o')
+  fn_e = 'bin/usr/'+fn
+  file fn_e => [fn_c, :ulib, 'tool/user.ld'] do 
     sh "gcc -c #{cinc} -nostdinc -fno-builtin #{fn_c} -o #{fn_o}"
-    sh "ld #{fn_o} -o #{fn_e} -e c -T tool/user.ld"
+    sh "ld bin/usr/entry.o #{fn_o} -o #{fn_e} -e c -T tool/user.ld"
+    sh "nm #{fn_e} > #{fn_o.ext('sym')}"
+    sh "objdump -S #{fn_e} > #{fn_e.ext('S')}"
+    sh "cp #{fn_e} root/bin/#{fn}"
   end
 end

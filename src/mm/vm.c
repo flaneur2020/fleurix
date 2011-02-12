@@ -1,12 +1,18 @@
 #include <param.h>
 #include <x86.h>
-#include <proc.h>
 #include <proto.h>
-
+#include <proc.h>
+//
 #include <page.h>
 #include <vm.h>
-
-void do_pgfault(struct trap *tf);
+//
+#include <buf.h>
+#include <conf.h>
+#include <hd.h>
+//
+#include <super.h>
+#include <inode.h>
+#include <file.h>
 
 /*
  * vm.c
@@ -22,14 +28,27 @@ struct pde pgd0[1024] __attribute__((aligned(4096)));
 
 /* --------------------------------------------------------- */
 
-struct pte* find_pte(struct pte *pgd, uint vaddr){
+/*
+ * given a page directory, find the pte where the virtual address
+ * lied in. If the 'creat' parameter is set, allocate a page as 
+ * middle page table.
+ * */
+struct pte* find_pte(struct pte *pgd, uint vaddr, uint creat){
     struct pde *pde; 
     struct pte *pt;
+    struct page *pg;
 
     pde = &pgd[PDX(vaddr)];
     if ((pde->pd_flag & PTE_P)==0) {
-        panic("no pde");
-        return NULL;
+        if (creat==0) {
+            panic("no pde");
+            return NULL;
+        }
+        pg = pgalloc();
+        pde->pd_flag = PTE_P | PTE_W;
+        pde->pd_off = pg->pg_num;
+        pt = (struct pte*)(pde->pd_off << 12);
+        memset(pt, 0, PAGE);
     }
     pt = (struct pte*)(pde->pd_off << 12);
     return &pt[PTX(vaddr)];
@@ -51,12 +70,6 @@ int vm_clone(struct vm *to, struct vm *from){
     return 0;
 }
 
-/* overlap the current address space as a new clean address space
- * which from a a.out executable image.
- * */
-int vm_new(char *path){
-}
-
 /**/
 int vm_free(){
 }
@@ -69,28 +82,3 @@ int vm_free(){
 int vm_verify(char* addr, uint size){
 }
 
-/* --------------------------------------------------- */
-
-/* Map the top 4mb virtual memory as physical memory. Initiliaze
- * the page-level allocator, set the fault handler and misc.
- * */
-void vm_init(){
-    int pn;
-
-    // map the entire physical memory into the kernel's address space.
-    for (pn=0; pn<PMEM/(PAGE*1024); pn++) {
-        pgd0[pn].pd_off = pn << 10;
-        pgd0[pn].pd_flag = PTE_PS | PTE_P | PTE_W; // note: set it 4mb via a PTE_S
-    }
-    //
-    for (pn=PMEM/(PAGE*1024); pn<1024; pn++) {
-        pgd0[pn].pd_flag &= ~PTE_P;
-    }
-    // init physical page allocator
-    pm_init();
-    // set fault handler
-    set_hwint(0x0E, do_pgfault);
-    // load page directory and enable the MMU.
-    lpgd((uint)pgd0);
-    mmu_enable();
-}

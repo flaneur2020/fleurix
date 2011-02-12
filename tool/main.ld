@@ -19,8 +19,5 @@ SECTIONS {
         *(.bss);
         . = ALIGN(4096);
     }
-    /DISCARD/ : {
-        *(.comment .pdr .note)
-    }
     __kend__ = .;
 }
