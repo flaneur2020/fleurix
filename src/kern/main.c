@@ -46,7 +46,12 @@ void init(){
     do_mount(rootdev, NULL);
 
     fd = do_open("/dev/tty0", O_RDONLY);
-    do_read(fd, buf, 127);
+    while (1) {
+        printf("$ ");
+        memset(buf, 0, 127);
+        do_read(fd, buf, 127);
+        printf("%s\n", buf);
+    }
     for(;;);
 }
 

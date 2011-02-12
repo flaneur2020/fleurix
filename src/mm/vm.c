@@ -51,11 +51,14 @@ int vm_clone(struct vm *to, struct vm *from){
     return 0;
 }
 
-/**/
-int vm_free(){
+/* overlap the current address space as a new clean address space
+ * which from a a.out executable image.
+ * */
+int vm_new(char *path){
 }
 
-int vm_new(){
+/**/
+int vm_free(){
 }
 
 /* Have a check of virtual memory area on getting a user space 

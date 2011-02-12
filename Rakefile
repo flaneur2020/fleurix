@@ -5,6 +5,12 @@ cflag  = %w{
   -finline-functions -finline-small-functions -findirect-inlining -finline-functions -finline-functions-called-once 
 } * ' '
 
+mkdir_p 'bin'
+mkdir_p 'root/bin'
+mkdir_p 'root/dev'
+
+# ----------------------------------------------------------
+
 task :default => [:bochs]
 
 task :bochs => :build do
@@ -22,7 +28,7 @@ end
 task :build => ['bin/kernel.img', :rootfs, :ctags]
 
 task :clean do
-  sh "rm -rf bin/* src/kern/entry.S .bochsout"
+  sh "rm -rf bin/* root/bin/* src/kern/entry.S .bochsout"
 end
 
 ## helpers ##
@@ -31,105 +37,42 @@ task :todo do
 end
 
 task :ctags do
-  sh "ctags -R"
+  sh "ctags -R ."
 end
 
 task :fsck do 
   sh "fsck.minix -fl ./bin/rootfs.img"
 end
 
-# 
-# the root file system aka the hard disk image, 1mb yet and ignored
-# partition
-# note: for the mounting, a root privilege is required.
-# 
-task :rootfs => ['bin/rootfs.img']
+# --------------------------------------------------------------------
+# kernel.img = boot.bin + main.bin
 
-desc 'init and copy some thing into the hard disk image.'
-file 'bin/rootfs.img' do 
-  sh "bximage bin/rootfs.img -hd -mode=flat -size=1 -q"
-  sh "mkfs.minix bin/rootfs.img"
-  mkdir_p '/tmp/fx_mnt_root'
-  `sudo umount /tmp/fx_mnt_root`
-  sh "sudo mount -o loop -t minix bin/rootfs.img /tmp/fx_mnt_root"
-  sh "sudo cp -r ./root/* /tmp/fx_mnt_root"
-  sh "sudo umount /tmp/fx_mnt_root"
-  sh "rm -rf /tmp/fx_mnt_root"
-end
-
-# 
 # the kernel image, a concat of boot image and the main binary.
-# 
 file 'bin/kernel.img' => ['bin/boot.bin', 'bin/main.bin'] do
   sh "cat bin/boot.bin bin/main.bin > bin/kernel.img"
 end
 
-# ---------------------------------------------------------------------
-#  the boot loader part
-#
+# --------------------------------------------------------------------
+# the bootloader part
+# => boot.bin
 
 file 'bin/boot.o' => ['src/boot/boot.S'] do
   sh "nasm -f elf -o bin/boot.o src/boot/boot.S"
 end
 
-file 'bin/boot.bin' => ['bin/boot.o', 'boot.ld'] do 
-  sh "ld bin/boot.o -o bin/boot.bin -e c -T boot.ld"
+file 'bin/boot.bin' => ['bin/boot.o', 'tool/boot.ld'] do 
+  sh "ld bin/boot.o -o bin/boot.bin -e c -T tool/boot.ld"
 end
 
 # ---------------------------------------------------------------------
-# mainly C part
+# kernel's C part
 # => main.bin
-# ---------------------------------------------------------------------
 
 hfiles = Dir['src/inc/*.h']
-
-cfiles = [
-  'src/lib/string.c',
-  'src/lib/bitmap.c',
-  #
-  'src/kern/sysent.c',
-  'src/kern/sys1.c',
-  'src/kern/sys2.c',
-  'src/kern/sys3.c',
-  'src/kern/sys4.c',
-  'src/kern/sched.c',
-  'src/kern/fork.c',
-  'src/kern/seg.c',
-  'src/kern/trap.c',
-  'src/kern/timer.c',
-  #
-  'src/blk/buf.c',
-  'src/blk/conf.c',
-  'src/blk/hd.c',
-  #
-  'src/chr/vga.c',
-  'src/chr/keybd.c',
-  'src/chr/tty.c',
-  #
-  'src/mm/pm.c',
-  'src/mm/vm.c',
-  'src/mm/pgfault.c',
-  'src/mm/malloc.c',
-  #
-  'src/fs/super.c',
-  'src/fs/inode.c',
-  'src/fs/mount.c',
-  'src/fs/namei.c',
-  'src/fs/rdwri.c',
-  'src/fs/rdwr.c',
-  'src/fs/open.c',
-  'src/fs/fcntl.c',
-  'src/fs/link.c',
-  'src/fs/alloc.c',
-  'src/fs/bmap.c',
-  #
-  'src/kern/main.c'
-]
-
+cfiles = Dir['src/**/*.c']
 sfiles = [
   'src/kern/entry.S'
 ]
-
 ofiles = (sfiles + cfiles).map{|fn| 'bin/'+File.basename(fn).ext('o') }
 
 cfiles.each do |fn_c|
@@ -152,8 +95,8 @@ file 'bin/main.bin' => 'bin/main.elf' do
   sh "objcopy -R .pdr -R .comment -R .note -S -O binary bin/main.elf bin/main.bin"
 end
 
-file 'bin/main.elf' => ofiles + ['main.ld'] do
-  sh "ld #{ofiles * ' '} -o bin/main.elf -e c -T main.ld"
+file 'bin/main.elf' => ofiles + ['tool/main.ld'] do
+  sh "ld #{ofiles * ' '} -o bin/main.elf -e c -T tool/main.ld"
   sh "(nm bin/main.elf | sort) > main.sym"
 end
 
@@ -162,4 +105,41 @@ file 'src/kern/entry.S' => 'src/kern/entry.S.rb' do
   sh 'ruby src/kern/entry.S.rb > src/kern/entry.S'
 end
 
+# ----------------------------------------------------------------------
+# the rootfs part. 
+# => rootfs.img
 
+# the root file system aka the hard disk image, 1mb yet and ignored
+# partition
+# note: on mounting, a root privilege is required.
+task :rootfs => ['bin/rootfs.img']
+
+# init and copy some thing into the hard disk image.
+file 'bin/rootfs.img' => [:usr] do 
+  `rm -f bin/rootfs.img`
+  sh "bximage bin/rootfs.img -hd -mode=flat -size=1 -q"
+  sh "mkfs.minix bin/rootfs.img"
+  mkdir_p '/tmp/fx_mnt_root'
+  `sudo umount /tmp/fx_mnt_root`
+  sh "sudo mount -o loop -t minix bin/rootfs.img /tmp/fx_mnt_root"
+  sh "sudo cp -r ./root/* /tmp/fx_mnt_root"
+  sh "sudo umount /tmp/fx_mnt_root"
+  sh "rm -rf /tmp/fx_mnt_root"
+end
+
+# ----------------------------------------------------------------------
+
+usr_cfiles = Dir['usr/*.c']
+usr_ofiles = usr_cfiles.map{|fn| 'bin/'+File.basename(fn).ext('o') }
+usr_efiles = usr_cfiles.map{|fn| 'root/bin/'+File.basename(fn).ext('') }
+
+task :usr => usr_efiles
+
+usr_cfiles.each do |fn_c|
+  fn_o = 'bin/'+File.basename(fn_c).ext('o')
+  fn_e = 'root/bin/'+File.basename(fn_c).ext('')
+  file fn_e => fn_c do 
+    sh "gcc -c #{cinc} -nostdinc -fno-builtin #{fn_c} -o #{fn_o}"
+    sh "ld #{fn_o} -o #{fn_e} -e c -T tool/user.ld"
+  end
+end
