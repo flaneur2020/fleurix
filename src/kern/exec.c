@@ -73,9 +73,6 @@ int do_exec(char *path, char **argv){
     vma_init(&(vm->vm_heap),  heap,  PAGE,        VMA_ZERO, NULL, NULL);
     vma_init(&(vm->vm_stack), VM_STACK, PAGE,     VMA_STACK|VMA_ZERO, NULL, NULL);
     // give a page to user stack
-    pg = pgalloc();
-    pgattach(vm->vm_pgd, VM_STACK-PAGE, pg, PTE_W|PTE_U|PTE_P);
-    //
     esp = (char*)VM_STACK;
     char *str = "hello";
     esp = upush(esp, str, strlen(str)+1);
@@ -86,6 +83,8 @@ int do_exec(char *path, char **argv){
     dump_ahead(ah);
     
     unlk_ino(ip);
+    printf("base: %x\n", vm->vm_text.v_base);
+    _retu(vm->vm_text.v_base, esp);
     return 0;
 
 _badf:

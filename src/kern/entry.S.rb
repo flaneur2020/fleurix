@@ -13,11 +13,28 @@ _spin:
     jmp _spin
 
 ;;
-;; retu(uint eip3, uint esp3)
+;; retu(uint eip, uint esp3)
 ;; return to user mode via an IRET instruction.
+;; note:  
+;;    USER_CS = 0x0B
+;;    USER_DS = 0x13
 ;; 
 [global _retu]
 _retu:
+    pop dword eax       ;; ignore the returned eip
+    pop dword eax       ;; esp3 -> eax
+    pop dword ebx       ;; eip -> ebx
+    mov ax, 0x0B 
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+    push dword 0x0B
+    push dword eax      ;; esp3
+    pushf
+    push dword 0x13
+    push dword ebx      ;; eip
+    iret
 
 ;;
 ;; on task switch
@@ -25,8 +42,8 @@ _retu:
 ;;
 [global _do_swtch]
 _do_swtch:
-    mov eax, dword [esp+4]
-    pop dword [eax]
+    mov eax, dword [esp+4]  ;; new
+    pop dword [eax]         ;; *old
     mov dword [eax+4], esp
     mov dword [eax+8], ebx
     mov dword [eax+12], ecx

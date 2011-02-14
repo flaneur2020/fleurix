@@ -17,15 +17,11 @@ void do_no_page(uint vaddr){
     char *buf;
 
     vm = &cu->p_vm;
-    printf("> do_no_page();");
     // if this page lies on the edge of user stack, grows the stack.
     if (vm->vm_stack.v_base - vaddr < PAGE) {
-        printf("%x\n", vaddr);
         vm->vm_stack.v_base -= PAGE;
         vm->vm_stack.v_size += PAGE;
         pg = pgalloc();
-        printf("vaddr: %x\n", vaddr);
-        printf("PTE_ADDR(vaddr): %x\n", PTE_ADDR(vaddr));
         pgattach(vm->vm_pgd, PTE_ADDR(vaddr), pg, PTE_U|PTE_W|PTE_P);
         return;
     }
