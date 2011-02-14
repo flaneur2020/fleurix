@@ -6,7 +6,7 @@
 #include <conf.h>
 
 /* buf bodies. */
-char buffers[NBUF][BSIZE] __attribute__((aligned(BSIZE)));
+char buffers[NBUF][BLK] __attribute__((aligned(BLK)));
 
 /* buf heads */
 struct buf   buff[NBUF];

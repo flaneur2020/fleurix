@@ -33,14 +33,14 @@ int readi(struct inode *ip, char *buf, uint off, uint cnt){
     }
     // read
     for(tot=0; tot<cnt; tot+=m, off+=m, buf+=m){
-        m = min(cnt - tot, BSIZE - off%BSIZE);
-        bn = bmap(ip, off/BSIZE, 0);
+        m = min(cnt - tot, BLK - off%BLK);
+        bn = bmap(ip, off/BLK, 0);
         if (bn == 0) {
-            memset(bp->b_data + off%BSIZE, 0, m);
+            memset(bp->b_data + off%BLK, 0, m);
         }
         else {
             bp = bread(ip->i_dev, bn);
-            memcpy(buf, bp->b_data + off%BSIZE, m);
+            memcpy(buf, bp->b_data + off%BLK, m);
             brelse(bp);
         }
     }
@@ -63,14 +63,14 @@ int writei(struct inode *ip, char *buf, uint off, uint cnt){
     }
     // do write.
     for(tot=0; tot<cnt; tot+=m, off+=m, buf+=m){
-        m = min(cnt - tot, BSIZE - off%BSIZE);
-        bn = bmap(ip, off/BSIZE, 1);
+        m = min(cnt - tot, BLK - off%BLK);
+        bn = bmap(ip, off/BLK, 1);
         if (bn==0) {
             panic("bad block.");
         }
         else {
             bp = bread(ip->i_dev, bn); // note here!
-            memcpy(bp->b_data + off%BSIZE, buf, m);
+            memcpy(bp->b_data + off%BLK, buf, m);
             bwrite(bp);
             brelse(bp);
         }

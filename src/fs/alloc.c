@@ -23,7 +23,7 @@ int balloc(ushort dev){
     sp = getsp(dev);
     for(nr=0; nr < sp->s_max_zone; nr++){
         bp = bread(dev, BMAPBLK(sp, nr));
-        r = find_bit(bp->b_data, BSIZE);
+        r = find_bit(bp->b_data, BLK);
         if (r < 0) {
             continue;
         }
@@ -68,7 +68,7 @@ int bzero(ushort dev, uint bn){
     struct buf *bp;
 
     bp = getblk(dev, bn);
-    memset(bp->b_data, 0, BSIZE);
+    memset(bp->b_data, 0, BLK);
     bwrite(bp);
     brelse(bp);
     return 0;
@@ -89,7 +89,7 @@ int ialloc(ushort dev){
     sp = getsp(dev);
     for (nr=0; nr < sp->s_max_inode; nr++){
         bp = bread(dev, IMAPBLK(sp, nr));
-        r = find_bit(bp->b_data, BSIZE);   
+        r = find_bit(bp->b_data, BLK);   
         if (r < 0) {
             continue;
         }

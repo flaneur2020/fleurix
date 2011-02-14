@@ -1,4 +1,6 @@
 /* */
+#ifndef BUF_H
+#define BUF_H
 
 struct buf {
     uint            b_flag;
@@ -51,4 +53,4 @@ extern struct buf   bfreelist;
 #define B_DIRTY     0x20
 #define B_ASYNC     0x40
 
-
+#endif

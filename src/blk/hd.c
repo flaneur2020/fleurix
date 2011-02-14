@@ -70,8 +70,8 @@ int hd_request(struct buf *bp){
 
 /* if waiting list is not empty, then take the tail, send a request 
  * for the hard disk drive and mark it active.
- * note: BSIZE = (sizeof logical block) / (sizeof disk block), so 
- * physical address = lba * BSIZE
+ * note: BLK = (sizeof logical block) / (sizeof disk block), so 
+ * physical address = lba * BLK
  * TODO: don't support two hd disk yet.
  * */
 void hd_start(){
@@ -85,11 +85,11 @@ void hd_start(){
     hdtab.d_active = 1;
     // read or write.
     if (bp->b_flag & B_READ) {
-        hd_cmd(0, HD_CMD_READ, bp->b_blkno*BSIZE/PBSIZE, BSIZE/PBSIZE);
+        hd_cmd(0, HD_CMD_READ, bp->b_blkno*BLK/PBLK, BLK/PBLK);
     }
     else {
-        hd_cmd(0, HD_CMD_WRITE, bp->b_blkno*BSIZE/PBSIZE, BSIZE/PBSIZE);
-        outsl(0x1F0, bp->b_data, BSIZE/4);
+        hd_cmd(0, HD_CMD_WRITE, bp->b_blkno*BLK/PBLK, BLK/PBLK);
+        outsl(0x1F0, bp->b_data, BLK/4);
     }
 }
 
@@ -110,7 +110,7 @@ int do_hd_intr(struct trap *tf){
     bp->av_next->av_prev = bp->av_prev;
     // read data if needed
     if (bp->b_flag & B_READ) {
-        insl(0x1F0, bp->b_data, BSIZE/4);
+        insl(0x1F0, bp->b_data, BLK/4);
     }
     iodone(bp);
     hd_start();

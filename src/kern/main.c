@@ -45,7 +45,7 @@ void init(){
     static char buf[255] = {0, };
     do_mount(rootdev, NULL);
     
-    do_execvp("/bin/hello", NULL);
+    do_exec("/bin/hello", NULL);
 
     for(;;);
 }

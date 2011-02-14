@@ -32,9 +32,13 @@ void    ltr(uint n);
 void    lldt(uint n);
 void    ljmp(ushort seg, uint offset);
 
+// mm/vm.c
+struct pte* find_pte(uint vaddr, uint creat);
+
 // drv/bio.c
 int     nodev();
 int     nulldev();
+
 
 // fs/inode.c
 struct inode* iget(ushort dev, uint num);

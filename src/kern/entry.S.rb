@@ -13,6 +13,13 @@ _spin:
     jmp _spin
 
 ;;
+;; retu(uint eip3, uint esp3)
+;; return to user mode via an IRET instruction.
+;; 
+[global _retu]
+_retu:
+
+;;
 ;; on task switch
 ;; _do_swtch(struct contxt *old, struct contxt *new);
 ;;

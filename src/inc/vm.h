@@ -7,7 +7,7 @@
  * do what it deserves. */
 struct vma {
     uint            v_flag;
-    uint            v_base;
+    uint            v_base; // must be one page aligned
     uint            v_size;
     struct inode   *v_ino;
     uint            v_ioff; // keep aligned, boy

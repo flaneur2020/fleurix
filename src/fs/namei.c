@@ -28,11 +28,11 @@ uint find_entry(struct inode* dip, char *name, uint len){
     }
     len = min(len, NAMELEN);
 
-    for(i=0; i<dip->i_size/BSIZE+1; i++){
+    for(i=0; i<dip->i_size/BLK+1; i++){
         bn = bmap(dip, i, 0);
         bp = bread(dip->i_dev, bn);
         dep = (struct dirent *)bp->b_data;
-        for(j=0; j<BSIZE/(sizeof(struct dirent))+1; j++) {
+        for(j=0; j<BLK/(sizeof(struct dirent))+1; j++) {
             if (0==strncmp(name, dep[j].d_name, len)){
                 ino = dep[j].d_ino;
                 brelse(bp);
@@ -58,11 +58,11 @@ int unlink_entry(struct inode *dip, char *name, int len){
     }
     len = min(len, NAMELEN);
 
-    for(i=0; i<dip->i_size/BSIZE+1; i++){
+    for(i=0; i<dip->i_size/BLK+1; i++){
         bn = bmap(dip, i, 0);
         bp = bread(dip->i_dev, bn);
         dep = (struct dirent *)bp->b_data;
-        for(j=0; j<BSIZE/(sizeof(struct dirent))+1; j++) {
+        for(j=0; j<BLK/(sizeof(struct dirent))+1; j++) {
             if (0==strncmp(name, dep[j].d_name, len)){
                 ino = dep[j].d_ino;
                 dep[j].d_ino = 0;

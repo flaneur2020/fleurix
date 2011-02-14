@@ -19,6 +19,8 @@
 // 
 #include <a.out.h>
 
+char* upush(char* esp, char *buf, int len);
+
 /*
  * exec.c
  *
@@ -31,8 +33,9 @@
 /* initialize a new struct vm according to an a.out executable 
  * image.
  * returns NULL on fail.
+ * TODO: ignored envp yet.
  * */
-int do_execvp(char *path, char **argv, char **envp){
+int do_exec(char *path, char **argv){
     struct inode *ip;
     struct buf *bp;
     struct ahead *ah;
@@ -74,7 +77,11 @@ int do_execvp(char *path, char **argv, char **envp){
     pgattach(vm->vm_pgd, VM_STACK-PAGE, pg, PTE_W|PTE_U|PTE_P);
     //
     esp = (char*)VM_STACK;
-    *--esp = 1;
+    char *str = "hello";
+    esp = upush(esp, str, strlen(str)+1);
+    esp = upush(esp, str, strlen(str)+1);
+    printf("esp: %x\n", esp);
+    printf("esp: %s\n", esp);
 
     dump_ahead(ah);
     
@@ -84,6 +91,14 @@ int do_execvp(char *path, char **argv, char **envp){
 _badf:
     unlk_ino(ip);
     return NULL;
+}
+
+/* push one string into the user stack. returns the new esp */
+char* upush(char* esp, char *buf, int len){
+    vm_verify(esp-len, len);
+    esp -= len;
+    memcpy(esp, buf, len);
+    return esp;
 }
 
 /* ---------------------------------------------------- */

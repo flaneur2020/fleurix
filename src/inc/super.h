@@ -48,8 +48,8 @@ extern uint max_filesiz;
 
 /* helpers */
 /* bits/inodes per block */
-#define BPB             (BSIZE*8)
-#define IPB             (BSIZE/(sizeof(struct d_inode)))
+#define BPB             (BLK*8)
+#define IPB             (BLK/(sizeof(struct d_inode)))
 /* inode number/block number to each's bitmap block.
  * note that inode number starts at 1.
  * */
