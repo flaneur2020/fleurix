@@ -5,7 +5,9 @@
 [global _start]
 [extern main]
 _start:
-    jmp main
+    call main
+_spin:
+    jmp _spin
 
 [section .data]
 [global errno]

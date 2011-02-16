@@ -87,17 +87,22 @@ int vm_free(){
  * pointer, on writing a write protected page, x86 do not raise 
  * a page fault in ring0, so simulate a write only access as 
  * what mmu does if nessary.
+ * note: on verifying kernel memory, this routine will raise a 
+ * panic.
  * */
 int vm_verify(uint vaddr, uint size){
     struct pde *pgd;
     struct pte *pte;
     struct page *pg;
-    uint off;
+    uint offset[2], off, i;
     
     if (size>PAGE || size<=0) {
         panic("vm_verify(): bad size");
     }
-    for (off=0; off<=size-1; off+=size-1) {
+    offset[0] = 0;
+    offset[1] = size-1;
+    for (i=0; i<2; i++) {
+        off = offset[i];
         pte = find_pte(vaddr+off, 1);
         if ((pte->pt_flag & PTE_P)==0) {
             do_no_page(vaddr+off);

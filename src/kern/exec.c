@@ -19,7 +19,8 @@
 // 
 #include <a.out.h>
 
-char* upush(char* esp, char *buf, int len);
+int upush(uint *esp, char *buf, int len);
+int upush_argv(uint *esp, char **argv);
 
 /*
  * exec.c
@@ -40,11 +41,11 @@ int do_exec(char *path, char **argv){
     struct buf *bp;
     struct ahead *ah;
     struct page *pg;
-    int bn;
     struct vm *vm;
     struct vma *vp;
+    uint bn, argc, esp;
     uint base, text, data, bss, heap;
-    char* esp;
+    char *argv0, **uargv;
 
     ip = namei(path, 0);
     if (ip==NULL) 
@@ -73,11 +74,15 @@ int do_exec(char *path, char **argv){
     vma_init(&(vm->vm_bss),   bss,   ah->a_bsize, VMA_ZERO, NULL, NULL);
     vma_init(&(vm->vm_heap),  heap,  PAGE,        VMA_ZERO, NULL, NULL);
     vma_init(&(vm->vm_stack), VM_STACK, PAGE,     VMA_STACK|VMA_ZERO, NULL, NULL);
-    // give a page to user stack
-    esp = (char*)VM_STACK;
-    char *str = "hello";
-    esp = upush(esp, str, strlen(str)+1);
-    esp = upush(esp, str, strlen(str)+1);
+    // push arguments to the end of user stack, which always the same address.
+    esp = VM_STACK;
+    upush(&esp, path, strlen(path)+1);
+    argv0 = esp;
+    argc = upush_argv(&esp, argv) + 1;
+    upush(&esp, &argv0, sizeof(uint));
+    uargv = esp;
+    upush(&esp, &uargv, sizeof(uint));
+    upush(&esp, &argc, sizeof(uint));
 
     brelse(bp);
     unlk_ino(ip);
@@ -91,12 +96,37 @@ _badf:
     return NULL;
 }
 
+int upush_argv(uint *esp, char **argv){
+    uint arglen, argc, i;
+    char *str, **uargv;
+
+    if (argv==NULL) {
+        return 0;
+    }
+    argc = 0;
+    arglen = 0;
+    for (i=0; (str=argv[i])!=NULL; i++) {
+        arglen += strlen(str)+1;
+        argc++;
+    }
+    arglen += sizeof(char*) * argc;
+    vm_verify(*esp-arglen, arglen);
+    uargv = *esp - arglen;
+    for (i=0; i<argc; i++){
+        str = argv[i];
+        upush(esp, str, strlen(str)+1);
+        uargv[i] = (char *) *esp;
+    }
+    *esp = uargv;
+    return argc;
+}
+
 /* push one string into the user stack. returns the new esp */
-char* upush(char* esp, char *buf, int len){
-    vm_verify(esp-len, len);
-    esp -= len;
-    memcpy(esp, buf, len);
-    return esp;
+int upush(uint *esp, char *buf, int len){
+    vm_verify(*esp-len, len);
+    *esp -= len;
+    memcpy(*esp, buf, len);
+    return 0;
 }
 
 /* ---------------------------------------------------- */

@@ -40,12 +40,14 @@ void main(){
     }
 }
 
+char *argv[] = {"abc\n", "testt\n", NULL};
+
 void init(){
     int fd;
     static char buf[255] = {0, };
     do_mount(rootdev, NULL);
     
-    do_exec("/bin/hello", NULL);
+    do_exec("/bin/hello", argv);
 
     for(;;);
 }
