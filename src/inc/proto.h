@@ -26,12 +26,16 @@ void do_pgfault(struct trap *tf);
 // timer.c
 void    do_timer();
 
-// syscall.c
+// kern/syscall.c
 void    do_syscall();
 
 void    ltr(uint n);
 void    lldt(uint n);
 void    ljmp(ushort seg, uint offset);
+
+// kern/exec.c
+uint upush(uint *esp, char *buf, int len);
+uint upush_argv(uint *esp, char **argv);
 
 // mm/vm.c
 struct pte* find_pte(uint vaddr, uint creat);

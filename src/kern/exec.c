@@ -19,9 +19,6 @@
 // 
 #include <a.out.h>
 
-int upush(uint *esp, char *buf, int len);
-int upush_argv(uint *esp, char **argv);
-
 /*
  * exec.c
  *
@@ -34,7 +31,18 @@ int upush_argv(uint *esp, char **argv);
 /* initialize a new struct vm according to an a.out executable 
  * image.
  * returns NULL on fail.
- * TODO: ignored envp yet.
+ * the user stack initialized like this:
+ *   |--------------- esp
+ *   | argc
+ *   |---------------
+ *   | argv
+ *   |---------------
+ *   | argv[0] "..."
+ *   | argv[1] "..."
+ *   | ...
+ *   | argv[n] "..."
+ *   --------------- VM_STACK
+ * note: ignored envp yet.
  * */
 int do_exec(char *path, char **argv){
     struct inode *ip;
@@ -76,14 +84,12 @@ int do_exec(char *path, char **argv){
     vma_init(&(vm->vm_stack), VM_STACK, PAGE,     VMA_STACK|VMA_ZERO, NULL, NULL);
     // push arguments to the end of user stack, which always the same address.
     esp = VM_STACK;
-    upush(&esp, path, strlen(path)+1);
-    argv0 = esp;
-    argc = upush_argv(&esp, argv) + 1;
-    upush(&esp, &argv0, sizeof(uint));
-    uargv = esp;
+    argv0 = upush(&esp, path, strlen(path)+1);
+    argc  = upush_argv(&esp, argv) + 1;
+    uargv = upush(&esp, &argv0, sizeof(uint));
     upush(&esp, &uargv, sizeof(uint));
     upush(&esp, &argc, sizeof(uint));
-
+    // never forget this:
     brelse(bp);
     unlk_ino(ip);
     // enter user mode
@@ -96,7 +102,9 @@ _badf:
     return NULL;
 }
 
-int upush_argv(uint *esp, char **argv){
+/* push strings and one array into user stack, returns a count of 
+ * argv. */
+uint upush_argv(uint *esp, char **argv){
     uint arglen, argc, i;
     char *str, **uargv;
 
@@ -122,11 +130,11 @@ int upush_argv(uint *esp, char **argv){
 }
 
 /* push one string into the user stack. returns the new esp */
-int upush(uint *esp, char *buf, int len){
-    vm_verify(*esp-len, len);
-    *esp -= len;
-    memcpy(*esp, buf, len);
-    return 0;
+uint upush(uint *esp, char *buf, int len){
+    uint tmp = *esp; // take care, *esp may overlaps *buf
+    vm_verify(tmp-=len, len);
+    memcpy(tmp, buf, len);
+    return (*esp=tmp);
 }
 
 /* ---------------------------------------------------- */
