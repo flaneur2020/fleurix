@@ -40,7 +40,7 @@ struct pte {
 #define POFF(la) ((uint)((la&0xFFF)))
 #define PPN(la)  (((uint) (la)) >> 12)
 
-#define PTE_ADDR(pte)	((uint)(pte) & ~0xFFF)
+#define PG_ADDR(addr)   ((uint)(addr) & ~0xFFF)
 
 /* CR2 stores the virtual address on which raised the page fault. 
  * error code stores inside the trap frame.

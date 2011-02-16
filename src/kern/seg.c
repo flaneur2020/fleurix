@@ -3,21 +3,6 @@
 #include <proto.h>
 #include <proc.h>
 
-/**
- *  GDT
- *  -----------
- *  0 NULL_SEG
- *  1 KERN_CS
- *  2 KERN_DS
- *  3 TSS
- *  4 LDT0
- *  5 LDT1
- *  6 LDT2
- *  7 LDT3
- *  8 ...
- *  ...
- * */
-
 struct seg_desc     gdt[NSEG] = {0, };
 struct gdt_desc     gdt_desc;
 

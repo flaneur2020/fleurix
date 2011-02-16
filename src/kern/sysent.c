@@ -26,6 +26,8 @@ static uint sys_routines[NSYSC] = {
     [NR_fork]   = &sys_fork,
     [NR_nice]   = &sys_nice,
     [NR_getpid] = &sys_getpid,
+    [NR_open]   = &sys_open,
+    [NR_write]  = &sys_write,
     &nosys,
 };
 
@@ -56,7 +58,6 @@ void do_syscall(struct trap *tf){
     int ret;
     int (*func)(struct trap *tf);
 
-    printf("syscall called\n");
     if (tf->eax > NSYSC) {
         panic("bad syscall");
     }

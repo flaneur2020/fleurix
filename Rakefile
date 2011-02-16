@@ -158,7 +158,7 @@ usr_cfiles.each do |fn_c|
   fn_o = 'bin/usr/'+fn.ext('o')
   fn_e = 'bin/usr/'+fn
   file fn_e => [fn_c, :ulib, 'tool/user.ld'] do 
-    sh "gcc -c #{cinc} -nostdinc -fno-builtin #{fn_c} -o #{fn_o}"
+    sh "gcc -c #{cinc} -nostdinc -fno-builtin -fno-stack-protector #{fn_c} -o #{fn_o}"
     sh "ld bin/usr/entry.o #{fn_o} -o #{fn_e} -e c -T tool/user.ld"
     sh "nm #{fn_e} > #{fn_o.ext('sym')}"
     sh "objdump -S #{fn_e} > #{fn_e.ext('S')}"

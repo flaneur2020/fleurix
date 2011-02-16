@@ -16,25 +16,25 @@ _spin:
 ;; retu(uint eip, uint esp3)
 ;; return to user mode via an IRET instruction.
 ;; note:  
-;;    USER_CS = 0x0B
-;;    USER_DS = 0x13
+;;    USER_CS = 0x1B
+;;    USER_DS = 0x23
 ;; 
 [global _retu]
 _retu:
     pop dword eax       ;; ignore the returned eip
-    pop dword eax       ;; esp3 -> eax
     pop dword ebx       ;; eip -> ebx
-    mov ax, 0x0B 
+    pop dword ecx       ;; esp3 -> ecx
+    mov ax, 0x23 
     mov ds, ax
     mov es, ax
     mov fs, ax
     mov gs, ax
-    push dword 0x0B
-    push dword eax      ;; esp3
-    pushf
-    push dword 0x13
+    push dword 0x23     ;; ss3
+    push dword ecx      ;; esp3
+    pushf               ;; eflags
+    push dword 0x1B     ;; cs
     push dword ebx      ;; eip
-    iret
+    iretd
 
 ;;
 ;; on task switch

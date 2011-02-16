@@ -36,16 +36,13 @@ struct gdt_desc {
 #define STS_IG      0xE     // 32-bit Interrupt Gate
 #define STS_TRG     0xF     // 32-bit Trap Gate
 
-/* 
- * selectors 
- * note: the selectors of tss & ldt reside in gdt.
- * */
-#define KERN_CS 0x08
-#define KERN_DS 0x10
-#define USER_CS (0x08|3)
-#define USER_DS (0x10|3)
+/* selectors */
+#define KERN_CS (1<<3)
+#define KERN_DS (2<<3)
+#define USER_CS ((3<<3)|3)
+#define USER_DS ((4<<3)|3)
 
 #define TSS0 5
 #define _TSS (TSS0<<3)
-#define LDT0 (TSS0+1)
+#define LDT0 6
 #define _LDT(n) ((LDT0+n)<<3)

@@ -105,6 +105,8 @@ int sys_fork    (struct trap *);
 int sys_nice    (struct trap *);
 int sys_debug   (struct trap *);
 int sys_getpid  (struct trap *);
+int sys_open    (struct trap *);
+int sys_write   (struct trap *);
 
 static inline _SYS1(int, debug, int);
 static inline _SYS1(int, close, int);

@@ -27,7 +27,7 @@ int sys_access(struct trap *tf){
     struct inode *ip;
     int r;
 
-    r = vm_verify(path, 0);
+    r = vm_verify(path, strlen(path)+1);
 
     ip = namei(path, 0);
     if (ip==NULL) {
@@ -43,7 +43,7 @@ int sys_open(struct trap *tf){
     int mode = tf->edx;
     int r;
 
-    r = vm_verify(path, 0);
+    r = vm_verify(path, strlen(path)+1);
 
     return do_open(path, flag, mode);
 }

@@ -6,7 +6,7 @@ int a = 3;
 
 int main(int argc, char **argv) {
     int fd;
-    char str[] = "hello";
+    char str[] = "hello, world\n";
 
     fd = open("/dev/tty0", O_RDONLY, 0);
     write(fd, str, sizeof(str));

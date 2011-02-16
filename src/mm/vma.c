@@ -33,7 +33,8 @@ struct vma* find_vma(uint addr){
 }
 
 /* */
-int vma_init(struct vma *vp, uint base, uint size, struct inode *ip, uint ioff){
+int vma_init(struct vma *vp, uint base, uint size, uint flag, struct inode *ip, uint ioff){
+    vp->v_flag = flag;
     vp->v_base = base;
     vp->v_size = size;
     vp->v_ino  = ip;

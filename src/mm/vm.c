@@ -45,7 +45,6 @@ struct pte* find_pte(uint vaddr, uint creat){
     pde = &pgd[PDX(vaddr)];
     if ((pde->pd_flag & PTE_P)==0) {
         if (creat==0) {
-            panic("no pde");
             return NULL;
         }
         pg = pgalloc();
@@ -72,7 +71,11 @@ int vm_clone(struct vm *to, struct vm *from){
     for (i=0; i<PMEM/(PAGE*1024); i++) {
         to->vm_pgd[i] = from->vm_pgd[i];
     }
-    // TODO
+    // 
+    for (i=PMEM/(PAGE*1024); i<1024; i++) {
+        to->vm_pgd[i] = from->vm_pgd[i];
+        to->vm_pgd[i].pd_flag &= ~PTE_W;
+    }
     return 0;
 }
 

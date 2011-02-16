@@ -4,6 +4,7 @@
 #include <idt.h>
 #include <inode.h>
 #include <tty.h>
+#include <vm.h>
 
 // tty.c
 void    tty_init();
@@ -34,6 +35,7 @@ void    ljmp(ushort seg, uint offset);
 
 // mm/vm.c
 struct pte* find_pte(uint vaddr, uint creat);
+int vma_init(struct vma *vp, uint base, uint size, uint flag, struct inode *ip, uint ioff);
 
 // drv/bio.c
 int     nodev();

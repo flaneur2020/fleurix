@@ -13,7 +13,7 @@ void do_no_page(uint vaddr){
     struct vm *vm;
     struct vma *vma;
     struct page *pg;
-    uint bn;
+    uint off, flag;
     char *buf;
 
     vm = &cu->p_vm;
@@ -22,7 +22,7 @@ void do_no_page(uint vaddr){
         vm->vm_stack.v_base -= PAGE;
         vm->vm_stack.v_size += PAGE;
         pg = pgalloc();
-        pgattach(vm->vm_pgd, PTE_ADDR(vaddr), pg, PTE_U|PTE_W|PTE_P);
+        pgattach(vm->vm_pgd, PG_ADDR(vaddr), pg, PTE_U|PTE_W|PTE_P);
         return;
     }
     // else
@@ -34,19 +34,20 @@ void do_no_page(uint vaddr){
     // demand zero
     if (vma->v_flag & VMA_ZERO) {
         pg = pgalloc();
-        pgattach(vm->vm_pgd, PTE_ADDR(vaddr), pg, PTE_U|PTE_W|PTE_P);
-        memset(PG_ADDR(pg), 0, PAGE);
+        pgattach(vm->vm_pgd, PG_ADDR(vaddr), pg, PTE_U|PTE_W|PTE_P);
+        memset(PG_ADDR(vaddr), 0, PAGE);
         return;
     }
     // demand file
     if (vma->v_flag & VMA_MMAP) {
         pg = pgalloc();
-        pgattach(vm->vm_pgd, PTE_ADDR(vaddr), pg, PTE_U|PTE_W|PTE_P);
+        flag = PTE_U|PTE_P;
+        flag |= (vma->v_flag & VMA_RDONLY)? 0:PTE_W;
+        pgattach(vm->vm_pgd, PG_ADDR(vaddr), pg, flag);
         // fill this new-allocated page
-        buf = PG_ADDR(pg);
-        for(bn=0; bn<PAGE/BLK; bn++) {
-            readi(vma->v_ino, buf, bn*BLK, BLK);
-        }
+        buf = PG_ADDR(vaddr);
+        off = buf - PG_ADDR(vm->vm_entry);
+        readi(vma->v_ino, buf, off, PAGE);
         return;
     }
     // segmentation fault
@@ -68,24 +69,22 @@ void do_wp_page(uint vaddr){
  * the common handler of all page faults, as a dispatcher.
  * */
 void do_pgfault(struct trap *tf){
-    uint cr2;
+    uint addr;
 
-    asm volatile("movl %%cr2, %0":"=a"(cr2));
+    asm volatile("movl %%cr2, %0":"=a"(addr));
     // invalid page
-    if (tf->err_code & PFE_P) {
-        do_no_page(cr2);
+    if ((tf->err_code & PFE_P)==0) {
+        do_no_page(addr);
         return;
     }
     // write procted page
     if (tf->err_code & PFE_W) {
-        do_wp_page(cr2);
+        do_wp_page(addr);
         return;
     }
     // TODO: raise a signal here, hence segmention fault.
     if (tf->err_code & PFE_U) {
-        panic("user bad mem access.");
     }
-    printf("page fault: %x \nerr_code %x\n", cr2, tf->err_code);
     panic("~");
 }
 

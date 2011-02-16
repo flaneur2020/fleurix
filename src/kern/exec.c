@@ -67,6 +67,7 @@ int do_exec(char *path, char **argv){
     heap = bss  + ah->a_bsize;
     // initialize all the VMAs
     vm = &cu->p_vm;
+    vm->vm_entry = ah->a_entry;
     vma_init(&(vm->vm_text),  text,  ah->a_tsize, VMA_MMAP, ip, text-base);
     vma_init(&(vm->vm_data),  data,  ah->a_dsize, VMA_MMAP, ip, data-base);
     vma_init(&(vm->vm_bss),   bss,   ah->a_bsize, VMA_ZERO, NULL, NULL);
@@ -77,17 +78,15 @@ int do_exec(char *path, char **argv){
     char *str = "hello";
     esp = upush(esp, str, strlen(str)+1);
     esp = upush(esp, str, strlen(str)+1);
-    printf("esp: %x\n", esp);
-    printf("esp: %s\n", esp);
 
-    dump_ahead(ah);
-    
+    brelse(bp);
     unlk_ino(ip);
-    printf("base: %x\n", vm->vm_text.v_base);
-    _retu(vm->vm_text.v_base, esp);
+    // enter user mode
+    _retu(vm->vm_entry, esp);
     return 0;
 
 _badf:
+    brelse(bp);
     unlk_ino(ip);
     return NULL;
 }

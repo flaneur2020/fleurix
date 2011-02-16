@@ -24,6 +24,7 @@ struct vma {
  * */
 struct vm {
     struct pde  *vm_pgd;
+    uint         vm_entry;
     struct vma   vm_area[0];  // trick here, treat the fields downblow as an array.
     struct vma   vm_text;
     struct vma   vm_data;

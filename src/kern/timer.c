@@ -58,7 +58,6 @@ void do_timer(struct trap *tf){
     if (cu->p_cpu+1 <= 127) {
         cu->p_cpu++;
     }
-
     // per second
     if (tick % HZ ==0){
         sched_cpu();
