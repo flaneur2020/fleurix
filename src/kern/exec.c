@@ -105,7 +105,8 @@ _badf:
 /* push strings and one array into user stack, returns a count of 
  * argv. */
 uint upush_argv(uint *esp, char **argv){
-    uint arglen, argc, i;
+    uint arglen, argc;
+    int i;
     char *str, **uargv;
 
     if (argv==NULL) {
@@ -120,7 +121,7 @@ uint upush_argv(uint *esp, char **argv){
     arglen += sizeof(char*) * argc;
     vm_verify(*esp-arglen, arglen);
     uargv = *esp - arglen;
-    for (i=0; i<argc; i++){
+    for (i=argc-1; i>=0; i--){
         str = argv[i];
         upush(esp, str, strlen(str)+1);
         uargv[i] = (char *) *esp;
