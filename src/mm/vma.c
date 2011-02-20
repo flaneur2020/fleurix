@@ -40,3 +40,5 @@ int vma_init(struct vma *vp, uint base, uint size, uint flag, struct inode *ip, 
     vp->v_ino  = ip;
     vp->v_ioff = ioff;
 }
+
+

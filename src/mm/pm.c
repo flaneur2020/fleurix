@@ -127,16 +127,7 @@ int pm_init(){
 void mm_init(){
     int pn;
 
-    // map the entire physical memory into the kernel's address space, via 4mb big pages
-    for (pn=0; pn<PMEM/(PAGE*1024); pn++) {
-        pgd0[pn].pd_off = pn << 10;
-        pgd0[pn].pd_flag = PTE_PS | PTE_P | PTE_W; // note: set it 4mb via a PTE_PS
-    }
-    // all the rest pde are user's land.
-    for (pn=PMEM/(PAGE*1024); pn<1024; pn++) {
-        pgd0[pn].pd_off = 0;
-        pgd0[pn].pd_flag = PTE_U;
-    }
+    pgd_init(pgd0);
     // init physical page allocator
     pm_init();
     // set fault handler
