@@ -15,6 +15,11 @@
 #include <inode.h>
 #include <file.h>
 
+/* pm.c
+ * this file implies some routines on the allocation, free, and modification of 
+ * physical pages(.aka page frames).
+ * */
+
 
 /*
  * the map for page frames. Each physical page is associated with one reference

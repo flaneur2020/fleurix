@@ -45,8 +45,9 @@ void do_no_page(uint vaddr){
         flag |= (vma->v_flag & VMA_RDONLY)? 0:PTE_W;
         pgattach(vm->vm_pgd, PG_ADDR(vaddr), pg, flag);
         // fill this new-allocated page
+        // hint: vaddr is *ALWAYS* greater than or equal with vma->v_base
         buf = PG_ADDR(vaddr);
-        off = buf - PG_ADDR(vm->vm_entry);
+        off = buf - vma->v_base + vma->v_ioff;
         readi(vma->v_ino, buf, off, PAGE);
         return;
     }

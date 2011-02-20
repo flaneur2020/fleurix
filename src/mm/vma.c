@@ -16,7 +16,7 @@
 
 
 /*
- * find the vma where the vaddr lied in,
+ * find the vma where the vaddr lied in, mainly called on do_no_page() or do_wp_page().
  * returns NULL on fail.
  * */
 struct vma* find_vma(uint addr){
@@ -39,6 +39,9 @@ int vma_init(struct vma *vp, uint base, uint size, uint flag, struct inode *ip, 
     vp->v_size = size;
     vp->v_ino  = ip;
     vp->v_ioff = ioff;
+    vp->v_count = 1;
 }
 
+int vma_free(struct vma *vp){
+}
 
