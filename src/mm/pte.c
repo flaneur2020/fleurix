@@ -84,11 +84,11 @@ int pgd_init(struct pde *pgd){
     }
 }
 
-/* copy the page tables of a range of virtual memory, and set both 
- * pte's flag. 
+/* copy the page tables of a range of virtual memory of the current process
+ * , and set both pte's flag. 
  * note: on Copy On Write, both parent and child process will be marked 
- * write-protected, and increase the reference count of each shared page 
- * frame. 
+ * write-protected, and increase the reference count of each shared physical 
+ * page. 
  * */
 int pgd_copy(struct pde *pgd, uint base, uint size, uint flag){
     struct pde *pde;

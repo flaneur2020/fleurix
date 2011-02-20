@@ -23,16 +23,17 @@
 /* --------------------------------------------------------- */
 
 /*
- * Clone the kernel's address space first. 
+ * Clone the kernel's address space first, the only way on
+ * initializing a struct vm.
  * */
-int vm_clone(struct vm *to, struct vm *from){
+int vm_clone(struct vm *to){
     int i;
     struct vma *vp;
 
     to->vm_pgd = (struct pde*)kmalloc(PAGE);
     // clone kernel's address space
     pgd_init(to->vm_pgd);
-    // clone user's
+    // clone user's, aka for each VMA.
     for (i=0; i<NVMA; i++) {
         vp = &(cu->p_vm.vm_area[i]);
         pgd_copy(to->vm_pgd, vp->v_base, vp->v_size, PTE_P|PTE_U); // turn off both's PTE_W

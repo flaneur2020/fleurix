@@ -87,8 +87,8 @@ struct proc* kspawn(void (*func)()){
             p->p_ofile[fd] = fp;
         }
     }
-    // share kernel's address space.
-    vm_clone(&p->p_vm, &cu->p_vm);
+    // clone kernel's address space.
+    vm_clone(&p->p_vm);
     p->p_contxt.eip = func;
     p->p_contxt.esp = (uint)p+PAGE;
     p->p_stat = SRUN;
@@ -101,7 +101,7 @@ struct proc* kspawn(void (*func)()){
  * space, hence fork() just returns to _hwint_ret(in entry.S.rb),
  * and initialize a kernel stack just as intrrupt occurs here.
  * */
-int copy_proc(struct trap *tf){
+int do_fork(struct trap *tf){
     struct proc *p;
     struct trap *ntf;
 

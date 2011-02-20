@@ -19,7 +19,7 @@ int sys_debug(struct trap *tf){
 }
 
 int sys_fork(struct trap *tf){
-    int ret = copy_proc(tf);
+    int ret = do_fork(tf);
     if (ret<0){
         panic("bad fork()\n");
     }

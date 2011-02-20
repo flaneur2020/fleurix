@@ -126,18 +126,18 @@ int pm_init(){
     }
 }
 
-/* Map the top 4mb virtual memory as physical memory. Initiliaze
- * the page-level allocator, set the fault handler and misc.
+/* Map the top 128mb virtual memory as physical memory. Initiliaze
+ * the page-level allocator, setup the fault handler, enable paging 
+ * and misc.
  * */
 void mm_init(){
-    int pn;
-
+    // init kernel's address space
     pgd_init(pgd0);
     // init physical page allocator
     pm_init();
     // set fault handler
     set_hwint(0x0E, do_pgfault);
     // load page directory and enable the MMU.
-    lpgd((uint)pgd0);
+    lpgd(pgd0);
     mmu_enable();
 }

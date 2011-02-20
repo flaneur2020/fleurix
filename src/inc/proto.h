@@ -38,6 +38,7 @@ uint upush(uint *esp, char *buf, int len);
 uint upush_argv(uint *esp, char **argv);
 
 // mm/vm.c
+int vm_clone(struct vm *to);
 struct pte* find_pte(uint vaddr, uint creat);
 int vma_init(struct vma *vp, uint base, uint size, uint flag, struct inode *ip, uint ioff);
 
