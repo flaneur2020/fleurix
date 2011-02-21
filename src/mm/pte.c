@@ -99,7 +99,7 @@ int pgd_copy(struct pde *pgd, uint base, uint size, uint flag){
     for (pdn=PPN(base)/1024; pdn<PPN(base+size)/1024; pdn++){
         pde = &(cu->p_vm.vm_pgd[pdn]);
         if (pde->pd_flag & PTE_P) {
-            old_pt = (struct pte*)(pde->pd_off << 12);
+            old_pt = (struct pte*)(pde->pd_off * PAGE);
             new_pt = (struct pte*)kmalloc(PAGE);
             pgd[pdn].pd_off = PPN(new_pt);
             pgd[pdn].pd_flag = PTE_U | PTE_W | PTE_P;
@@ -108,7 +108,7 @@ int pgd_copy(struct pde *pgd, uint base, uint size, uint flag){
                 new_pt[pn].pt_flag = flag;
                 old_pt[pn].pt_flag = flag; // note: old PTE is also modified.
                 // increase page's ref count
-                pg = pgfind(pdn*1024+pn);
+                pg = pgfind(old_pt[pn].pt_off);
                 pg->pg_count++;
             }
         }

@@ -2,7 +2,7 @@
 #include <file.h>
 #include <unistd.h>
 
-int i;
+int a=3;
 
 int strlen(char *str) {
     char* sp;
@@ -15,9 +15,10 @@ int main(int argc, char **argv) {
     char str[] = "hello, world\n";
 
     fd = open("/dev/tty0", O_RDONLY, 0);
-    for (i=0; i<argc;i++) {
-        write(fd, "\n", 1);
-        write(fd, argv[i], strlen(argv[i]));
+    if (fork()) {
+        while(a) 
+            write(fd, "0", 1);
     }
+    while(a);
     return 0;
 }

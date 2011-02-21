@@ -16,8 +16,6 @@
 
 /*
  * vm.c
- *
- *
  * */
 
 /* --------------------------------------------------------- */
@@ -36,7 +34,9 @@ int vm_clone(struct vm *to){
     // clone user's, aka for each VMA.
     for (i=0; i<NVMA; i++) {
         vp = &(cu->p_vm.vm_area[i]);
-        pgd_copy(to->vm_pgd, vp->v_base, vp->v_size, PTE_P|PTE_U); // turn off both's PTE_W
+        if (vp->v_flag != 0) {
+            pgd_copy(to->vm_pgd, vp->v_base, vp->v_size, PTE_P|PTE_U); // turn off both's PTE_W
+        }
     }
     return 0;
 }
@@ -70,5 +70,36 @@ int vm_verify(uint vaddr, uint size){
         }
     }
     return 0;
+}
+
+/* ------------------------------------------------------------------------- */
+
+/*
+ * find the vma where the vaddr lied in, mainly called on do_no_page() or do_wp_page().
+ * returns NULL on fail.
+ * */
+struct vma* find_vma(uint addr){
+    struct vma* vma;
+    struct vma* vp;
+    //
+    vma = cu->p_vm.vm_area;
+    for (vp=&vma[0]; vp<&vma[NVMA]; vp++) {
+        if (addr >= vp->v_base && addr < vp->v_base+vp->v_size) {
+            return vp;
+        }
+    }
+    return NULL;
+}
+
+/* */
+int vma_init(struct vma *vp, uint base, uint size, uint flag, struct inode *ip, uint ioff){
+    vp->v_flag = flag;
+    vp->v_base = base;
+    vp->v_size = size;
+    vp->v_ino  = ip;
+    vp->v_ioff = ioff;
+}
+
+int vma_free(struct vma *vp){
 }
 

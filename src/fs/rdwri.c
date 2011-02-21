@@ -16,7 +16,7 @@
  * */
 
 /* 
- * read data from inode.
+ * read data from a locked inode.
  * returns -1 on error.
  * */
 int readi(struct inode *ip, char *buf, uint off, uint cnt){

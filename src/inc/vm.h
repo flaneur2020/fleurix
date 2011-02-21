@@ -11,7 +11,6 @@ struct vma {
     uint            v_size; // 
     struct inode   *v_ino;
     uint            v_ioff; // keep block aligned
-    uint            v_count;
 };
 
 #define VMA_RDONLY  0x1 // read only 

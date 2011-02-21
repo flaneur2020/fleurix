@@ -32,11 +32,10 @@ struct page pgfreelist;
 
 /* returns the page struct via a physical page number. */
 struct page* pgfind(uint pn){
-    int nr;
-    if (nr<0 || nr>=NPAGE ) {
-        panic("bad page number.");
+    if (pn<0 || pn>=NPAGE ) {
+        panic("pgfind(): bad page number.");
     }
-    return &coremap[nr];
+    return &coremap[pn];
 }
 
 /* 

@@ -48,7 +48,9 @@ void do_no_page(uint vaddr){
         // hint: vaddr is *ALWAYS* greater than or equal with vma->v_base
         buf = PG_ADDR(vaddr);
         off = buf - vma->v_base + vma->v_ioff;
+        lock_ino(vma->v_ino);
         readi(vma->v_ino, buf, off, PAGE);
+        unlk_ino(vma->v_ino);
         return;
     }
     // segmentation fault
@@ -63,7 +65,24 @@ void do_no_page(uint vaddr){
  * else allocate one page and associate inside the page table. 
  * */
 void do_wp_page(uint vaddr){
-    panic("do_wp_page();");
+    struct pte *pte;
+    struct page *pg;
+    char *old_page, *new_page;
+
+    pte = find_pte(vaddr, 0);
+    pg = pgfind(pte->pt_off);
+    if (pg->pg_count > 1) {
+        old_page = (char*)(pg->pg_num * PAGE);
+        new_page = (char*)kmalloc(PAGE);
+        memcpy(new_page, old_page, PAGE);
+        pte->pt_off = PPN(new_page);
+        pte->pt_flag |= PTE_W;
+        lpgd(cu->p_vm.vm_pgd);
+    }
+    else if (pg->pg_count==1) {
+        pte->pt_flag |= PTE_W;
+        lpgd(cu->p_vm.vm_pgd);
+    }
 }
 
 /*
