@@ -13,8 +13,8 @@
 
 int sys_nice(struct trap *tf){
     int n = tf->ebx & 0xff;
-    if (n > 20) n = 20;
-    if (n<-19) n=-19;
+    if (n > 20) n = 40;
+    if (n < -39) n = -39;
 }
 
 int sys_getpid(struct trap *tf){

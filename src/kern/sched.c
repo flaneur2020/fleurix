@@ -63,7 +63,7 @@ void sched_cpu(){
     for(i=0;i<NPROC;i++){
         if ((p=proc[i])) {
             p->p_cpu /= 2;
-            if (p->p_pri>PUSER) {
+            if (p->p_pri > PUSER) {
                 setpri(p);
             }
         }
@@ -81,24 +81,19 @@ void swtch(){
 
     // clear the re-schedule flag
     runrun = 0;
-
-    // re-caculate cu's p_pri
-    setpri(cu);
-
     // find the proc
     for(i=0;i<NPROC;i++){
         if ((p=proc[i]) && (p->p_stat==SRUN)) {
-            if (p->p_pri < n){
+            if (p->p_pri <= n){
                 n = p->p_pri;
                 np = p;
-            }   
+            }
         }
     }
     if (np==NULL){
         n = proc[0]->p_pri;
         np = proc[0];
     }
-    //debug_proc_list();
     if (np!=cu) {
         swtch_to(np);
     }

@@ -15,10 +15,13 @@ int main(int argc, char **argv) {
     char str[] = "hello, world\n";
 
     fd = open("/dev/tty0", O_RDONLY, 0);
-    if (fork()) {
-        while(a) 
-            write(fd, "0", 1);
+    if (fork()==0) {
+        while(1) write(fd, "2", 1);
     }
-    while(a);
+    else {
+        while(1) write(fd, "1", 1);
+        //while(1) write(fd, "1", 1);
+    }
+    while(1);
     return 0;
 }

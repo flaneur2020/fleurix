@@ -87,6 +87,7 @@ int do_write(int fd, char *buf, int cnt){
         // TODO
     case S_IFCHR:
         r = tty_write(&tty[MINOR(ip->i_dev)], buf, cnt);
+        break;
     case S_IFDIR:
     case S_IFREG:
     default:

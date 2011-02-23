@@ -66,10 +66,10 @@ struct bucket *bkalloc(){
     uint page, page_end;
 
     if (bkfreelist.bk_next == NULL) {
-        cli();
         bh = &bkfreelist;
         page = kbrk();
         page_end = page + PAGE;
+        cli();
         for (bk = (struct bucket *)page; (uint)bk < page_end; bk++) {
             bh->bk_next = bk;
             bk->bk_next = NULL;

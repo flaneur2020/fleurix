@@ -173,7 +173,7 @@ void hwint_common(struct trap *tf) {
     // and make sure only swtch on returning to user mode,
     // thus to keep the kernel nonpremtive.
     setpri(cu);
-    if (runrun && (tf->cs & 3)==RING3) {
+    if ((tf->cs & 3)==RING3) {
         swtch();
     }
 }

@@ -80,14 +80,14 @@ int pgfree(struct page *pp){
 /*
  * map a linear address to physical address, and flush the TLB.
  * */
-int pgattach(struct pde *pgd, uint vaddr, struct page *pp, uint flag){
+struct pte* pgattach(struct pde *pgd, uint vaddr, struct page *pp, uint flag){
     struct pte *pte;
 
     pte = find_pte(vaddr, 1);
     pte->pt_off = pp->pg_num;
     pte->pt_flag = flag;
     lpgd(pgd);
-    return 0;
+    return pte;
 }
 
 /* initialize pages' free list. */

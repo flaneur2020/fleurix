@@ -47,7 +47,7 @@ int find_pid(){
  * ease here for the fact that trap occured in the kernel space do 
  * not refering the esp in TSS.
  *
- * This initialized a struct proc, and replaced the body of fork().  
+ * returns a pointer to the newly borned proc, one page size(with the kernel stack).
  * */
 struct proc* kspawn(void (*func)()){
     uint nr;
@@ -70,8 +70,8 @@ struct proc* kspawn(void (*func)()){
     p->p_ppid = cu->p_pid;
     p->p_flag = cu->p_flag;
     p->p_cpu  = cu->p_cpu;
-    p->p_pri  = cu->p_pri;
     p->p_nice = cu->p_nice;
+    p->p_pri  = PUSER;
     //
     p->p_uid  = cu->p_uid;
     p->p_gid  = cu->p_gid;
@@ -89,6 +89,7 @@ struct proc* kspawn(void (*func)()){
     }
     // clone kernel's address space.
     vm_clone(&p->p_vm);
+    p->p_contxt = cu->p_contxt;
     p->p_contxt.eip = func;
     p->p_contxt.esp = (uint)p+PAGE;
     p->p_stat = SRUN;

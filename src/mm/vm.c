@@ -35,6 +35,7 @@ int vm_clone(struct vm *to){
     for (i=0; i<NVMA; i++) {
         vp = &(cu->p_vm.vm_area[i]);
         if (vp->v_flag != 0) {
+            to->vm_area[i] = *vp;
             pgd_copy(to->vm_pgd, vp->v_base, vp->v_size, PTE_P|PTE_U); // turn off both's PTE_W
         }
     }

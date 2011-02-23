@@ -60,7 +60,7 @@ struct pte* find_pte(uint vaddr, uint creat){
         pde->pd_off = pg->pg_num;
         pt = (struct pte*)(pde->pd_off << 12);
         memset(pt, 0, PAGE);
-        lpgd(pgd);
+        flmmu();
     }
     pt = (struct pte*)(pde->pd_off << 12);
     return &pt[PTX(vaddr)];
@@ -116,3 +116,7 @@ int pgd_copy(struct pde *pgd, uint base, uint size, uint flag){
     return 0;
 }
 
+/* flush the TLB */
+void flmmu(){
+    lpgd(cu->p_vm.vm_pgd);
+}
