@@ -36,7 +36,7 @@ void main(){
     //
     kspawn(&init);
     for(;;){
-        sti();
+        sti(); 
         printf("0");
         swtch();
     }

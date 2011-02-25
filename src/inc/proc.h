@@ -4,6 +4,7 @@
 #include <inode.h>
 #include <file.h>
 #include <vm.h>
+#include <sig.h>
 
 /* the regs saved in a task switch. */
 struct contxt {
@@ -36,6 +37,8 @@ struct proc {
     uint                p_chan;         /* the event channel which proc is awaiting */
     uint                p_error;        /* return error code */
     uint                p_umask;        /* umask for files */
+    uint                p_sig;          /* a bitmap of the recieved signals of current proc */
+    sigfunc_t           p_signal[NSIG]; /* signal handlers */
     struct inode       *p_cdir;         /* current working dir */
     struct file        *p_ofile[NOFILE];/* file desciptors of the current opened files */
     struct contxt       p_contxt;       /* - */

@@ -138,4 +138,3 @@ int find_bit(char *bm, int size){
     }
     return -1;
 }
-
