@@ -34,12 +34,6 @@ struct bucket bktab[] = {
 
 struct bucket bkfreelist = {0, };
 
-uint kbrk(){
-    struct page *pp;
-    pp = pgalloc();
-    return pp->pg_num << 12;
-}
-
 /* ---------------------------------------------------------- */
 
 inline int bkslot(int size){
@@ -59,15 +53,19 @@ inline int bkslot(int size){
 }
 
 /* 
- * Allocate one bucket. All buckets are 
+ * Allocate one bucket. All free buckets are cached in one free list,
+ * if no free bucket, allocate one page and divide it into buckets.
  * */
 struct bucket *bkalloc(){
     struct bucket *bk, *bh;
+    struct page *pg;
     uint page, page_end;
 
+    // no free bucket, allocate one page and divide it into buckets
     if (bkfreelist.bk_next == NULL) {
         bh = &bkfreelist;
-        page = kbrk();
+        pg = pgalloc();
+        page = pg->pg_num*PAGE;
         page_end = page + PAGE;
         cli();
         for (bk = (struct bucket *)page; (uint)bk < page_end; bk++) {
@@ -77,12 +75,13 @@ struct bucket *bkalloc(){
         }
         sti();
     }
-    // take the head.
+    // got free bucket, take the head.
     bk = bkfreelist.bk_next;
     bkfreelist.bk_next = bk->bk_next;
     return bk;
 }
 
+/* free one bucket back to the free list. */
 int bkfree(struct bucket *bk){
     cli();
     bk->bk_next = bkfreelist.bk_next;
@@ -93,9 +92,11 @@ int bkfree(struct bucket *bk){
 int bkinit(struct bucket *bk, int size){
     uint page;
     int i;
+    struct page *pg;
     struct bkentry *beh, *be;
 
-    page = kbrk(); 
+    pg = pgalloc();
+    page = (pg->pg_num)*PAGE;
     bk->bk_page = page;
     bk->bk_size = size;
     bk->bk_entry = beh = (struct bkentry *)page;
@@ -117,8 +118,8 @@ int bkinit(struct bucket *bk, int size){
 void* kmalloc(uint size){
     struct bucket *bk, *bh;
     struct bkentry *be, *beh;
+    struct page *pg;
     int sn, i;
-    uint page;
 
     sn = bkslot(size);
     if (sn < 0) {
@@ -127,6 +128,12 @@ void* kmalloc(uint size){
     
     bk = bh = &bktab[sn];
     size = bh->bk_size;
+    // special case for one page size
+    if (size==PAGE) {
+        pg = pgalloc();
+        return (void*)(pg->pg_num * PAGE);
+    }
+    // normal case:
 _find:
     // tranverse each bucket
     while((bk = bk->bk_next) != NULL){
@@ -151,6 +158,7 @@ _find:
 int kfree(void* addr, uint size){
     int sn;
     uint page;
+    struct page *pg;
     struct bucket *bh, *bk;
     struct bkentry *be;
 
@@ -158,11 +166,18 @@ int kfree(void* addr, uint size){
     if (sn < 0) {
         panic("kfree(): bad size");
     }
-    page = PPN(addr) << 12;
+    page = PPN(addr) * PAGE;
     
     bk = bh = &bktab[sn];
     size = bh->bk_size;
     be = (struct bkentry *)addr;
+    // special case for one page size
+    if (size==PAGE) {
+        pg = pgfind(PPN(addr));
+        pgfree(pg);
+        return 0;
+    }
+    // normal case
     while((bk = bk->bk_next) != NULL) {
         if (bk->bk_page == page) {
             be->bke_next = bk->bk_entry;

@@ -115,7 +115,7 @@ int do_fork(struct trap *tf){
 }
 
 /* TODO: do_exit(). */
-int do_exit(){
+int do_exit(int *ret){
 }
 
 /* ----------------------------------------------------------- */

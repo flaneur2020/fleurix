@@ -20,9 +20,11 @@ int issig(){
     uint n, sig;
 
     sig = cu->p_sig;
+    if (sig==0) 
+        return 0;
     for (n=0; n<32; n++) {
         if (sig & (1<<n)) {
-            if (cu->p_sigal[n]!=SIG_IGN) 
+            if (cu->p_signal[n]!=SIG_IGN) 
                 return n;
         }
     }
@@ -37,9 +39,6 @@ int issig(){
  * */
 int psig(uint sig){
     cu->p_sig &= ~(1<<sig);
-}
-
-int exit() {
 }
 
 /* ----------------------------------------------------- */
