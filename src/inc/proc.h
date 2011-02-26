@@ -53,8 +53,8 @@ extern struct proc *cu;
 extern uint runrun; 
 
 /* stat codes */
-#define SSLEEP      1           // sleeping on high priority
-#define SWAIT       2           // sleeping on low  priority
+#define SSLEEP      1           // sleeping on high priority (unitterruptible)
+#define SWAIT       2           // sleeping on low  priority (interruptible)
 #define SRUN        3           // running
 #define SZOMB       4           // proc is being terminated
 #define SSTOP       5           // proc is being traced

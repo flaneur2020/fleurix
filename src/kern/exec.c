@@ -56,18 +56,23 @@ int do_exec(char *path, char **argv){
     char *argv0, **uargv;
 
     ip = namei(path, 0);
-    if (ip==NULL) 
+    if (ip==NULL) {
+        syserr(ENOENT);
         goto _badf;
+    }
     // read the first block of file to get the a.out header.
     bn = bmap(ip, 0, 0);
     if (bn == 0) {
+        syserr(EINVAL);
         goto _badf;
     }
     bp = bread(ip->i_dev, bn);
     ah = (struct ahead*)bp->b_data;
     // check this a.out header.
-    if (ah->a_magic != NMAGIC) 
+    if (ah->a_magic != NMAGIC) {
+        syserr(EINVAL);
         goto _badf;
+    }
     // 
     base = ah->a_entry - sizeof(struct ahead); // note: keep alignment
     text = ah->a_entry;
@@ -77,11 +82,11 @@ int do_exec(char *path, char **argv){
     // initialize all the VMAs
     vm = &cu->p_vm;
     vm->vm_entry = ah->a_entry;
-    vma_init(&(vm->vm_text),  text,  ah->a_tsize, VMA_MMAP | VMA_RDONLY | VMA_PRIVATE, ip, text-base);
-    vma_init(&(vm->vm_data),  data,  ah->a_dsize, VMA_MMAP | VMA_PRIVATE, ip, data-base);
-    vma_init(&(vm->vm_bss),   bss,   ah->a_bsize, VMA_ZERO | VMA_PRIVATE, NULL, NULL);
-    vma_init(&(vm->vm_heap),  heap,  PAGE,        VMA_ZERO | VMA_PRIVATE, NULL, NULL);
-    vma_init(&(vm->vm_stack), VM_STACK, PAGE,     VMA_STACK | VMA_ZERO | VMA_PRIVATE, NULL, NULL);
+    vma_init(&(vm->vm_text),  text,  ah->a_tsize, VMA_MMAP | VMA_RDONLY | VMA_PRIVATE, ip->i_dev, ip->i_num, text-base);
+    vma_init(&(vm->vm_data),  data,  ah->a_dsize, VMA_MMAP | VMA_PRIVATE, ip->i_dev, ip->i_num, data-base);
+    vma_init(&(vm->vm_bss),   bss,   ah->a_bsize, VMA_ZERO | VMA_PRIVATE, NULL, NULL, NULL);
+    vma_init(&(vm->vm_heap),  heap,  PAGE,        VMA_ZERO | VMA_PRIVATE, NULL, NULL, NULL);
+    vma_init(&(vm->vm_stack), VM_STACK, PAGE,     VMA_STACK | VMA_ZERO | VMA_PRIVATE, NULL, NULL, NULL);
     // push arguments to the end of user stack, which always the same address.
     esp = VM_STACK;
     argv0 = upush(&esp, path, strlen(path)+1);
@@ -91,7 +96,7 @@ int do_exec(char *path, char **argv){
     upush(&esp, &argc, sizeof(uint));
     // never forget this:
     brelse(bp);
-    unlk_ino(ip);
+    iput(ip);
     // enter user mode
     _retu(vm->vm_entry, esp);
     return 0;

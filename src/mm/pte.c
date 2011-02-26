@@ -120,7 +120,7 @@ int pt_copy(struct pde *pgd, uint base, uint size, uint flag){
     return 0;
 }
 
-/* free the page tables of a range of virtual memory. */
+/* decrease all the pages' reference count, and free the page tables. */
 int pt_free(struct pde *pgd, uint base, uint size){
     struct pde *pde;
     struct pte *pte, *pt;

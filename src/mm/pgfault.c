@@ -14,6 +14,7 @@ void do_no_page(uint vaddr){
     struct vma *vp;
     struct pte *pte;
     struct page *pg;
+    struct inode *ip;
     uint off, flag;
     char *buf;
 
@@ -47,9 +48,12 @@ void do_no_page(uint vaddr){
         // hint: vaddr is *ALWAYS* greater than or equal with vp->v_base
         buf = PG_ADDR(vaddr);
         off = buf - vp->v_base + vp->v_ioff;
-        lock_ino(vp->v_ino);
-        readi(vp->v_ino, buf, off, PAGE);
-        unlk_ino(vp->v_ino);
+        ip = iget(vp->v_dev, vp->v_ino);
+        if (ip==NULL) {
+            panic("do_no_page(): bad ino.");
+        }
+        readi(ip, buf, off, PAGE);
+        iput(ip);
         pte->pt_flag &= ~(vp->v_flag&VMA_RDONLY? 0:PTE_W);
         flmmu();
         return;

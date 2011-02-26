@@ -114,8 +114,22 @@ int do_fork(struct trap *tf){
     return p->p_pid;
 }
 
-/* TODO: do_exit(). */
-int do_exit(int *ret){
+/* terminate the currenct proccess into ZOMBIE.
+ * TODO:
+ * */
+int do_exit(int ret){
+    struct file *fp;
+    uint fd;
+    // close all the opened files
+    for (fd=0; fd<NOFILE; fd++){
+        fp = cu->p_ofile[fd];
+        if (fp != NULL) {
+            do_close(fd);
+        }
+    }
+    // free the VM
+    vm_free(&cu->p_vm);
+    return 0;
 }
 
 /* ----------------------------------------------------------- */
