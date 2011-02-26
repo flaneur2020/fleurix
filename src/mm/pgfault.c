@@ -81,6 +81,7 @@ void do_wp_page(uint vaddr){
         pte = find_pte(vaddr, 0);
         pg = pgfind(pte->pt_off);
         if (pg->pg_count > 1) {
+            pg->pg_count--; //decrease the reference count of the old page.
             old_page = (char*)(pg->pg_num * PAGE);
             new_page = (char*)kmalloc(PAGE);
             memcpy(new_page, old_page, PAGE);

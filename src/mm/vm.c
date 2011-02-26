@@ -36,14 +36,29 @@ int vm_clone(struct vm *to){
         vp = &(cu->p_vm.vm_area[i]);
         if (vp->v_flag != 0) {
             to->vm_area[i] = *vp;
-            pgd_copy(to->vm_pgd, vp->v_base, vp->v_size, PTE_P|PTE_U); // turn off both's PTE_W
+            pt_copy(to->vm_pgd, vp->v_base, vp->v_size, PTE_P|PTE_U); // turn off both's PTE_W
         }
     }
     return 0;
 }
 
-/* */
+/* free all the pages used in this process, deallocate all the 
+ * page tables, and finally free the pgd.
+ * TODO: debug this.
+ * */
 int vm_free(struct vm *vm){
+    struct vma *vp;
+    int i;
+
+    for (i=0; i<NVMA; i++) {
+        vp = &vm->vm_area[i];
+        if (vp->v_flag != 0) {
+            pt_free(vm->vm_pgd, vp->v_base, vp->v_size);
+            vp->v_flag = 0;
+        }
+    }
+    kfree(vm->vm_pgd);
+    return 0;
 }
 
 /* Have a check of virtual memory area on getting a user space 

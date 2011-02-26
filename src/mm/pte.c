@@ -90,12 +90,16 @@ int pgd_init(struct pde *pgd){
  * write-protected, and increase the reference count of each shared physical 
  * page. 
  * */
-int pgd_copy(struct pde *pgd, uint base, uint size, uint flag){
+int pt_copy(struct pde *pgd, uint base, uint size, uint flag){
     struct pde *pde;
     struct pte *pte, *old_pt, *new_pt;
     struct page *pg;
     uint pdn, pn;
 
+    if (base<KMEM_END) {
+        panic("pt_copy(): bad memory");
+    }
+    //
     for (pdn=PPN(base)/1024; pdn<PPN(base+size)/1024; pdn++){
         pde = &(cu->p_vm.vm_pgd[pdn]);
         if (pde->pd_flag & PTE_P) {
@@ -107,10 +111,31 @@ int pgd_copy(struct pde *pgd, uint base, uint size, uint flag){
                 new_pt[pn].pt_off = old_pt[pn].pt_off;
                 new_pt[pn].pt_flag = flag;
                 old_pt[pn].pt_flag = flag; // note: old PTE is also modified.
-                // increase page's ref count
+                // increase this page's ref count
                 pg = pgfind(old_pt[pn].pt_off);
                 pg->pg_count++;
             }
+        }
+    }
+    return 0;
+}
+
+/* free the page tables of a range of virtual memory. */
+int pt_free(struct pde *pgd, uint base, uint size){
+    struct pde *pde;
+    struct pte *pte, *pt;
+    struct page *pg;
+    uint pdn, pn;
+
+    for (pdn=PPN(base)/1024; pdn<PPN(base+size)/1024; pdn++) {
+        pde = &pgd[pdn];
+        if (pde->pd_flag & PTE_P) {
+            pt = (struct pte*)(pde->pd_off * PAGE);
+            for(pn=0; pn<1024; pn++) {
+                pg = pgfind(pt[pn].pt_off);
+                pgfree(pg); // decrease each page's reference count.
+            }
+            kfree(pt);
         }
     }
     return 0;

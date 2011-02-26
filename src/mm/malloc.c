@@ -113,7 +113,8 @@ int bkinit(struct bucket *bk, int size){
 
 /* 
  * kmalloc().
- * 
+ * one page size is special considered, for no need to arrange
+ * any bucket. which symmeties in kfree.
  * */
 void* kmalloc(uint size){
     struct bucket *bk, *bh;
@@ -167,7 +168,7 @@ int kfree(void* addr, uint size){
         panic("kfree(): bad size");
     }
     page = PPN(addr) * PAGE;
-    
+    //
     bk = bh = &bktab[sn];
     size = bh->bk_size;
     be = (struct bkentry *)addr;
