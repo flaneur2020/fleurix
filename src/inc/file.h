@@ -4,7 +4,8 @@
 #include <inode.h>
 
 struct file {
-    char            f_flag;
+    char            f_oflag;
+    char            f_fdflag; // only one FD_CLOEXEC by default.
     char            f_count;
     uint            f_offset;
     struct inode   *f_ino;
@@ -12,7 +13,7 @@ struct file {
 
 extern struct file file[NFILE];
 
-/* open/fcntl */
+/* flags in open/fcntl */
 #define O_ACCMODE	0x3
 
 #define O_RDONLY	0x0     // read only

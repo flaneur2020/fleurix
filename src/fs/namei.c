@@ -120,14 +120,14 @@ struct inode* _namei(char *path, uchar creat, uchar parent, char **name){
     char* tmp;
 
     // if path starts from root
-    // note if p_cdir==NULL, it's an early initialized process, 
+    // note if p_wdir==NULL, it's an early initialized process, 
     // set it's root directory here.
     if (*path == '/') {
         wip = iget(rootdev, ROOTINO);
-        cu->p_cdir = wip;
+        cu->p_wdir = wip;
     }
     else {
-        cdp = cu->p_cdir;
+        cdp = cu->p_wdir;
         wip = iget(cdp->i_dev, cdp->i_num);
     }
 

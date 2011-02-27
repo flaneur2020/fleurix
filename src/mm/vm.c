@@ -43,8 +43,8 @@ int vm_clone(struct vm *to){
 }
 
 /* free all the pages used in this process, deallocate all the 
- * page tables, and finally free the pgd.
- * TODO: debug this.
+ * page tables, 
+ * note: this routin will *NOT* free the pgd.
  * */
 int vm_free(struct vm *vm){
     struct vma *vp;
@@ -55,10 +55,12 @@ int vm_free(struct vm *vm){
         if (vp->v_flag != 0) {
             pt_free(vm->vm_pgd, vp->v_base, vp->v_size);
             vp->v_flag = 0;
-            iput(vp->v_ino);
+            vp->v_base = 0;
+            vp->v_size = 0;
+            if (vp->v_ino)
+                iput(vp->v_ino);
         }
     }
-    kfree(vm->vm_pgd);
     return 0;
 }
 

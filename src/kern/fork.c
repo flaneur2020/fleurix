@@ -78,8 +78,11 @@ struct proc* kspawn(void (*func)()){
     p->p_ruid = cu->p_ruid;
     p->p_rgid = cu->p_rgid;
     // increase the reference count of inodes, and dup files
-    p->p_cdir = cu->p_cdir;
-    p->p_cdir->i_count++;
+    p->p_wdir = cu->p_wdir;
+    p->p_wdir->i_count++;
+    p->p_iroot = cu->p_iroot;
+    p->p_iroot->i_count++;
+    // dup the files.
     for (fd=0; fd<NOFILE; fd++){
         fp = cu->p_ofile[fd];
         if (fp != NULL) {
@@ -117,16 +120,20 @@ int do_fork(struct trap *tf){
 /* terminate the currenct proccess into ZOMBIE.
  * TODO:
  * */
-int do_exit(int ret){
+int do_exit(int err){
     struct file *fp;
     uint fd;
-    // close all the opened files
+
+    cu->p_error = err;
+    // close all the opened files, and iput the directories.
     for (fd=0; fd<NOFILE; fd++){
         fp = cu->p_ofile[fd];
         if (fp != NULL) {
             do_close(fd);
         }
     }
+    iput(cu->p_wdir);
+    iput(cu->p_iroot);
     // free the VM
     vm_free(&cu->p_vm);
     return 0;

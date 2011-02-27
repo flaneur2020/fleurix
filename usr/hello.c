@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
     int fd;
     char str[] = "hello, world\n";
 
-    fd = open("/dev/tty0", O_RDONLY, 0);
+    fd = 1;
     for (i=0; i<argc;i++) {
         write(fd, "\n", 1);
         write(fd, argv[i], strlen(argv[i]));

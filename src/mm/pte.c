@@ -132,10 +132,12 @@ int pt_free(struct pde *pgd, uint base, uint size){
         if (pde->pd_flag & PTE_P) {
             pt = (struct pte*)(pde->pd_off * PAGE);
             for(pn=0; pn<1024; pn++) {
-                pg = pgfind(pt[pn].pt_off);
+                pte = &pt[pn];
+                pte->pt_flag &= ~PTE_P;
+                pg = pgfind(pte->pt_off);
                 pgfree(pg); // decrease each page's reference count.
             }
-            kfree(pt);
+            kfree(pt, PAGE);
         }
     }
     return 0;

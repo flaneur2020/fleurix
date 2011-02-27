@@ -52,6 +52,8 @@ _found:
     if (dev==rootdev) {
         rootsp = sp;
     }
+    if (ip!=NULL) 
+        ip->i_count++;
     sp->s_imnt = ip;
     unlk_sp(sp);
     return 0;

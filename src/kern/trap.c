@@ -150,24 +150,29 @@ void lidt(struct idt_desc idtd){
 void hwint_common(struct trap *tf) {
     void (*func)(struct trap *tf);
 
-    func = hwint_routines[tf->int_no]; 
-    // trap
+    // save the current trap frame
+    if ((tf->cs & 3)==RING3) {
+        cu->p_trap = tf; 
+    }
+    func = hwint_routines[tf->int_no];
     if (tf->int_no < 32) {
-        if (func){
-            func(tf);
-        }
-        else {
+        // trap
+        if (func==NULL){
             printf("hwint_common: unhandled exception: %s \n", fault_str[tf->int_no]);
-            debug_regs(tf);
+            dump_tf(tf);
             for(;;);
         }
+        func(tf);
     }
-    // irq, syscall and blah~
     else {
+        // irq, syscall
+        irq_eoi(tf->int_no);
         if (func)
             func(tf);
-        irq_eoi(tf->int_no);
     }
+    // on signal
+    if (issig())
+        psig();
     // on sheduling 
     // if the re-schedule flag is set, make an task swtch.
     // and make sure only swtch on returning to user mode,
@@ -184,7 +189,7 @@ void set_hwint(int nr, void (*func)(struct trap *tf)){
 
 /***********************************************************************************/
 
-void debug_regs(struct trap *tf){
+void dump_tf(struct trap *tf){
     printf("gs = %x, fs = %x, es = %x, ds = %x\n", tf->gs, tf->fs, tf->es, tf->ds);
     printf("edi = %x, esi = %x, ebp = %x \n",tf->edi, tf->esi, tf->ebp);
     printf("ebx = %x, edx = %x, ecx = %x, eax = %x \n",tf->ebx, tf->edx, tf->ecx, tf->eax);

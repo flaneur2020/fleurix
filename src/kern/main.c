@@ -37,7 +37,6 @@ void main(){
     kspawn(&init);
     for(;;){
         sti(); 
-        printf("0");
         swtch();
     }
 }
@@ -48,7 +47,14 @@ void init(){
     int fd;
     static char buf[255] = {0, };
     do_mount(rootdev, NULL);
-    
+    cu->p_iroot = cu->p_wdir;
+    cu->p_iroot->i_count++;
+    do_open("/dev/tty0", O_RDWR, 0); //stdin
+    do_dup(0); // stdout
+    do_dup(0); // stderr
+    do_fcntl(0, F_SETFD, 0); // turn off FD_CLOEXEC
+    do_fcntl(1, F_SETFD, 0);
+    do_fcntl(2, F_SETFD, 0);
     do_exec("/bin/test_fork", argv);
 
     for(;;);

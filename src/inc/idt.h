@@ -19,7 +19,7 @@ struct idt_desc {
 
 struct trap {
     int        gs, fs, es, ds;                             /* pushed the segs last */
-    int        edi, esi, ebp, _esp, ebx, edx, ecx, eax;    /* pushed by 'pusha' */
+    int        edi, esi, ebp, _esp, ebx, edx, ecx, eax;    /* pushed by 'pusha', note the esp here is ignored. */
     int        int_no, err_code;                           /* our 'push byte #' and ecodes do this */
     int        eip, cs, eflags, esp, ss;                   /* pushed by the processor automatically */ 
 } __attribute__((packed));

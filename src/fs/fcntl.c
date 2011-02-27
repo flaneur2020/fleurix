@@ -36,12 +36,15 @@ int do_fcntl(int fd, uint cmd, uint arg){
         case F_DUPFD:
             return do_dup(fd);
         case F_GETFL:
-            return fp->f_flag;
+            return fp->f_oflag;
         case F_SETFL:
-            fp->f_flag = arg;
+            fp->f_oflag = arg;
             return 0;
         case F_GETFD:
+            return fp->f_fdflag;
         case F_SETFD:
+            fp->f_fdflag = arg;
+            return 0;
         case F_GETLK:
         case F_SETLK:
         case F_SETLKW:

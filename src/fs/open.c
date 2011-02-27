@@ -59,7 +59,8 @@ int do_open(char *path, uint flag, uint mode){
         itrunc(ip);
     }
     unlk_ino(ip);
-    fp->f_flag = flag;
+    fp->f_oflag = flag;
+    fp->f_fdflag = FD_CLOEXEC;
     fp->f_ino = ip;
     return fd;
 }
@@ -87,7 +88,7 @@ int do_close(int fd){
     fp->f_count--;
     if (fp->f_count <= 0) {
         fp->f_count = 0;
-        fp->f_flag = 0;
+        fp->f_oflag = 0;
         fp->f_offset = 0;
     }
     return 0;
@@ -153,7 +154,7 @@ struct file* falloc(int fd){
             fp->f_count = 1;
             cu->p_ofile[fd] = fp;
             fp->f_offset = 0;
-            fp->f_flag = 0;
+            fp->f_oflag = 0;
             return fp;
         }
     }

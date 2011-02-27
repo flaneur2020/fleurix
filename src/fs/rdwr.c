@@ -30,7 +30,7 @@ int do_read(int fd, char *buf, int cnt){
         return -1;
     }
     // on write only
-    if (fp->f_flag & O_WRONLY) {
+    if (fp->f_oflag & O_WRONLY) {
         syserr(EBADF);
         return -1;
     }
@@ -68,12 +68,12 @@ int do_write(int fd, char *buf, int cnt){
         return -1;
     }
     // on read only
-    if (fp->f_flag & O_RDONLY) {
+    if (fp->f_oflag & O_RDONLY) {
         syserr(EBADF);
         return -1;
     }
     //
-    if (fp->f_flag & O_APPEND) {
+    if (fp->f_oflag & O_APPEND) {
         off = fp->f_ino->i_size;
     }
     else {

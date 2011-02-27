@@ -12,29 +12,6 @@ puts %{
 _spin:
     jmp _spin
 
-;;
-;; retu(uint eip, uint esp3)
-;; return to user mode via an IRET instruction.
-;; note:  
-;;    USER_CS = 0x1B
-;;    USER_DS = 0x23
-;; 
-[global _retu]
-_retu:
-    pop dword eax       ;; ignore the returned eip
-    pop dword ebx       ;; eip -> ebx
-    pop dword ecx       ;; esp3 -> ecx
-    mov ax, 0x23 
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
-    push dword 0x23     ;; ss3
-    push dword ecx      ;; esp3
-    pushf               ;; eflags
-    push dword 0x1B     ;; cs
-    push dword ebx      ;; eip
-    iretd
 
 ;;
 ;; on task switch
@@ -65,6 +42,38 @@ _do_swtch:
     ret
 
 ;;
+;; retu(uint eip, uint esp3)
+;; return to user mode via an IRET instruction.
+;; note:  
+;;    USER_CS = 0x1B
+;;    USER_DS = 0x23
+;; 
+[global _retu]
+_retu:
+    pop dword eax       ;; ignore the returned eip
+    pop dword ebx       ;; eip -> ebx
+    pop dword ecx       ;; esp3 -> ecx
+    mov ax, 0x23 
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+    push dword 0x23     ;; ss3
+    push dword ecx      ;; esp3
+    pushf               ;; eflags
+    push dword 0x1B     ;; cs
+    push dword ebx      ;; eip
+    iretd
+
+;; retsys(struct trap *tf)
+[global _retsys]
+_retsys:
+    pop  dword ecx
+    add  ecx, 4
+    mov  esp, ecx
+    jmp  _hwint_ret
+
+;;
 ;; entry to trap handlers
 ;; 
 
@@ -90,10 +99,10 @@ _hwint_common_stub:
     mov ds, ax
     mov es, ax
     mov eax, esp
-    push eax                        ; esp is just the pointer to struct regs *.
+    push eax                        ; esp is just the pointer to struct trap *.
     mov eax, hwint_common           ; calls hwint_common() in C
     call eax
-    pop eax                         ; esp ignored
+    pop eax
 _hwint_ret:
     pop dword gs
     pop dword fs

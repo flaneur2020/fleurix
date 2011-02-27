@@ -116,7 +116,7 @@ void do_pgfault(struct trap *tf){
     // TODO: raise a signal here, hence segmention fault.
     if (tf->err_code & PFE_U) {
     }
-    debug_regs(tf);
+    dump_tf(tf);
     panic("~");
 }
 

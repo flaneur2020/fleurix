@@ -51,7 +51,8 @@ int do_exec(char *path, char **argv){
     struct page *pg;
     struct vm *vm;
     struct vma *vp;
-    uint bn, argc, esp;
+    struct file *fp;
+    uint bn, fd, argc, esp;
     uint base, text, data, bss, heap;
     char *argv0, **uargv;
 
@@ -79,8 +80,10 @@ int do_exec(char *path, char **argv){
     data = text + ah->a_tsize;
     bss  = data + ah->a_dsize;
     heap = bss  + ah->a_bsize;
-    // initialize all the VMAs
+    // dettach the previous address space, and initialize a new one
     vm = &cu->p_vm;
+    vm_free(vm);
+    pgd_init(vm->vm_pgd);
     vm->vm_entry = ah->a_entry;
     vma_init(&(vm->vm_text),  text,  ah->a_tsize, VMA_MMAP | VMA_RDONLY | VMA_PRIVATE, ip, text-base);
     vma_init(&(vm->vm_data),  data,  ah->a_dsize, VMA_MMAP | VMA_PRIVATE, ip, data-base);
@@ -94,6 +97,13 @@ int do_exec(char *path, char **argv){
     uargv = upush(&esp, &argv0, sizeof(uint));
     upush(&esp, &uargv, sizeof(uint));
     upush(&esp, &argc, sizeof(uint));
+    // close all the file descriptors with FD_CLOEXEC
+    for (fd=0; fd<NOFILE; fd++) {
+        fp = cu->p_ofile[fd];
+        if (fp!=NULL && (fp->f_fdflag & FD_CLOEXEC)) {
+            do_close(fd);
+        }
+    }
     // never forget this:
     brelse(bp);
     iput(ip);

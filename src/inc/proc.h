@@ -24,6 +24,7 @@ struct contxt {
 struct proc {
     char                p_stat;
     char                p_flag;
+    uint                p_chan;         /* the event channel which proc is awaiting */
     int                 p_pri;          /* on shedule */
     int                 p_cpu;          /* - */
     int                 p_nice;         /* - */
@@ -34,15 +35,16 @@ struct proc {
     uint                p_gid;          /* effective gid */
     uint                p_ruid;         /* real uid */
     uint                p_rgid;         /* real gid */
-    uint                p_chan;         /* the event channel which proc is awaiting */
-    uint                p_error;        /* return error code */
     uint                p_umask;        /* umask for files */
+    uint                p_error;        /* return error code */
     uint                p_sig;          /* a bitmap of the recieved signals of current proc */
     sigfunc_t           p_signal[NSIG]; /* signal handlers */
-    struct inode       *p_cdir;         /* current working dir */
+    struct inode       *p_wdir;         /* current working dir */
+    struct inode       *p_iroot;        /* the root dir */
     struct file        *p_ofile[NOFILE];/* file desciptors of the current opened files */
-    struct contxt       p_contxt;       /* - */
     struct vm           p_vm;
+    struct contxt       p_contxt;       /* - */
+    struct trap        *p_trap;         /* saved on entering kernel from user, for psig(). */
 };
 
 extern struct proc *proc[NPROC];
