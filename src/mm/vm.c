@@ -55,6 +55,7 @@ int vm_free(struct vm *vm){
         if (vp->v_flag != 0) {
             pt_free(vm->vm_pgd, vp->v_base, vp->v_size);
             vp->v_flag = 0;
+            iput(vp->v_ino);
         }
     }
     kfree(vm->vm_pgd);
@@ -107,13 +108,16 @@ struct vma* find_vma(uint addr){
     return NULL;
 }
 
-/* */
-int vma_init(struct vma *vp, uint base, uint size, uint flag, ushort dev, ushort ino, uint ioff){
+/* initialize a VMA.
+ * note that each vma is associated with one inode. */
+int vma_init(struct vma *vp, uint base, uint size, uint flag, struct inode *ip, uint ioff){
     vp->v_flag = flag;
     vp->v_base = base;
     vp->v_size = size;
-    vp->v_dev = dev;
-    vp->v_ino = ino;
     vp->v_ioff = ioff;
+    if (ip) {
+        ip->i_count++;
+        vp->v_ino = ip;
+    }
 }
 

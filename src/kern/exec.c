@@ -82,11 +82,11 @@ int do_exec(char *path, char **argv){
     // initialize all the VMAs
     vm = &cu->p_vm;
     vm->vm_entry = ah->a_entry;
-    vma_init(&(vm->vm_text),  text,  ah->a_tsize, VMA_MMAP | VMA_RDONLY | VMA_PRIVATE, ip->i_dev, ip->i_num, text-base);
-    vma_init(&(vm->vm_data),  data,  ah->a_dsize, VMA_MMAP | VMA_PRIVATE, ip->i_dev, ip->i_num, data-base);
-    vma_init(&(vm->vm_bss),   bss,   ah->a_bsize, VMA_ZERO | VMA_PRIVATE, NULL, NULL, NULL);
-    vma_init(&(vm->vm_heap),  heap,  PAGE,        VMA_ZERO | VMA_PRIVATE, NULL, NULL, NULL);
-    vma_init(&(vm->vm_stack), VM_STACK, PAGE,     VMA_STACK | VMA_ZERO | VMA_PRIVATE, NULL, NULL, NULL);
+    vma_init(&(vm->vm_text),  text,  ah->a_tsize, VMA_MMAP | VMA_RDONLY | VMA_PRIVATE, ip, text-base);
+    vma_init(&(vm->vm_data),  data,  ah->a_dsize, VMA_MMAP | VMA_PRIVATE, ip, data-base);
+    vma_init(&(vm->vm_bss),   bss,   ah->a_bsize, VMA_ZERO | VMA_PRIVATE, NULL, NULL);
+    vma_init(&(vm->vm_heap),  heap,  PAGE,        VMA_ZERO | VMA_PRIVATE, NULL, NULL);
+    vma_init(&(vm->vm_stack), VM_STACK, PAGE,     VMA_STACK | VMA_ZERO | VMA_PRIVATE, NULL, NULL);
     // push arguments to the end of user stack, which always the same address.
     esp = VM_STACK;
     argv0 = upush(&esp, path, strlen(path)+1);
@@ -103,7 +103,7 @@ int do_exec(char *path, char **argv){
 
 _badf:
     brelse(bp);
-    unlk_ino(ip);
+    iput(ip);
     return NULL;
 }
 

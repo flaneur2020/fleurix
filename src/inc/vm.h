@@ -9,8 +9,7 @@ struct vma {
     uint            v_flag;
     uint            v_base; // must be one page aligned
     uint            v_size; // must be one page aligned
-    ushort          v_dev;  // dev num of the mapped inode
-    ushort          v_ino;  // inode number
+    struct inode   *v_ino;  // inode
     uint            v_ioff; // keep block aligned
 };
 
