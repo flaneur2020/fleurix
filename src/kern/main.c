@@ -2,6 +2,7 @@
 #include <x86.h>
 #include <proto.h>
 #include <proc.h>
+#include <signal.h>
 #include <unistd.h>
 //
 #include <page.h>

@@ -44,9 +44,9 @@ int vm_clone(struct vm *to){
 
 /* free all the pages used in this process, deallocate all the 
  * page tables, 
- * note: this routin will *NOT* free the pgd.
+ * note: this routine will *NOT* free the pgd.
  * */
-int vm_free(struct vm *vm){
+int vm_clear(struct vm *vm){
     struct vma *vp;
     int i;
 
@@ -54,11 +54,12 @@ int vm_free(struct vm *vm){
         vp = &vm->vm_area[i];
         if (vp->v_flag != 0) {
             pt_free(vm->vm_pgd, vp->v_base, vp->v_size);
+            if (vp->v_ino)
+                iput(vp->v_ino);
+            vp->v_ino = NULL;
             vp->v_flag = 0;
             vp->v_base = 0;
             vp->v_size = 0;
-            if (vp->v_ino)
-                iput(vp->v_ino);
         }
     }
     return 0;

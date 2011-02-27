@@ -135,7 +135,8 @@ int do_exit(int err){
     iput(cu->p_wdir);
     iput(cu->p_iroot);
     // free the VM
-    vm_free(&cu->p_vm);
+    vm_clear(&cu->p_vm);
+    kfree(cu->p_vm.vm_pgd);
     return 0;
 }
 

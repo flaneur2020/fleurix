@@ -1,5 +1,12 @@
-#ifndef SIG_H
-#define SIG_H
+#ifndef SIGNAL_H
+#define SIGNAL_H
+
+struct sigaction{
+    void    (*sa_handler)(int);
+    uint      sa_mask;
+    int       sa_flags;
+    void    (*sa_restorer)(void);
+};
 
 #define NSIG 32
 
@@ -26,7 +33,5 @@
 
 #define SIG_DFL		((void (*)(int))0)	/* default signal handling */
 #define SIG_IGN		((void (*)(int))1)	/* ignore signal */
-
-typedef void (*sigfunc_t)(int);
 
 #endif

@@ -82,7 +82,7 @@ int do_exec(char *path, char **argv){
     heap = bss  + ah->a_bsize;
     // dettach the previous address space, and initialize a new one
     vm = &cu->p_vm;
-    vm_free(vm);
+    vm_clear(vm);
     pgd_init(vm->vm_pgd);
     vm->vm_entry = ah->a_entry;
     vma_init(&(vm->vm_text),  text,  ah->a_tsize, VMA_MMAP | VMA_RDONLY | VMA_PRIVATE, ip, text-base);
