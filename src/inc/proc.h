@@ -36,8 +36,11 @@ struct proc {
     uint                p_ruid;         /* real uid */
     uint                p_rgid;         /* real gid */
     uint                p_umask;        /* umask for files */
-    uint                p_error;        /* return error code */
-    uint                p_sig;          /* a bitmap of the recieved signals of current proc */
+    uint                p_sig;          /* a bitmap of the recieved signals */
+    uint                p_sigmask;      /* a bitmap of the blocked(masked) signals */
+    uint                p_cursig;       /* the current signal to be delivered */
+    char                p_ret;          /* the exit code */
+    uint                p_error;        /* the returned error code from a syscall. */
     struct sigaction    p_sigact[NSIG]; /* signal handlers */
     struct inode       *p_wdir;         /* current working dir */
     struct inode       *p_iroot;        /* the root dir */

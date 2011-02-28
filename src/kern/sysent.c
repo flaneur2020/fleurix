@@ -28,6 +28,7 @@ static uint sys_routines[NSYSC] = {
     [NR_getpid] = &sys_getpid,
     [NR_open]   = &sys_open,
     [NR_write]  = &sys_write,
+    [NR_exec]   = &sys_exec,
     &nosys,
 };
 

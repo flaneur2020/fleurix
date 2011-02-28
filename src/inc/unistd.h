@@ -79,6 +79,7 @@ enum {
     NR_getpid,
     NR_setuid,
     NR_chdir,
+    NR_exec,
     // on fs
     NR_access,
     NR_chown,
@@ -107,6 +108,7 @@ int sys_debug   (struct trap *);
 int sys_getpid  (struct trap *);
 int sys_open    (struct trap *);
 int sys_write   (struct trap *);
+int sys_exec    (struct trap *);
 
 static inline _SYS1(int, debug, int);
 static inline _SYS1(int, close, int);
@@ -120,5 +122,6 @@ static inline _SYS0(int, getpid);
 static inline _SYS2(int, access, char*, int);
 static inline _SYS3(int, write, int, char*, int);
 static inline _SYS3(int, open, char*, int, int);
+static inline _SYS2(int, exec, char*, char**);
 
 #endif

@@ -12,10 +12,10 @@ int strlen(char *str) {
 
 int main(int argc, char **argv) {
     int fd;
-    char str[] = "hello, world\n";
+    char str[] = "/bin/hello, world\n";
 
-    fd = 1;
-    for (i=0; i<argc;i++) {
+    write(1, str, sizeof(str));
+    for (i=0; i<argc; i++) {
         write(fd, "\n", 1);
         write(fd, argv[i], strlen(argv[i]));
     }

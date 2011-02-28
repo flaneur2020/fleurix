@@ -8,6 +8,7 @@ SECTIONS {
         bin/usr/entry.o(.text) *(.text)
         *(.rodata .gnu.linkonce.*)
         . = ALIGN(0x1000);
+        __text_end__ = .;
     }
     .data : {
         __data__ = .;

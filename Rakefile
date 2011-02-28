@@ -130,9 +130,8 @@ end
 
 # ----------------------------------------------------------------------
 
-usr_cfiles = %w{
+usr_cfiles = Dir['usr/test_*.c'] + %w{
   usr/hello.c
-  usr/test_fork.c
 }
 usr_ofiles = usr_cfiles.map{|fn| 'bin/usr/'+File.basename(fn).ext('o') }
 usr_efiles = usr_cfiles.map{|fn| 'bin/usr/'+File.basename(fn).ext('') }

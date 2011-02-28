@@ -10,6 +10,7 @@ struct sigaction{
 
 #define NSIG 32
 
+/* the list of signals */
 #define SIGHUP		 1
 #define SIGINT		 2
 #define SIGQUIT		 3

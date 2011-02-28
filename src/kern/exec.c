@@ -94,6 +94,9 @@ int do_exec(char *path, char **argv){
     esp = VM_STACK;
     argv0 = upush(&esp, path, strlen(path)+1);
     argc  = upush_argv(&esp, argv) + 1;
+    if (argc<0) {
+        panic("exec(): bad mem");
+    }
     uargv = upush(&esp, &argv0, sizeof(uint));
     upush(&esp, &uargv, sizeof(uint));
     upush(&esp, &argc, sizeof(uint));
@@ -119,9 +122,9 @@ _badf:
 
 /* push strings and one array into user stack, returns a count of 
  * argv. */
-uint upush_argv(uint *esp, char **argv){
+int upush_argv(uint *esp, char **argv){
     uint arglen, argc;
-    int i;
+    int i,r;
     char *str, **uargv;
 
     if (argv==NULL) {
@@ -134,7 +137,10 @@ uint upush_argv(uint *esp, char **argv){
         argc++;
     }
     arglen += sizeof(char*) * argc;
-    vm_verify(*esp-arglen, arglen);
+    if (vm_verify(*esp-arglen, arglen) < 0){
+        syserr(EINVAL);
+        return -1;
+    }
     uargv = *esp - arglen;
     for (i=argc-1; i>=0; i--){
         str = argv[i];
@@ -146,9 +152,11 @@ uint upush_argv(uint *esp, char **argv){
 }
 
 /* push one string into the user stack. returns the new esp */
-uint upush(uint *esp, char *buf, int len){
+int upush(uint *esp, char *buf, int len){
     uint tmp = *esp; // take care, *esp may overlaps *buf
-    vm_verify(tmp-=len, len);
+    if (vm_verify(tmp-=len, len) < 0) {
+        panic("upush(): bad mem");
+    }
     memcpy(tmp, buf, len);
     return (*esp=tmp);
 }

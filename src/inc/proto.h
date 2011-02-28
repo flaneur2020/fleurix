@@ -34,8 +34,8 @@ void    lldt(uint n);
 void    ljmp(ushort seg, uint offset);
 
 // kern/exec.c
-uint upush(uint *esp, char *buf, int len);
-uint upush_argv(uint *esp, char **argv);
+int upush(uint *esp, char *buf, int len);
+int upush_argv(uint *esp, char **argv);
 
 // mm/vm.c
 int vm_clone(struct vm *to);

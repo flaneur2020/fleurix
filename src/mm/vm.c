@@ -42,8 +42,9 @@ int vm_clone(struct vm *to){
     return 0;
 }
 
-/* free all the pages used in this process, deallocate all the 
- * page tables, 
+/* free all the pages used in this process, deallocate all the page tables, 
+ * this routine is called on freeing one task in do_exit(), or overlapping 
+ * a proc's address space on do_exec() is being called. 
  * note: this routine will *NOT* free the pgd.
  * */
 int vm_clear(struct vm *vm){
@@ -53,7 +54,7 @@ int vm_clear(struct vm *vm){
     for (i=0; i<NVMA; i++) {
         vp = &vm->vm_area[i];
         if (vp->v_flag != 0) {
-            pt_free(vm->vm_pgd, vp->v_base, vp->v_size);
+            pt_free(vm->vm_pgd, PG_ADDR(vp->v_base), vp->v_size);
             if (vp->v_ino)
                 iput(vp->v_ino);
             vp->v_ino = NULL;
@@ -69,7 +70,8 @@ int vm_clear(struct vm *vm){
  * pointer, on writing a write protected page, x86 do not raise 
  * a page fault in ring0, so simulate a write only access as 
  * what mmu does if nessary.
- * note: do not verify kernel memory.
+ * note: only use this routine before writing, be aware that do 
+ * not touch kernel memory.
  * */
 int vm_verify(uint vaddr, uint size){
     struct pde *pgd;
@@ -77,9 +79,10 @@ int vm_verify(uint vaddr, uint size){
     struct page *pg;
     uint page;
     
-    if (vaddr<KMEM_END || size<=0) {
+    if (vaddr<KMEM_END || size<0) {
         return -1;
     }
+    // special case on checking string.
     for (page=PG_ADDR(vaddr); page<=PG_ADDR(vaddr+size-1); page+=PAGE) {
         pte = find_pte(page, 1);
         if ((pte->pt_flag & PTE_P)==0) {

@@ -15,27 +15,24 @@
 
 /* ----------------------------------------------------- */
 
-/* returns a signal number, or returns 0 on no signal */
-int signum(){
-    uint n, sig;
-
-    sig = cu->p_sig;
-    if (sig==0) 
-        return 0;
-    for (n=0; n<32; n++) {
-        if (sig & (1<<n))
-            return n;
-    }
-}
-
-/* returns true if the current process has got a signal. */
+/* returns true if the current process has got a signal.
+ * on delivering the signal, clear the bit in cu->p_sig.
+ * */
 int issig(){
     uint n, sig;
     struct sigaction sa;
 
-    sig = signum();
-    if (cu->p_sigact[sig].sa_handler != SIG_IGN){
-        return sig;
+    sig = cu->p_sig;
+    if (sig==0)
+        return 0;
+    for (n=0; n<32; n++) {
+        if (sig & (1<<n)) {
+            cu->p_sig &= ~(1<<n);
+            if (cu->p_sigact[n].sa_handler == SIG_IGN)
+                return 0;
+            cu->p_cursig = n;
+            return n;
+        }
     }
     return 0;
 }
@@ -50,8 +47,10 @@ void psig(){
     uint n, ufunc, esp;
     struct trap *tf;
 
-    n = signum();
-    cu->p_sig &= ~(1<<n);
+    n = cu->p_cursig;
+    if (n==0)
+        return;
+    cu->p_cursig = 0;
     if ((ufunc=cu->p_sigact[n].sa_handler) != SIG_DFL) {
         tf = cu->p_trap;
         esp = tf->esp;
@@ -61,13 +60,25 @@ void psig(){
         _retsys(cu->p_trap);
         return;
     }
-    // on default
+    // on SIG_DFL
     do_exit(1);
 }
 
 /* ----------------------------------------------------- */
 
 int sigsend(int pid, int sig){
+    struct proc *p;
+    
+    p = proc[pid];
+    if (p==NULL || sig<0 || sig>=NSIG) 
+        return -1;
+    if (p->p_sigact[sig].sa_handler != SIG_IGN) {
+        p->p_sig |= (1<<sig);
+        if (p->p_stat == SWAIT) {
+            setrun(p);
+        }
+    }
+    return 0;
 }
 
 /* ----------------------------------------------------- */

@@ -45,6 +45,7 @@ struct pte* find_pte(uint vaddr, uint creat){
     struct pde *pde, *pgd; 
     struct pte *pt;
     struct page *pg;
+    uint pn;
 
     if (vaddr < KMEM_END) {
         panic("find_pte(): don't touch kernel's address space.");
@@ -59,7 +60,10 @@ struct pte* find_pte(uint vaddr, uint creat){
         pde->pd_flag = PTE_P | PTE_U | PTE_W;
         pde->pd_off = pg->pg_num;
         pt = (struct pte*)(pde->pd_off << 12);
-        memset(pt, 0, PAGE);
+        for (pn=0; pn<1024; pn++) {
+            pt[pn].pt_off = 0;
+            pt[pn].pt_flag = 0;
+        }
         flmmu();
     }
     pt = (struct pte*)(pde->pd_off << 12);
@@ -108,12 +112,14 @@ int pt_copy(struct pde *pgd, uint base, uint size, uint flag){
             pgd[pdn].pd_off = PPN(new_pt);
             pgd[pdn].pd_flag = PTE_U | PTE_W | PTE_P;
             for(pn=0; pn<1024; pn++) {
-                new_pt[pn].pt_off = old_pt[pn].pt_off;
-                new_pt[pn].pt_flag = flag;
-                old_pt[pn].pt_flag = flag; // note: old PTE is also modified.
-                // increase this page's ref count
-                pg = pgfind(old_pt[pn].pt_off);
-                pg->pg_count++;
+                if (old_pt[pn].pt_flag & PTE_P) {
+                    new_pt[pn].pt_off = old_pt[pn].pt_off;
+                    new_pt[pn].pt_flag = flag;
+                    old_pt[pn].pt_flag = flag; // note: old PTE is also modified.
+                    // increase this page's ref count
+                    pg = pgfind(old_pt[pn].pt_off);
+                    pg->pg_count++;
+                }
             }
         }
     }
@@ -127,15 +133,21 @@ int pt_free(struct pde *pgd, uint base, uint size){
     struct page *pg;
     uint pdn, pn;
 
+    if (base<KMEM_END) {
+        panic("pt_free(): bad memory");
+    }
+    //
     for (pdn=PPN(base)/1024; pdn<PPN(base+size)/1024; pdn++) {
         pde = &pgd[pdn];
         if (pde->pd_flag & PTE_P) {
             pt = (struct pte*)(pde->pd_off * PAGE);
             for(pn=0; pn<1024; pn++) {
                 pte = &pt[pn];
-                pte->pt_flag &= ~PTE_P;
-                pg = pgfind(pte->pt_off);
-                pgfree(pg); // decrease each page's reference count.
+                if (pte->pt_flag & PTE_P) {
+                    pte->pt_flag &= ~PTE_P;
+                    pg = pgfind(pte->pt_off);
+                    pgfree(pg); // decrease each page's reference count.
+                }
             }
             kfree(pt, PAGE);
         }
