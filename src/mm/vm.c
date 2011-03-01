@@ -13,6 +13,7 @@
 #include <super.h>
 #include <inode.h>
 #include <file.h>
+#include <a.out.h>
 
 /*
  * vm.c
@@ -63,6 +64,26 @@ int vm_clear(struct vm *vm){
             vp->v_size = 0;
         }
     }
+    return 0;
+}
+
+/* renew a adress space, called on do_exec() */
+int vm_renew(struct vm *vm, struct ahead *ah, struct inode *ip){
+    uint base, text, data, bss, heap;
+
+    base = ah->a_entry - sizeof(struct ahead); // note: keep alignment
+    text = ah->a_entry - sizeof(struct ahead);
+    data = text + ah->a_tsize;
+    bss  = data + ah->a_dsize;
+    heap = bss  + ah->a_bsize; 
+    //
+    pgd_init(vm->vm_pgd);
+    vm->vm_entry = ah->a_entry;
+    vma_init(&(vm->vm_text),  text,  ah->a_tsize, VMA_MMAP | VMA_RDONLY | VMA_PRIVATE, ip, text-base);
+    vma_init(&(vm->vm_data),  data,  ah->a_dsize, VMA_MMAP | VMA_PRIVATE, ip, data-base);
+    vma_init(&(vm->vm_bss),   bss,   ah->a_bsize, VMA_ZERO | VMA_PRIVATE, NULL, NULL);
+    vma_init(&(vm->vm_heap),  heap,  PAGE,        VMA_ZERO | VMA_PRIVATE, NULL, NULL);
+    vma_init(&(vm->vm_stack), VM_STACK, PAGE,     VMA_STACK | VMA_ZERO | VMA_PRIVATE, NULL, NULL);
     return 0;
 }
 

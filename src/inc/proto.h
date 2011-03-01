@@ -35,7 +35,7 @@ void    ljmp(ushort seg, uint offset);
 
 // kern/exec.c
 int upush(uint *esp, char *buf, int len);
-int upush_argv(uint *esp, char **argv);
+int upush_argv(uint *esp, char *path, char **argv);
 
 // mm/vm.c
 int vm_clone(struct vm *to);

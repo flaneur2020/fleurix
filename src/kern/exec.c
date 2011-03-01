@@ -74,30 +74,15 @@ int do_exec(char *path, char **argv){
         syserr(EINVAL);
         goto _badf;
     }
-    // 
-    base = ah->a_entry - sizeof(struct ahead); // note: keep alignment
-    text = ah->a_entry;
-    data = text + ah->a_tsize;
-    bss  = data + ah->a_dsize;
-    heap = bss  + ah->a_bsize;
     // dettach the previous address space, and initialize a new one
     vm = &cu->p_vm;
     vm_clear(vm);
-    pgd_init(vm->vm_pgd);
-    vm->vm_entry = ah->a_entry;
-    vma_init(&(vm->vm_text),  text,  ah->a_tsize, VMA_MMAP | VMA_RDONLY | VMA_PRIVATE, ip, text-base);
-    vma_init(&(vm->vm_data),  data,  ah->a_dsize, VMA_MMAP | VMA_PRIVATE, ip, data-base);
-    vma_init(&(vm->vm_bss),   bss,   ah->a_bsize, VMA_ZERO | VMA_PRIVATE, NULL, NULL);
-    vma_init(&(vm->vm_heap),  heap,  PAGE,        VMA_ZERO | VMA_PRIVATE, NULL, NULL);
-    vma_init(&(vm->vm_stack), VM_STACK, PAGE,     VMA_STACK | VMA_ZERO | VMA_PRIVATE, NULL, NULL);
+    vm_renew(vm, ah, ip);
     // push arguments to the end of user stack, which always the same address.
     esp = VM_STACK;
-    argv0 = upush(&esp, path, strlen(path)+1);
-    argc  = upush_argv(&esp, argv) + 1;
-    if (argc<0) {
+    argc  = upush_argv(&esp, path, argv);
+    if (argc<0)
         panic("exec(): bad mem");
-    }
-    uargv = upush(&esp, &argv0, sizeof(uint));
     upush(&esp, &uargv, sizeof(uint));
     upush(&esp, &argc, sizeof(uint));
     // close all the file descriptors with FD_CLOEXEC
@@ -122,16 +107,16 @@ _badf:
 
 /* push strings and one array into user stack, returns a count of 
  * argv. */
-int upush_argv(uint *esp, char **argv){
+int upush_argv(uint *esp, char *path, char **argv){
     uint arglen, argc;
     int i,r;
-    char *str, **uargv;
+    char *str, **uargv, **tmp;
 
     if (argv==NULL) {
         return 0;
     }
-    argc = 0;
-    arglen = 0;
+    argc = 1;
+    arglen = strlen(path)+1;
     for (i=0; (str=argv[i])!=NULL; i++) {
         arglen += strlen(str)+1;
         argc++;
@@ -141,13 +126,29 @@ int upush_argv(uint *esp, char **argv){
         syserr(EINVAL);
         return -1;
     }
+    // store the argv in temp
+    tmp    = (char**)kmalloc(PAGE);
+    tmp[0] = (char*) kmalloc(PAGE);
+    tmp[PAGE-1] = '\0';
+    strncpy(tmp[0], path, PAGE-1);
+    for(i=1; i<argc; i++) {
+        tmp[i] = (char*)kmalloc(PAGE);
+        tmp[PAGE-1] = '\0';
+        strncpy(tmp[i], argv[i], PAGE-1);
+    }
+    // push to ustack finally
     uargv = *esp - arglen;
     for (i=argc-1; i>=0; i--){
-        str = argv[i];
+        str = tmp[i];
         upush(esp, str, strlen(str)+1);
         uargv[i] = (char *) *esp;
     }
     *esp = uargv;
+    // freeing tmp
+    for(i=0; i<argc; i++){
+        kfree(tmp[i], PAGE);
+    }
+    kfree(tmp, PAGE);
     return argc;
 }
 
