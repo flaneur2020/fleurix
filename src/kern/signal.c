@@ -53,7 +53,7 @@ void psig(){
     struct sigaction *sa;
 
     n = cu->p_cursig;
-    if (n==0)
+    if (n==0 || n>NSIG)
         return;
     sa = &(cu->p_sigact[n-1]);
     // check blocked signal
@@ -61,13 +61,13 @@ void psig(){
         return 0;
     cu->p_sigmask |= sa->sa_mask;
     cu->p_cursig = 0;
-    if ((ufunc=cu->p_sigact[n-1].sa_handler) != SIG_DFL) {
+    if (sa->sa_handler != SIG_DFL) {
         tf = cu->p_trap;
         esp = tf->esp;
         upush(&esp, &tf->eip, sizeof(uint));
         upush(&esp, n, sizeof(uint));
         tf->esp = esp;
-        tf->eip = ufunc;
+        tf->eip = sa->sa_handler;
         _retsys(cu->p_trap);
         return;
     }

@@ -24,6 +24,7 @@ int main(int argc, char **argv) {
 
     sa.sa_handler = hwsig;
     if ((pid=fork())==0) {
+        sigaction(SIGINT, &sa, NULL);
         while(1) write(1, str, sizeof(str));
     }
     kill(pid, SIGINT);
