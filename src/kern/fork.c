@@ -117,39 +117,6 @@ int do_fork(struct trap *tf){
     return p->p_pid;
 }
 
-/* terminate the currenct proccess into ZOMBIE.
- * TODO:
- * */
-int do_exit(int ret){
-    struct file *fp;
-    struct proc *p;
-    uint fd, nr;
-
-    cu->p_ret = ret;
-    // make this process Zombie, give all the children to proc[1] 
-    // and tell its parent
-    cu->p_stat = SZOMB;
-    for (nr=0; nr<NPROC; nr++) {
-        if ((p=proc[nr]) && (p->p_ppid==cu->p_pid)) {
-            p->p_ppid = 1;
-            sigsend(1, SIGCHLD);
-        }
-    }
-    // close all the opened files, and iput the directories.
-    for (fd=0; fd<NOFILE; fd++){
-        fp = cu->p_ofile[fd];
-        if (fp != NULL) {
-            do_close(fd);
-        }
-    }
-    iput(cu->p_wdir);
-    iput(cu->p_iroot);
-    // free the VM
-    vm_clear(&cu->p_vm);
-    kfree(cu->p_vm.vm_pgd);
-    return 0;
-}
-
 /* ----------------------------------------------------------- */
 
 /* 

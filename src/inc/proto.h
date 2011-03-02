@@ -37,10 +37,18 @@ void    ljmp(ushort seg, uint offset);
 int upush(uint *esp, char *buf, int len);
 int upush_argv(uint *esp, char *path, char **argv);
 
+// kern/signal.c
+int sigsend(int pid, int n, int priv);
+
 // mm/vm.c
 int vm_clone(struct vm *to);
 struct pte* find_pte(uint vaddr, uint creat);
+struct vma* find_vma(uint addr);
 int vma_init(struct vma *vp, uint base, uint size, uint flag, struct inode *ip, uint ioff);
+
+// mm/malloc.c
+void* kmalloc(uint size);
+int kfree(void* addr, uint size);
 
 // drv/bio.c
 int     nodev();

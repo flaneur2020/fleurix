@@ -31,6 +31,7 @@ struct proc {
     int                 p_time;         /* on swap */
     uint                p_pid;          
     uint                p_ppid;         /* parent's pid */
+    uint                p_pgrp;         /* process group */
     uint                p_uid;          /* effective uid */
     uint                p_gid;          /* effective gid */
     uint                p_ruid;         /* real uid */
@@ -78,12 +79,15 @@ extern uint runrun;
 #define	PSWP	  (-100)
 #define	PINOD	  (-90)
 #define	PRIBIO	  (-50)
-#define PRITTY    (-45)
 #define	PPIPE	  1
+#define PRITTY    10
 #define	PWAIT	  40
 #define	PSLEP	  90
 #define	PUSER	  100
 
+/* options for waitpid, WUNTRACED not supported */
+#define WNOHANG		1
+#define WUNTRACED	2
 
 /* error codes */
 #define ERROR		99

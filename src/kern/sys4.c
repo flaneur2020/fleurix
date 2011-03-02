@@ -2,6 +2,7 @@
 #include <x86.h>
 #include <proto.h>
 #include <proc.h>
+#include <signal.h>
 
 #include <unistd.h>
 
@@ -11,25 +12,37 @@
  *
  * */
 
-int pause(struct trap *tf){
-}
-
 /* kill(int pid, int sig); */
-int kill(struct trap *tf){
+int sys_kill(struct trap *tf){
+    int pid = (int)tf->ebx;
+    int sig = (int)tf->ecx;
+    
+    return do_kill(pid, sig);
 }
 
-int signal(struct trap *tf){
+int sys_pause(struct trap *tf){
 }
 
-int wait(struct trap *tf){
+int sys_signal(struct trap *tf){
 }
 
-int alarm(struct trap *tf){
+int sys_sigaction(struct trap *tf){
+    int pid = (int) tf->ebx;
+    int sa = (struct sigaction*) tf->ecx;
+    int old_sa = (struct sigaction*)tf->edx;
+
+    return do_sigaction(pid, sa, old_sa);
+}
+
+int sys_waitpid(struct trap *tf){
+}
+
+int sys_alarm(struct trap *tf){
 }
 
 /* --------------------------- */
 
-int sync(struct trap *tf){
+int sys_sync(struct trap *tf){
     syserr(ENOSYS);
 }
 

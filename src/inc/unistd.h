@@ -9,6 +9,8 @@
 #ifndef UNISTD_H
 #define UNISTD_H
 
+#include <signal.h>
+
 #define _SYS0(T0, FN)                           \
     T0 FN(){                                    \
         register int r;                         \
@@ -80,6 +82,10 @@ enum {
     NR_setuid,
     NR_chdir,
     NR_exec,
+    // on signal
+    NR_kill,
+    NR_sigaction,
+    NR_signal,
     // on fs
     NR_access,
     NR_chown,
@@ -109,12 +115,14 @@ int sys_getpid  (struct trap *);
 int sys_open    (struct trap *);
 int sys_write   (struct trap *);
 int sys_exec    (struct trap *);
+int sys_exit    (struct trap *);
+int sys_kill    (struct trap *);
+int sys_sigaction(struct trap *);
 
 static inline _SYS1(int, debug, int);
 static inline _SYS1(int, close, int);
 static inline _SYS0(int, setup);
 static inline _SYS0(int, fork); 
-static inline _SYS1(int, exit, int); 
 static inline _SYS1(int, nice, int);
 static inline _SYS1(int, chdir, char*);
 static inline _SYS1(int, setuid, int);
@@ -123,5 +131,8 @@ static inline _SYS2(int, access, char*, int);
 static inline _SYS3(int, write, int, char*, int);
 static inline _SYS3(int, open, char*, int, int);
 static inline _SYS2(int, exec, char*, char**);
+static inline _SYS1(int, exit, int);
+static inline _SYS2(int, kill, int, int);
+static inline _SYS3(int, sigaction, int, struct sigaction*, struct sigaction*);
 
 #endif

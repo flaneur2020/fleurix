@@ -105,8 +105,8 @@ _badf:
     return NULL;
 }
 
-/* push strings and one array into user stack, returns a count of 
- * argv. */
+/* push argv into user stack, returns argc.
+ * */
 int upush_argv(uint *esp, char *path, char **argv){
     uint arglen, argc;
     int i,r;

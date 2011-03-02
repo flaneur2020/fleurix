@@ -16,7 +16,9 @@ int main(int argc, char **argv) {
 
     fd = open("/dev/tty0", O_RDONLY, 0);
     if (fork()==0) {
+        write(1, str, sizeof(str));
         exit(0);
+        write(1, str, sizeof(str));
     }
     while(1);
     return 0;

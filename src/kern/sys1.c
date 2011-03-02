@@ -46,7 +46,4 @@ int sys_exec(struct trap *tf){
 int sys_brk(struct trap *tf){
 }
 
-int sys_pause(struct trap *tf){
-}
-
 /* --------------------------------------- */

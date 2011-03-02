@@ -17,8 +17,6 @@
  * what the hardware does in user space, or it may cause corruption, 
  * even overlaps the kernel memory, be careful. 
  *
- * TODO: A verify_area() is nessary.
- *
  * */
 
 int sys_access(struct trap *tf){

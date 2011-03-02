@@ -98,6 +98,7 @@ int vm_verify(uint vaddr, uint size){
     struct pde *pgd;
     struct pte *pte;
     struct page *pg;
+    struct vma *vma;
     uint page;
     
     if (vaddr<KMEM_END || size<0) {
@@ -105,6 +106,8 @@ int vm_verify(uint vaddr, uint size){
     }
     // special case on checking string.
     for (page=PG_ADDR(vaddr); page<=PG_ADDR(vaddr+size-1); page+=PAGE) {
+        if (find_vma(page)==NULL)
+            return 0;
         pte = find_pte(page, 1);
         if ((pte->pt_flag & PTE_P)==0) {
             do_no_page(page);

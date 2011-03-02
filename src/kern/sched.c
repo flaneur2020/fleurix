@@ -13,12 +13,26 @@ uint runrun = 0;
  * TODO: race condition should consider later.
  * */
 void sleep(uint chan, int pri){
-    cli();
-    cu->p_chan = chan;
-    cu->p_pri  = pri;
-    cu->p_stat = SWAIT;
-    sti();
-    swtch();
+    if (pri < 0) {
+        cli();
+        cu->p_chan = chan;
+        cu->p_pri  = pri;
+        cu->p_stat = SSLEEP; // uninterruptible
+        sti();
+        swtch();
+    }
+    else {
+        if (issig())
+            psig();
+        cli();
+        cu->p_chan = chan;
+        cu->p_pri = pri;
+        cu->p_stat = SWAIT; // interruptible
+        sti();
+        if (issig()) 
+            psig();
+        swtch();
+    }
 }
 
 void wakeup(uint chan){
