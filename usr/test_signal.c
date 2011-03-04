@@ -11,9 +11,9 @@ int strlen(char *str) {
     return sp-str;
 }
 
-int hwsig(int n){
-    char str[] = "handled";
-    write(1, str, sizeof(str));
+int hwsig(int i){
+    char str[] = "handled\n";
+    while(1) write(1, str, sizeof(str));
     for(;;);
 }
 

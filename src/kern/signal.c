@@ -64,8 +64,8 @@ void psig(){
     if (sa->sa_handler != SIG_DFL) {
         tf = cu->p_trap;
         esp = tf->esp;
-        upush(&esp, &tf->eip, sizeof(uint));
         upush(&esp, n, sizeof(uint));
+        upush(&esp, &tf->eip, sizeof(uint));
         tf->esp = esp;
         tf->eip = sa->sa_handler;
         _retsys(cu->p_trap);
@@ -75,8 +75,8 @@ void psig(){
     do_exit(1);
 }
 
-/* ----------------------------------------------------- */
 
+/* ----------------------------------------------------- */
 int sigsend(int pid, int n, int priv){
     struct proc *p;
     

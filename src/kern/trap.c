@@ -171,7 +171,7 @@ void hwint_common(struct trap *tf) {
             func(tf);
     }
     // on signal
-    if (issig())
+    if ((tf->cs & 3) && issig())
         psig();
     // on sheduling 
     // if the re-schedule flag is set, make an task swtch.
