@@ -22,7 +22,6 @@ int do_exit(int ret){
     cu->p_ret = ret;
     // make this process Zombie, give all the children to proc[1] 
     // and tell its parent
-    cu->p_stat = SZOMB;
     cu->p_chan = 0;
     for (nr=0; nr<NPROC; nr++) {
         if ((p=proc[nr]) && (p->p_ppid==cu->p_pid)) {
@@ -49,6 +48,7 @@ int do_exit(int ret){
     // tell its parent
     sigsend(cu->p_ppid, SIGCHLD, 1);
     //
+    cu->p_stat = SZOMB;
     swtch();
     return 0;
 }

@@ -73,7 +73,7 @@ void do_wp_page(uint vaddr){
 
     vp = find_vma(vaddr);
     if (vp->v_flag & VMA_RDONLY) {
-        printf("vaddr: %x\n", vaddr);
+        printk("vaddr: %x\n", vaddr);
         panic("do_wp_page(): rdonly vma.");
         return;
     }
@@ -117,6 +117,7 @@ void do_pgfault(struct trap *tf){
     if (tf->err_code & PFE_U) {
     }
     dump_tf(tf);
+    printk("do_pgfault(): addr: %x\n", addr);
     panic("~");
 }
 

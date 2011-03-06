@@ -166,13 +166,13 @@ int upush(uint *esp, char *buf, int len){
 
 /* for debug */
 int dump_ahead(struct ahead *ah){
-    printf("sizeof(struct ahead): %x\n", sizeof(struct ahead));
-    printf("a_magic: %x\n", ah->a_magic);
-    printf("a_tsize: %x\n", ah->a_tsize);
-    printf("a_dsize: %x\n", ah->a_dsize);
-    printf("a_bsize: %x\n", ah->a_bsize);
-    printf("a_syms: %x\n", ah->a_syms);
-    printf("a_entry: %x\n", ah->a_entry);
-    printf("a_trsize: %x\n", ah->a_trsize);
-    printf("a_drsize: %x\n", ah->a_drsize);
+    printk("sizeof(struct ahead): %x\n", sizeof(struct ahead));
+    printk("a_magic: %x\n", ah->a_magic);
+    printk("a_tsize: %x\n", ah->a_tsize);
+    printk("a_dsize: %x\n", ah->a_dsize);
+    printk("a_bsize: %x\n", ah->a_bsize);
+    printk("a_syms: %x\n", ah->a_syms);
+    printk("a_entry: %x\n", ah->a_entry);
+    printk("a_trsize: %x\n", ah->a_trsize);
+    printk("a_drsize: %x\n", ah->a_drsize);
 }

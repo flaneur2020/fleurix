@@ -1,10 +1,7 @@
-/**
- *
- * macro helpers on doing syscall.
- *
- * fleurer<me.ssword@gmail.com>
- *
- * */
+/* 
+ * unistd.h - fleurer<me.ssword@gmail.com>
+ * some macro helpers on making syscall.
+ **/
 
 #ifndef UNISTD_H
 #define UNISTD_H
@@ -76,7 +73,7 @@ enum {
     NR_setup, 
     //
     NR_fork,
-    NR_exit,
+    NR__exit,
     NR_nice,
     NR_getpid,
     NR_setuid,
@@ -85,6 +82,7 @@ enum {
     // on signal
     NR_kill,
     NR_sigaction,
+    NR_sigreturn,
     NR_signal,
     // on fs
     NR_access,
@@ -115,9 +113,10 @@ int sys_getpid  (struct trap *);
 int sys_open    (struct trap *);
 int sys_write   (struct trap *);
 int sys_exec    (struct trap *);
-int sys_exit    (struct trap *);
+int sys__exit    (struct trap *);
 int sys_kill    (struct trap *);
-int sys_sigaction(struct trap *);
+int sys_sigaction (struct trap *);
+int sys_sigreturn (struct trap *);
 
 static inline _SYS1(int, debug, int);
 static inline _SYS1(int, close, int);
@@ -131,8 +130,9 @@ static inline _SYS2(int, access, char*, int);
 static inline _SYS3(int, write, int, char*, int);
 static inline _SYS3(int, open, char*, int, int);
 static inline _SYS2(int, exec, char*, char**);
-static inline _SYS1(int, exit, int);
+static inline _SYS1(int, _exit, int);
 static inline _SYS2(int, kill, int, int);
 static inline _SYS3(int, sigaction, int, struct sigaction*, struct sigaction*);
+static inline _SYS0(int, sigreturn);
 
 #endif

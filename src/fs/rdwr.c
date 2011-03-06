@@ -86,7 +86,6 @@ int do_write(int fd, char *buf, int cnt){
     case S_IFBLK:
         // TODO
     case S_IFCHR:
-        // TODO: race condition here, maybe a spin lock needed.
         r = tty_write(&tty[MINOR(ip->i_dev)], buf, cnt);
         break;
     case S_IFDIR:
@@ -100,7 +99,6 @@ int do_write(int fd, char *buf, int cnt){
     }
     fp->f_offset = off + cnt;
     unlk_ino(ip);
-    printf(" \n");
     return r;
 }
 

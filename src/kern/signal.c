@@ -10,6 +10,9 @@
 #include <file.h>
 //
 #include <signal.h>
+#include <setjmp.h>
+
+void _usigret();
 
 /* sig.c */
 
@@ -32,6 +35,9 @@ int issig(){
                 cu->p_sig &= ~(1<<(n-1));
                 return 0;
             }
+            // blocked
+            if (cu->p_sigmask & (1<<(n-1)) && n!=SIGKILL)
+                return 0;
             // normal case
             cu->p_sig &= ~(1<<(n-1));
             cu->p_cursig = n;
@@ -48,33 +54,65 @@ int issig(){
  *      psig();
  * */
 void psig(){
-    uint n, ufunc, esp;
+    uint n, ufunc, esp, usr;
     struct trap *tf;
     struct sigaction *sa;
+    struct jmp_buf jbuf, *ujbuf;
 
     n = cu->p_cursig;
     if (n==0 || n>NSIG)
         return;
     sa = &(cu->p_sigact[n-1]);
     // check blocked signal
-    if (cu->p_sigmask & (1<<(n-1)) && n!=SIGKILL)
-        return 0;
     cu->p_sigmask |= sa->sa_mask;
     cu->p_cursig = 0;
     if (sa->sa_handler != SIG_DFL) {
         tf = cu->p_trap;
+        // save registers and the old mask 
+        usigsav(&jbuf, tf);
+        jbuf.__sigmask = cu->p_sigmask;
+        // push to the user stack, with a "shellcode"
         esp = tf->esp;
-        upush(&esp, n, sizeof(uint));
-        upush(&esp, &tf->eip, sizeof(uint));
-        tf->esp = esp;
-        tf->eip = sa->sa_handler;
-        _retsys(cu->p_trap);
+        usr = upush(&esp, &_usigret, 16);
+        ujbuf = upush(&esp, &jbuf, sizeof(struct jmp_buf));
+        upush(&esp, &n, sizeof(uint));
+        upush(&esp, &usr, sizeof(uint));
+        _retu(sa->sa_handler, esp);
         return;
     }
     // on SIG_DFL
-    do_exit(1);
+    switch(n){
+        case SIGCHLD:
+            return;
+        case SIGINT:
+        case SIGKILL:
+        default:
+            do_exit(1);
+    }
 }
 
+
+/* ---------------------------------------------------- */
+
+/* this code will be pushed onto user's stack, only to copy, never
+ * call this routine manually. */
+void _usigret() {
+    asm("int $0x80;"::"a"(NR_sigreturn));
+}
+
+/* save the user state */
+void usigsav(struct jmp_buf *buf, struct trap *tf){
+    // save esp and eip
+    buf->esp = tf->esp;
+    buf->eip = tf->eip;
+    // save callee-saved registers
+    buf->ebx = tf->ebx;
+    buf->ecx = tf->ecx;
+    buf->edx = tf->edx;
+    buf->edi = tf->edi;
+    buf->esi = tf->esi;
+    buf->ebp = tf->ebp;
+}
 
 /* ----------------------------------------------------- */
 int sigsend(int pid, int n, int priv){

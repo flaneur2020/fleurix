@@ -29,9 +29,10 @@ static uint sys_routines[NSYSC] = {
     [NR_open]   = &sys_open,
     [NR_write]  = &sys_write,
     [NR_exec]   = &sys_exec,
-    [NR_exit]   = &sys_exit,
     [NR_kill]   = &sys_kill,
+    [NR__exit]   = &sys__exit,
     [NR_sigaction] = &sys_sigaction,
+    [NR_sigreturn] = &sys_sigreturn,
     &nosys,
 };
 

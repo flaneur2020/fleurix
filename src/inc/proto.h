@@ -11,7 +11,7 @@ void    tty_init();
 void    cls();
 void    putch(char ch);
 void    puts(char *ch);
-void    printf(char *fmt, ...);
+void    printk(char *fmt, ...);
 
 // trap.c
 void    idt_init();
@@ -84,7 +84,7 @@ int tty_write(struct tty *tp, char *buf, uint cnt);
 /* panic */
 #define panic(str)  \
     do {            \
-        printf("\nPANIC: %s:%d: %s\n", __FILE__, __LINE__, str);\
+        printk("\nPANIC: %s:%d: %s\n", __FILE__, __LINE__, str);\
         asm volatile("cli");\
         for(;;);\
     } while(0)

@@ -65,14 +65,6 @@ _retu:
     push dword ebx      ;; eip
     iretd
 
-;; retsys(struct trap *tf)
-[global _retsys]
-_retsys:
-    pop  dword ecx
-    add  ecx, 4
-    mov  esp, ecx
-    jmp  _hwint_ret
-
 ;;
 ;; entry to trap handlers
 ;; 

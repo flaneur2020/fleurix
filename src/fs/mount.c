@@ -41,7 +41,7 @@ int do_mount(ushort dev, struct inode *ip){
         }
     }
     // not found
-    printf("no free mount slot");
+    printk("no free mount slot");
     return -1;
 _found:
     // if the inode as mount point is not a directory

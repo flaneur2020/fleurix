@@ -8,7 +8,7 @@
  * vga.c
  *
  * This file indicated how to display text on the terminal, no 
- * xxx_init() needed. And you can take printf() almost every
+ * xxx_init() needed. And you can take printk() almost every
  * where among this kernel.
  * */
 
@@ -114,10 +114,10 @@ void printn(uint n, uint b){
     putch( ntab[m] );
 }
 
-/* a simpler printf
+/* a simpler printk
  * refer to unix v6 
  * */
-void printf(char *fmt, ...){
+void printk(char *fmt, ...){
     char c, *s;
     uint *adx = (uint*)(void*)&fmt + 1;
 _loop:

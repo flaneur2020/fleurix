@@ -3,6 +3,7 @@
 #include <proto.h>
 #include <proc.h>
 #include <signal.h>
+#include <setjmp.h>
 
 #include <unistd.h>
 
@@ -32,6 +33,22 @@ int sys_sigaction(struct trap *tf){
     int old_sa = (struct sigaction*)tf->edx;
 
     return do_sigaction(pid, sa, old_sa);
+}
+
+/* return to the  */
+int sys_sigreturn(struct trap *tf){
+    struct jmp_buf *ujbuf;
+    ujbuf = (struct jmp_buf*)(tf->eip-46);
+    tf->esp = ujbuf->esp;
+    tf->eip = ujbuf->eip;
+    tf->ebx = ujbuf->ebx;
+    tf->ecx = ujbuf->ecx;
+    tf->edx = ujbuf->edx;
+    tf->edi = ujbuf->edi;
+    tf->esi = ujbuf->esi;
+    tf->ebp = ujbuf->ebp;
+    cu->p_sigmask = ujbuf->__sigmask;
+    return 0;
 }
 
 int sys_waitpid(struct trap *tf){

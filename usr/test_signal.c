@@ -11,10 +11,15 @@ int strlen(char *str) {
     return sp-str;
 }
 
-int hwsig(int i){
-    char str[] = "handled\n";
-    while(1) write(1, str, sizeof(str));
-    for(;;);
+int hwsig(int n){
+    int i;
+    char str[] = "sig handled\n";
+
+    printf("n: %x\n", n);
+    for(i=0; i<n; i++) {
+        write(1, str, sizeof(str));
+    }
+    return 0;
 }
 
 int main(int argc, char **argv) {
@@ -25,7 +30,8 @@ int main(int argc, char **argv) {
     sa.sa_handler = hwsig;
     if ((pid=fork())==0) {
         sigaction(SIGINT, &sa, NULL);
-        while(1) write(1, str, sizeof(str));
+        write(1, str, sizeof(str));
+        for(;;);
     }
     kill(pid, SIGINT);
     return 0;

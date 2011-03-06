@@ -1,4 +1,4 @@
-cinc   = '-Isrc/inc'
+cinc   = '-Isrc/inc -Isrc/inc/usr'
 cflag  = %w{
   -Wall 
   -nostdinc -fno-builtin -fno-stack-protector
@@ -7,6 +7,7 @@ cflag  = %w{
 
 mkdir_p 'bin'
 mkdir_p 'bin/usr'
+mkdir_p 'bin/libsys'
 mkdir_p 'root/bin'
 mkdir_p 'root/dev'
 
@@ -136,20 +137,32 @@ usr_cfiles = Dir['usr/test_*.c'] + %w{
 usr_ofiles = usr_cfiles.map{|fn| 'bin/usr/'+File.basename(fn).ext('o') }
 usr_efiles = usr_cfiles.map{|fn| 'bin/usr/'+File.basename(fn).ext('') }
 
-ulib_cfiles = []
-ulib_sfiles = %w{
-  usr/entry.S
+libsys_cfiles = %w{
+  usr/libsys/printf.c
+  usr/libsys/libsys.c
 }
-ulib_ofiles = (ulib_cfiles+ulib_sfiles).map{|fn| 'bin/usr/'+File.basename(fn).ext('o') }
+libsys_sfiles = %w{
+  usr/libsys/entry.S
+}
+libsys_ofiles = (libsys_sfiles+libsys_cfiles).map{|fn| 'bin/libsys/'+File.basename(fn).ext('o') }
 
-task :ulib => ulib_ofiles
+task :libsys => libsys_ofiles
 
 task :usr => usr_efiles
 
-ulib_sfiles.each do |fn_s|
-  fn_o = 'bin/usr/'+File.basename(fn_s).ext('o')
+# => libsys.a
+libsys_sfiles.each do |fn_s|
+  fn_o = 'bin/libsys/'+File.basename(fn_s).ext('o')
   file fn_o => fn_s do
     sh "nasm -f elf -o #{fn_o} #{fn_s}"
+  end
+end
+
+libsys_cfiles.each do |fn_c|
+  fn = File.basename(fn_c).ext('')
+  fn_o = 'bin/libsys/'+fn.ext('o')
+  file fn_o => fn_c do
+    sh "gcc -c #{cinc} -nostdinc -fno-builtin -fno-stack-protector #{fn_c} -o #{fn_o}"
   end
 end
 
@@ -157,9 +170,9 @@ usr_cfiles.each do |fn_c|
   fn = File.basename(fn_c).ext('')
   fn_o = 'bin/usr/'+fn.ext('o')
   fn_e = 'bin/usr/'+fn
-  file fn_e => [fn_c, :ulib, 'tool/user.ld'] do 
+  file fn_e => [fn_c, :libsys, 'tool/user.ld'] do 
     sh "gcc -c #{cinc} -nostdinc -fno-builtin -fno-stack-protector #{fn_c} -o #{fn_o}"
-    sh "ld bin/usr/entry.o #{fn_o} -o #{fn_e} -e c -T tool/user.ld"
+    sh "ld #{libsys_ofiles*' '} #{fn_o} -o #{fn_e} -e c -T tool/user.ld"
     sh "nm #{fn_e} > #{fn_o.ext('sym')}"
     sh "objdump -S #{fn_e} > #{fn_e.ext('S')}"
     sh "cp #{fn_e} root/bin/#{fn}"

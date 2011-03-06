@@ -173,6 +173,7 @@ int tty_write(struct tty *tp, char *buf, uint cnt){
         tty_output(tp, buf[i]);
     }
     tty_start(tp);
+    return 0;
 }
 
 /* ---------------------------------------------- */

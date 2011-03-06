@@ -15,7 +15,7 @@
 /* --------------------------- */
 
 int sys_debug(struct trap *tf){
-    printf("%d", tf->ebx);
+    printk("%d", tf->ebx);
 }
 
 int sys_fork(struct trap *tf){
@@ -26,7 +26,7 @@ int sys_fork(struct trap *tf){
     return ret;
 }
 
-int sys_exit(struct trap *tf){
+int sys__exit(struct trap *tf){
     int code = (int)tf->ebx;
     return do_exit(code);
 }
