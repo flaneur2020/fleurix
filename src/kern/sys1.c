@@ -46,4 +46,16 @@ int sys_exec(struct trap *tf){
 int sys_brk(struct trap *tf){
 }
 
+/* waitpid(int pid, int *stat, int opt) */
+int sys_waitpid(struct trap *tf){
+    int pid = (int)tf->ebx;
+    int *stat = (int*)tf->ecx;
+    int opt = (int)tf->edx;
+
+    return do_waitpid(pid, stat, opt);
+}
+
+int sys_wait(struct trap *tf){
+}
+
 /* --------------------------------------- */

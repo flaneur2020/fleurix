@@ -15,10 +15,7 @@ int hwsig(int n){
     int i;
     char str[] = "sig handled\n";
 
-    printf("n: %x\n", n);
-    for(i=0; i<n; i++) {
-        write(1, str, sizeof(str));
-    }
+    printf("sig handled: %x\n", n);
     return 0;
 }
 
@@ -29,10 +26,12 @@ int main(int argc, char **argv) {
 
     sa.sa_handler = hwsig;
     if ((pid=fork())==0) {
-        sigaction(SIGINT, &sa, NULL);
+        signal(SIGINT, hwsig);
         write(1, str, sizeof(str));
         for(;;);
     }
+    kill(pid, SIGINT);
+    for(i=0;i<10000;i++);
     kill(pid, SIGINT);
     return 0;
 }

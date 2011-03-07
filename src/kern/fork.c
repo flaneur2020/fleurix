@@ -68,6 +68,7 @@ struct proc* kspawn(void (*func)()){
     p->p_stat = SSLEEP; // set SRUN later.
     p->p_pid  = nr;
     p->p_ppid = cu->p_pid;
+    p->p_pgrp = cu->p_pgrp;
     p->p_flag = cu->p_flag;
     p->p_cpu  = cu->p_cpu;
     p->p_nice = cu->p_nice;

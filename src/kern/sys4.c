@@ -24,21 +24,29 @@ int sys_kill(struct trap *tf){
 int sys_pause(struct trap *tf){
 }
 
+/* signal(int sig, void (*ufunc)(int)); */
 int sys_signal(struct trap *tf){
+    int sig = (int)tf->ebx;
+    uint ufunc = (uint)tf->ecx;
+
+    return do_signal(sig, ufunc);
 }
 
+/* sigaction(int sig, struct sigaction *sa, struct sigaction *old_sa); */
 int sys_sigaction(struct trap *tf){
-    int pid = (int) tf->ebx;
+    int sig = (int) tf->ebx;
     int sa = (struct sigaction*) tf->ecx;
     int old_sa = (struct sigaction*)tf->edx;
 
-    return do_sigaction(pid, sa, old_sa);
+    return do_sigaction(sig, sa, old_sa);
 }
 
-/* return to the  */
+/* called on returning from the signal handler. 
+ * note: this syscall should NEVER be called directly.
+ * */
 int sys_sigreturn(struct trap *tf){
     struct jmp_buf *ujbuf;
-    ujbuf = (struct jmp_buf*)(tf->eip-46);
+    ujbuf = (struct jmp_buf*)(tf->eip-46); // hard coded here, be careful
     tf->esp = ujbuf->esp;
     tf->eip = ujbuf->eip;
     tf->ebx = ujbuf->ebx;
@@ -49,9 +57,6 @@ int sys_sigreturn(struct trap *tf){
     tf->ebp = ujbuf->ebp;
     cu->p_sigmask = ujbuf->__sigmask;
     return 0;
-}
-
-int sys_waitpid(struct trap *tf){
 }
 
 int sys_alarm(struct trap *tf){

@@ -12,15 +12,21 @@ int strlen(char *str) {
 
 int main(int argc, char **argv) {
     int fd;
+    int ret;
     char str[] = "proc1\n";
     char str2[] = "proc2\n";
 
     fd = open("/dev/tty0", O_RDONLY, 0);
     if (fork()==0) {
-        write(1, str, sizeof(str));
+        printf("2");
+        printf("3");
+        _exit(0);
     }
     else {
-        write(1, str2, sizeof(str));
+        waitpid(0, &ret, 0);
+        printf("-- exited :%x\n", ret);
+        waitpid(0, &ret, 0);
+        printf("-- exited :%x\n", ret);
     }
     return 1;
 }

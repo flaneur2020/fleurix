@@ -20,14 +20,6 @@ int do_exit(int ret){
     uint fd, nr;
 
     cu->p_ret = ret;
-    // make this process Zombie, give all the children to proc[1] 
-    // and tell its parent
-    cu->p_chan = 0;
-    for (nr=0; nr<NPROC; nr++) {
-        if ((p=proc[nr]) && (p->p_ppid==cu->p_pid)) {
-            p->p_ppid = 1;
-        }
-    }
     // clear all the signal handlers
     for (nr=0; nr<NSIG; nr++) {
         cu->p_sigact[nr].sa_handler = SIG_DFL;
@@ -47,8 +39,18 @@ int do_exit(int ret){
     kfree(cu->p_vm.vm_pgd, PAGE);
     // tell its parent
     sigsend(cu->p_ppid, SIGCHLD, 1);
-    //
+    // make this process Zombie, give all the children to proc[1] 
+    // and tell its parent
+    cu->p_chan = 0;
     cu->p_stat = SZOMB;
-    swtch();
+    for (nr=1; nr<NPROC; nr++) {
+        if ((p=proc[nr]) && p!=cu && (p->p_ppid==cu->p_pid)) {
+            p->p_ppid = 1;
+        }
+    }
+    // wakeup proc[1] and its parent
+    p = proc[cu->p_ppid];
+    wakeup(proc[1]);
+    wakeup(p);
     return 0;
 }

@@ -29,7 +29,7 @@ int issig(){
     if (sig==0)
         return 0;
     for (n=0; n<32; n++) {
-        if (sig & (1<<(n-1))) {
+        if ((sig & (1<<(n-1))) && cu->p_pid!=0) {
             // ignored signal
             if ((cu->p_sigact[n-1].sa_handler == SIG_IGN) && n!=SIGKILL) {
                 cu->p_sig &= ~(1<<(n-1));
@@ -64,20 +64,25 @@ void psig(){
         return;
     sa = &(cu->p_sigact[n-1]);
     // check blocked signal
-    cu->p_sigmask |= sa->sa_mask;
+    if ((sa->sa_flags & SA_NOMASK)==0) {
+        cu->p_sigmask |= sa->sa_mask;
+    }
     cu->p_cursig = 0;
     if (sa->sa_handler != SIG_DFL) {
         tf = cu->p_trap;
         // save registers and the old mask 
-        usigsav(&jbuf, tf);
-        jbuf.__sigmask = cu->p_sigmask;
+        usigsav(&jbuf, tf, cu->p_sigmask);
         // push to the user stack, with a "shellcode"
         esp = tf->esp;
         usr = upush(&esp, &_usigret, 16);
         ujbuf = upush(&esp, &jbuf, sizeof(struct jmp_buf));
         upush(&esp, &n, sizeof(uint));
         upush(&esp, &usr, sizeof(uint));
-        _retu(sa->sa_handler, esp);
+        ufunc = sa->sa_handler;
+        if (sa->sa_flags & SA_ONESHOT) {
+            sa->sa_handler = NULL;
+        }
+        _retu(ufunc, esp);
         return;
     }
     // on SIG_DFL
@@ -100,8 +105,8 @@ void _usigret() {
     asm("int $0x80;"::"a"(NR_sigreturn));
 }
 
-/* save the user state */
-void usigsav(struct jmp_buf *buf, struct trap *tf){
+/* save the user state, which restored on sys_sigreturn(). */
+void usigsav(struct jmp_buf *buf, struct trap *tf, uint mask){
     // save esp and eip
     buf->esp = tf->esp;
     buf->eip = tf->eip;
@@ -112,6 +117,8 @@ void usigsav(struct jmp_buf *buf, struct trap *tf){
     buf->edi = tf->edi;
     buf->esi = tf->esi;
     buf->ebp = tf->ebp;
+    // sigmask
+    buf->__sigmask = mask;
 }
 
 /* ----------------------------------------------------- */
@@ -119,7 +126,7 @@ int sigsend(int pid, int n, int priv){
     struct proc *p;
     
     p = proc[pid];
-    if (p==NULL || n<0 || n>=NSIG) {
+    if (pid==0 || p==NULL || n<0 || n>=NSIG) {
         syserr(EINVAL);
         return -1;
     }
@@ -153,21 +160,21 @@ int do_kill(int pid, int sig){
         return sigsend(pid, sig, 0);
     }
     if (pid==0) {
-        for (nr=0; nr<NPROC; nr++) {
+        for (nr=1; nr<NPROC; nr++) {
             if (p=proc[nr] && (p!=cu) && (p->p_pgrp==cu->p_pid))
                 ret = sigsend(nr, sig, 0);
         }
         return ret;
     }
     if (pid==-1) {
-        for (nr=0; nr<NPROC; nr++) {
+        for (nr=1; nr<NPROC; nr++) {
             if (p=proc[nr] && (p!=cu)) 
                 ret = sigsend(nr, sig, 0);
         }
         return ret;
     }
     if (pid < -1) {
-        for (nr=0; nr<NPROC; nr++) {
+        for (nr=1; nr<NPROC; nr++) {
             if (p=proc[nr] && (p!=cu) && (p->p_pgrp==(-pid)))
                 ret = sigsend(nr, sig, 0);
         }
@@ -178,7 +185,7 @@ int do_kill(int pid, int sig){
 }
 
 int do_sigaction(int sig, struct sigaction *sa, struct sigaction *old_sa){
-    if (sig<1 || sig>NSIG || sig==SIGKILL)  {
+    if (sig<1 || sig>NSIG || sig==SIGKILL || sa==NULL)  {
         syserr(EINVAL);
         return -1;
     }
@@ -201,5 +208,17 @@ int do_sigaction(int sig, struct sigaction *sa, struct sigaction *old_sa){
 }
 
 /* handle a signal to a user function */
-int do_signal(int sig, void (*func)(int)){
+int do_signal(int sig, void (*ufunc)(int)){
+    struct sigaction *sa;
+
+    if (sig<1 || sig>NSIG || sig==SIGKILL) {
+        syserr(EINVAL);
+        return -1;
+    }
+    sa = &cu->p_sigact[sig-1];
+    sa->sa_handler = ufunc;
+    sa->sa_flags = SA_ONESHOT | SA_NOMASK;
+    sa->sa_mask = 0;
+    cu->p_sigmask = 0;
+    return 0;
 }
