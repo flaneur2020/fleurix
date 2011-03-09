@@ -41,8 +41,8 @@ struct pde pgd0[1024] __attribute__((aligned(4096)));
  * the virtual address lied in. If the 'creat' parameter is set,
  * allocate a page as middle page table and always success.
  * */
-struct pte* find_pte(uint vaddr, uint creat){
-    struct pde *pde, *pgd; 
+struct pte* find_pte(struct pde *pgd, uint vaddr, uint creat){
+    struct pde *pde; 
     struct pte *pt;
     struct page *pg;
     uint pn;
@@ -50,7 +50,6 @@ struct pte* find_pte(uint vaddr, uint creat){
     if (vaddr < KMEM_END) {
         panic("find_pte(): don't touch kernel's address space.");
     }
-    pgd = cu->p_vm.vm_pgd;
     pde = &pgd[PDX(vaddr)];
     if ((pde->pd_flag & PTE_P)==0) {
         if (creat==0) {
@@ -60,6 +59,7 @@ struct pte* find_pte(uint vaddr, uint creat){
         pde->pd_flag = PTE_P | PTE_U | PTE_W;
         pde->pd_off = pg->pg_num;
         pt = (struct pte*)(pde->pd_off << 12);
+        // memset pt[] as zero
         for (pn=0; pn<1024; pn++) {
             pt[pn].pt_off = 0;
             pt[pn].pt_flag = 0;
@@ -94,32 +94,28 @@ int pgd_init(struct pde *pgd){
  * write-protected, and increase the reference count of each shared physical 
  * page. 
  * */
-int pt_copy(struct pde *pgd, uint base, uint size, uint flag){
+int pt_copy(struct pde *pgd, uint base, uint size){
     struct pde *pde;
-    struct pte *pte, *old_pt, *new_pt;
+    struct pte *opte, *npte, *old_pt, *new_pt;
     struct page *pg;
-    uint pdn, pn;
+    uint off, addr;
 
     if (base<KMEM_END) {
         panic("pt_copy(): bad memory");
     }
-    //
-    for (pdn=PPN(base)/1024; pdn<PPN(base+size)/1024; pdn++){
-        pde = &(cu->p_vm.vm_pgd[pdn]);
-        if (pde->pd_flag & PTE_P) {
-            old_pt = (struct pte*)(pde->pd_off * PAGE);
-            new_pt = (struct pte*)kmalloc(PAGE);
-            pgd[pdn].pd_off = PPN(new_pt);
-            pgd[pdn].pd_flag = PTE_U | PTE_W | PTE_P;
-            for(pn=0; pn<1024; pn++) {
-                if (old_pt[pn].pt_flag & PTE_P) {
-                    new_pt[pn].pt_off = old_pt[pn].pt_off;
-                    new_pt[pn].pt_flag = flag;
-                    old_pt[pn].pt_flag = flag; // note: old PTE is also modified.
-                    // increase this page's ref count
-                    pg = pgfind(old_pt[pn].pt_off);
-                    pg->pg_count++;
-                }
+    for (off=0; off<size; off+=PAGE) {
+        addr = base + off;
+        opte = find_pte(cu->p_vm.vm_pgd, addr, 0);
+        if (opte!=NULL) {
+            npte = find_pte(pgd, addr, 1);
+            if (npte->pt_flag & PTE_P) {
+                npte->pt_off = opte->pt_off;
+                // set each's pt_flag the same
+                npte->pt_flag = PTE_P|PTE_U;
+                opte->pt_flag = PTE_P|PTE_U;
+                // increase the ref count of the physical page
+                pg = pgfind(opte->pt_off);
+                pg->pg_count++;
             }
         }
     }
@@ -137,21 +133,7 @@ int pt_free(struct pde *pgd, uint base, uint size){
         panic("pt_free(): bad memory");
     }
     //
-    for (pdn=PPN(base)/1024; pdn<PPN(base+size)/1024; pdn++) {
-        pde = &pgd[pdn];
-        if (pde->pd_flag & PTE_P) {
-            pt = (struct pte*)(pde->pd_off * PAGE);
-            for(pn=0; pn<1024; pn++) {
-                pte = &pt[pn];
-                if (pte->pt_flag & PTE_P) {
-                    pte->pt_flag &= ~PTE_P;
-                    pg = pgfind(pte->pt_off);
-                    pgfree(pg); // decrease each page's reference count.
-                }
-            }
-            kfree(pt, PAGE);
-        }
-    }
+    // TODO: rewrote this.
     return 0;
 }
 

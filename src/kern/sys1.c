@@ -15,15 +15,13 @@
 /* --------------------------- */
 
 int sys_debug(struct trap *tf){
-    printk("%d", tf->ebx);
+    dump_tf(tf);
+    for(;;);
+    return 0;
 }
 
 int sys_fork(struct trap *tf){
-    int ret = do_fork(tf);
-    if (ret<0){
-        panic("bad fork()\n");
-    }
-    return ret;
+    return do_fork(tf);
 }
 
 int sys__exit(struct trap *tf){

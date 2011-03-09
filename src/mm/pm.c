@@ -83,7 +83,7 @@ int pgfree(struct page *pp){
 struct pte* pgattach(struct pde *pgd, uint vaddr, struct page *pp, uint flag){
     struct pte *pte;
 
-    pte = find_pte(vaddr, 1);
+    pte = find_pte(pgd, vaddr, 1);
     pte->pt_off = pp->pg_num;
     pte->pt_flag = flag;
     lpgd(pgd);

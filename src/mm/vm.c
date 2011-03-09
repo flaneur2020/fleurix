@@ -37,7 +37,7 @@ int vm_clone(struct vm *to){
         vp = &(cu->p_vm.vm_area[i]);
         if (vp->v_flag != 0) {
             to->vm_area[i] = *vp;
-            pt_copy(to->vm_pgd, vp->v_base, vp->v_size, PTE_P|PTE_U); // turn off both's PTE_W
+            pt_copy(to->vm_pgd, vp->v_base, vp->v_size); // turn off both's PTE_W
         }
     }
     return 0;
@@ -106,7 +106,7 @@ int vm_verify(uint vaddr, uint size){
     }
     // special case on checking string.
     for (page=PG_ADDR(vaddr); page<=PG_ADDR(vaddr+size-1); page+=PAGE) {
-        pte = find_pte(page, 1);
+        pte = find_pte(cu->p_vm.vm_pgd, page, 1);
         if ((pte->pt_flag & PTE_P)==0) {
             do_no_page(page);
         }

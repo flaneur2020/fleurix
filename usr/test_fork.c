@@ -14,13 +14,19 @@ int main(int argc, char **argv) {
     int fd;
     char str[] = "hello, world\n";
 
-    if (fork()==0) {
-        while(1) write(1, "2", 1);
+    printf("-------\n");
+    printf("argv[0]: %s...\n", argv[0]);
+    printf("------\n");
+    if (fork()==0){
+        //while(1) printf("2");
+    }
+    else if(fork()==0){
+        while(1) printf("1");;
     }
     else {
-        while(1) write(1, "1", 1);
-        //while(1) write(fd, "1", 1);
+        while(1) printf("3");;
     }
     while(1);
     return 0;
 }
+

@@ -19,7 +19,7 @@ void do_no_page(uint vaddr){
 
     vm = &cu->p_vm;
     // if this page lies on the edge of user stack, grows the stack.
-    if (vm->vm_stack.v_base - vaddr < PAGE) {
+    if (vm->vm_stack.v_base - vaddr <= PAGE) {
         vm->vm_stack.v_base -= PAGE;
         vm->vm_stack.v_size += PAGE;
         pg = pgalloc();
@@ -29,7 +29,8 @@ void do_no_page(uint vaddr){
     // else
     vp = find_vma(vaddr);
     if (vp==NULL) {
-        // TODO: segmentation fault.
+        printk("vaddr: %x\n", vaddr);
+        panic("bad mem;");
         return;
     }
     // demand zero
@@ -48,6 +49,7 @@ void do_no_page(uint vaddr){
         buf = PG_ADDR(vaddr);
         off = buf - vp->v_base + vp->v_ioff;
         lock_ino(vp->v_ino);
+        printk("ino: %d off: %x\n", vp->v_ino->i_num, off );
         readi(vp->v_ino, buf, off, PAGE);
         unlk_ino(vp->v_ino);
         pte->pt_flag &= ~(vp->v_flag&VMA_RDONLY? 0:PTE_W);
@@ -78,13 +80,14 @@ void do_wp_page(uint vaddr){
         return;
     }
     if (vp->v_flag & VMA_PRIVATE) {
-        pte = find_pte(vaddr, 0);
+        pte = find_pte(cu->p_vm.vm_pgd, vaddr, 1);
         pg = pgfind(pte->pt_off);
         if (pg->pg_count > 1) {
             pg->pg_count--; //decrease the reference count of the old page.
             old_page = (char*)(pg->pg_num * PAGE);
             new_page = (char*)kmalloc(PAGE);
             memcpy(new_page, old_page, PAGE);
+            printk("new_page:%x old_page:%x\n", new_page, old_page);
             pte->pt_off = PPN(new_page);
             pte->pt_flag |= PTE_W;
             flmmu();
@@ -105,19 +108,21 @@ void do_pgfault(struct trap *tf){
     asm volatile("movl %%cr2, %0":"=a"(addr));
     // invalid page
     if ((tf->err_code & PFE_P)==0) {
+        printk("do_no_page(): pid: %x err: %x addr:%x\n", cu->p_pid, tf->err_code, addr);
         do_no_page(addr);
         return;
     }
     // write procted page
     if (tf->err_code & PFE_W) {
+        printk("do_wp_page(): pid: %x err: %x addr:%x\n", cu->p_pid, tf->err_code, addr);
         do_wp_page(addr);
         return;
     }
     // TODO: raise a signal here, hence segmention fault.
     if (tf->err_code & PFE_U) {
+        dump_tf(tf);
+        //printk("do_pgfault(): eip: %x addr: %x\n", tf->eip, addr);
+        panic("PFE_U");
     }
-    dump_tf(tf);
-    printk("do_pgfault(): addr: %x\n", addr);
-    panic("~");
 }
 

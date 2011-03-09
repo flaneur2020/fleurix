@@ -42,7 +42,7 @@ int sigsend(int pid, int n, int priv);
 
 // mm/vm.c
 int vm_clone(struct vm *to);
-struct pte* find_pte(uint vaddr, uint creat);
+struct pte* find_pte(struct pde *pgd, uint vaddr, uint creat);
 struct vma* find_vma(uint addr);
 int vma_init(struct vma *vp, uint base, uint size, uint flag, struct inode *ip, uint ioff);
 

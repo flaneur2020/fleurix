@@ -9,7 +9,7 @@
 #include <conf.h>                      
 
 /*
- * proc.c 2010 fleurer
+ * proc.c - 2010 fleurer
  * this file implies the initilization of proc[0] and the implementation 
  * of fork(), 
  *
@@ -115,6 +115,8 @@ int do_fork(struct trap *tf){
     *ntf = *tf;
     ntf->eax = 0; // this is why fork() returns 0.
     p->p_contxt.esp = ntf;
+    p->p_trap = ntf;
+    printk("~~~fork() cu:%x p:%x\n", cu->p_pid, p->p_pid);
     return p->p_pid;
 }
 

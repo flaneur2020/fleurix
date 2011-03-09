@@ -124,7 +124,7 @@ int sys_waitpid (struct trap *);
 int sys_sigaction (struct trap *);
 int sys_sigreturn (struct trap *);
 
-static inline _SYS1(int, debug, int);
+static inline _SYS0(int, debug);
 static inline _SYS1(int, close, int);
 static inline _SYS0(int, setup);
 static inline _SYS0(int, fork); 

@@ -53,8 +53,6 @@ int do_exec(char *path, char **argv){
     struct vma *vp;
     struct file *fp;
     uint bn, fd, argc, esp;
-    uint base, text, data, bss, heap;
-    char *argv0, **uargv;
 
     ip = namei(path, 0);
     if (ip==NULL) {
@@ -80,10 +78,9 @@ int do_exec(char *path, char **argv){
     vm_renew(vm, ah, ip);
     // push arguments to the end of user stack, which always the same address.
     esp = VM_STACK;
-    argc  = upush_argv(&esp, path, argv);
+    argc = upush_argv(&esp, path, argv);
     if (argc<0)
         panic("exec(): bad mem");
-    upush(&esp, &uargv, sizeof(uint));
     upush(&esp, &argc, sizeof(uint));
     // close all the file descriptors with FD_CLOEXEC
     for (fd=0; fd<NOFILE; fd++) {
@@ -108,18 +105,17 @@ _badf:
 /* push argv into user stack, returns argc.
  * */
 int upush_argv(uint *esp, char *path, char **argv){
-    uint arglen, argc;
+    uint arglen, argc, tmp_esp;
     int i,r;
     char *str, **uargv, **tmp;
 
-    if (argv==NULL) {
-        return 0;
-    }
     argc = 1;
     arglen = strlen(path)+1;
-    for (i=0; (str=argv[i])!=NULL; i++) {
-        arglen += strlen(str)+1;
-        argc++;
+    if (argv != NULL) {
+        for (i=0; (str=argv[i])!=NULL; i++) {
+            arglen += strlen(str)+1;
+            argc++;
+        }
     }
     arglen += sizeof(char*) * argc;
     if (vm_verify(*esp-arglen, arglen) < 0){
@@ -149,6 +145,8 @@ int upush_argv(uint *esp, char *path, char **argv){
         kfree(tmp[i], PAGE);
     }
     kfree(tmp, PAGE);
+    // push argv[]
+    upush(esp, &uargv, sizeof(uint));
     return argc;
 }
 
