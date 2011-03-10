@@ -73,8 +73,6 @@ int sys_write(struct trap *tf){
     char *buf = tf->ecx;
     int r;
 
-    r = vm_verify(buf, cnt);
-
     return do_write(fd, buf, cnt);
 }
 

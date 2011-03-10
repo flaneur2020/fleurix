@@ -79,6 +79,7 @@ int do_exec(char *path, char **argv){
     // push arguments to the end of user stack, which always the same address.
     esp = VM_STACK;
     argc = upush_argv(&esp, path, argv);
+    printk(".........\n");
     if (argc<0)
         panic("exec(): bad mem");
     upush(&esp, &argc, sizeof(uint));
@@ -103,6 +104,7 @@ _badf:
 }
 
 /* push argv into user stack, returns argc.
+ * note: vm_verify() may override proc's address space, take care.
  * */
 int upush_argv(uint *esp, char *path, char **argv){
     uint arglen, argc, tmp_esp;
@@ -118,19 +120,19 @@ int upush_argv(uint *esp, char *path, char **argv){
         }
     }
     arglen += sizeof(char*) * argc;
-    if (vm_verify(*esp-arglen, arglen) < 0){
-        syserr(EINVAL);
-        return -1;
-    }
     // store the argv in temp
     tmp    = (char**)kmalloc(PAGE);
     tmp[0] = (char*) kmalloc(PAGE);
     tmp[PAGE-1] = '\0';
-    strncpy(tmp[0], path, PAGE-1);
     for(i=1; i<argc; i++) {
         tmp[i] = (char*)kmalloc(PAGE);
         tmp[PAGE-1] = '\0';
         strncpy(tmp[i], argv[i], PAGE-1);
+    }
+    // note: vm_verify may modify proc's address space.
+    if (vm_verify(*esp-arglen, arglen) < 0){
+        syserr(EINVAL);
+        return -1;
     }
     // push to ustack finally
     uargv = *esp - arglen;

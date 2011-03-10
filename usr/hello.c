@@ -6,7 +6,6 @@ int i;
 
 int main(int argc, char **argv) {
     int fd;
-    char str[] = "/bin/hello, world\n";
 
     printf("hello~\n");
     for (i=0; i<argc; i++) {

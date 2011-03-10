@@ -104,6 +104,7 @@ void do_pgfault(struct trap *tf){
     uint addr;
 
     asm volatile("movl %%cr2, %0":"=a"(addr));
+    //printk("do_pgfault(): %d err:%x addr: %x\n", cu->p_pid, tf->err_code, addr);
     // invalid page
     if ((tf->err_code & PFE_P)==0) {
         do_no_page(addr);

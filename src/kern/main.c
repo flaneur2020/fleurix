@@ -56,7 +56,7 @@ void init(){
     do_fcntl(0, F_SETFD, 0); // turn off FD_CLOEXEC
     do_fcntl(1, F_SETFD, 0);
     do_fcntl(2, F_SETFD, 0);
-    do_exec("/bin/init", NULL);
+    do_exec("/bin/test_exec", NULL);
 
     for(;;);
 }

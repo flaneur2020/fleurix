@@ -119,7 +119,7 @@ void printn(uint n, uint b){
  * */
 void printk(char *fmt, ...){
     char c, *s;
-    uint *adx = (uint*)(void*)&fmt + 1;
+    int *adx = (uint*)(void*)&fmt + 1;
 _loop:
     while((c = *fmt++) != '%'){
         if (c == '\0') return;
