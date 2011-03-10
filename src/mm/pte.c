@@ -129,8 +129,20 @@ int pt_free(struct pde *pgd){
     struct page *pg;
     uint pdn, pn;
 
-    //
-    // TODO: rewrote this.
+    for(pdn=PDX(KMEM_END); pdn<1024; pdn++) {
+        pde = &pgd[pdn];
+        if (pde->pd_flag & PTE_P) {
+            pt = (struct pte*)(pde->pd_off * PAGE);
+            for(pn=0; pn<1024; pn++) {
+                pte = &pt[pn];
+                if (pte->pt_flag & PTE_P) {
+                    pg = pgfind(pte->pt_off);
+                    pgfree(pg);
+                }
+            }
+            kfree(pt, PAGE);
+        }
+    }
     return 0;
 }
 

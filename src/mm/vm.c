@@ -56,7 +56,6 @@ int vm_clear(struct vm *vm){
     for (i=0; i<NVMA; i++) {
         vp = &vm->vm_area[i];
         if (vp->v_flag != 0) {
-            pt_free(vm->vm_pgd, PG_ADDR(vp->v_base), vp->v_size);
             if (vp->v_ino)
                 iput(vp->v_ino);
             vp->v_ino = NULL;
@@ -65,6 +64,8 @@ int vm_clear(struct vm *vm){
             vp->v_size = 0;
         }
     }
+    // free the page tables. (but pgd is not freed yet.)
+    pt_free(vm->vm_pgd);
     return 0;
 }
 

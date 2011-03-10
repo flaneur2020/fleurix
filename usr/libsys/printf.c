@@ -3,7 +3,6 @@
 
 /* printf.c */
 /* implement a printf() in the user mode. */
-
 void putch(char c){
     write(1, &c, 1);
 }

@@ -41,7 +41,6 @@ int issig(){
             // normal case
             cu->p_sig &= ~(1<<(n-1));
             cu->p_cursig = n;
-            printk("got signal: %x\n", n);
             return n;
         }
     }

@@ -5,12 +5,6 @@
 
 int a=3;
 
-int strlen(char *str) {
-    char* sp;
-    for(sp=str; *sp!='\0'; sp++);
-    return sp-str;
-}
-
 int hwsig(int n){
     int i;
     char str[] = "sig handled\n";

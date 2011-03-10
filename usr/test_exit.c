@@ -4,12 +4,6 @@
 
 int a=3;
 
-int strlen(char *str) {
-    char* sp;
-    for(sp=str; *sp!='\0'; sp++);
-    return sp-str;
-}
-
 int main(int argc, char **argv) {
     int fd;
     int ret;
@@ -18,15 +12,16 @@ int main(int argc, char **argv) {
 
     fd = open("/dev/tty0", O_RDONLY, 0);
     if (fork()==0) {
-        printf("2");
-        printf("3");
+        printf("child1\n");
         _exit(0);
     }
-    else {
-        waitpid(0, &ret, 0);
-        printf("-- exited :%x\n", ret);
-        waitpid(0, &ret, 0);
-        printf("-- exited :%x\n", ret);
+    if (fork()==0) {
+        printf("child2\n");
+        _exit(1);
     }
+    waitpid(0, &ret, 0);
+    printf("-- exited :%x\n", ret);
+    waitpid(0, &ret, 0);
+    printf("-- exited :%x\n", ret);
     return 1;
 }

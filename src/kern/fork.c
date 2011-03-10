@@ -122,7 +122,6 @@ int do_fork(struct trap *tf){
     ntf->eax = 0; // this is why fork() returns 0.
     p->p_contxt.esp = ntf;
     p->p_trap = ntf;
-    printk("~~~fork() cu:%x p:%x\n", cu->p_pid, p->p_pid);
     return p->p_pid;
 }
 

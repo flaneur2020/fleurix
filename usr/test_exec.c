@@ -4,12 +4,6 @@
 
 int a=3;
 
-int strlen(char *str) {
-    char* sp;
-    for(sp=str; *sp!='\0'; sp++);
-    return sp-str;
-}
-
 int main(int argc, char **argv) {
     int fd;
     char str[] = "hello, world\n";

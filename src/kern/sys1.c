@@ -35,9 +35,6 @@ int sys_exec(struct trap *tf){
     char *path = (char*)tf->ebx;
     char **argv = (char**)tf->ecx;
 
-    if (vm_verify(path, strlen(path)+1)<0 || vm_verify(argv, 1)<0) {
-        syserr(EINVAL);
-    }
     return do_exec(path, argv);
 }
 

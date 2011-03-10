@@ -132,6 +132,7 @@ end
 # ----------------------------------------------------------------------
 
 usr_cfiles = Dir['usr/test_*.c'] + %w{
+  usr/init.c
   usr/hello.c
 }
 usr_ofiles = usr_cfiles.map{|fn| 'bin/usr/'+File.basename(fn).ext('o') }
@@ -139,6 +140,7 @@ usr_efiles = usr_cfiles.map{|fn| 'bin/usr/'+File.basename(fn).ext('') }
 
 libsys_cfiles = %w{
   usr/libsys/printf.c
+  usr/libsys/string.c
   usr/libsys/libsys.c
 }
 libsys_sfiles = %w{
