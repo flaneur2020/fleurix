@@ -15,15 +15,14 @@ int main(int argc, char **argv) {
     if (fork()==0) {
         printf("child1\n");
         exec("/bin/hello", NULL);
-        _exit(0);
     }
     if (fork()==0) {
         printf("child2\n");
         _exit(0);
     }
     while(1){
-        pid = waitpid(0, &ret, 0);
-        printf("--%d exited :%x\n", pid, ret);
+        pid = wait(&ret);
+        printf("--pid:%d ret:%x\n", pid, ret);
     }
     return 1;
 }

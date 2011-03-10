@@ -39,7 +39,6 @@ int issig(){
             if (cu->p_sigmask & (1<<(n-1)) && n!=SIGKILL)
                 return 0;
             // normal case
-            cu->p_sig &= ~(1<<(n-1));
             cu->p_cursig = n;
             return n;
         }
@@ -62,6 +61,7 @@ void psig(){
     n = cu->p_cursig;
     if (n==0 || n>NSIG)
         return;
+    cu->p_sig &= ~(1<<(n-1));
     sa = &(cu->p_sigact[n-1]);
     // check blocked signal
     if ((sa->sa_flags & SA_NOMASK)==0) {
@@ -88,6 +88,7 @@ void psig(){
     // on SIG_DFL
     switch(n){
         case SIGCHLD:
+        case SIGCONT:
             return;
         case SIGINT:
         case SIGKILL:

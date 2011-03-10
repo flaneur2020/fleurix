@@ -56,6 +56,9 @@ _not_found:
         return 0;
     }
     sleep(cu, PWAIT);
+    if (issig() == SIGCHLD) {
+        cu->p_sig &= ~SIGCHLD;
+    }
     goto _repeat;
 
 _found:

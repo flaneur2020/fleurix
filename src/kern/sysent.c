@@ -33,6 +33,7 @@ static uint sys_routines[NSYSC] = {
     [NR__exit]      = &sys__exit,
     [NR_waitpid]    = &sys_waitpid,
     [NR_wait]       = &sys_wait,
+    [NR_pause]      = &sys_pause,
     [NR_signal]     = &sys_signal,
     [NR_sigaction]  = &sys_sigaction,
     [NR_sigreturn]  = &sys_sigreturn,

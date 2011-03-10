@@ -22,7 +22,11 @@ int sys_kill(struct trap *tf){
 }
 
 int sys_pause(struct trap *tf){
+    sleep(&sys_pause, PWAIT);
+    return 0;
 }
+
+/* -------------------------------------------------- */
 
 /* signal(int sig, void (*ufunc)(int)); */
 int sys_signal(struct trap *tf){

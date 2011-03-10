@@ -74,6 +74,7 @@ enum {
     //
     NR_fork,
     NR__exit,
+    NR_pause,
     NR_wait,
     NR_waitpid,
     //
@@ -119,6 +120,7 @@ int sys_exec    (struct trap *);
 int sys__exit   (struct trap *);
 int sys_kill    (struct trap *);
 int sys_signal  (struct trap *);
+int sys_pause   (struct trap *);
 int sys_wait    (struct trap *);
 int sys_waitpid (struct trap *);
 int sys_sigaction (struct trap *);
@@ -143,5 +145,6 @@ static inline _SYS3(int, sigaction, int, struct sigaction*, struct sigaction*);
 static inline _SYS0(int, sigreturn);
 static inline _SYS3(int, waitpid, int, int*, int);
 static inline _SYS1(int, wait, int*);
+static inline _SYS0(int, pause);
 
 #endif

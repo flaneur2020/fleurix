@@ -12,6 +12,7 @@
  *
  * */
 
+
 /* --------------------------- */
 
 int sys_debug(struct trap *tf){
@@ -51,6 +52,12 @@ int sys_waitpid(struct trap *tf){
 }
 
 int sys_wait(struct trap *tf){
+    int *stat = (int*)tf->ebx;
+
+    return do_waitpid(-1, stat, 0);
 }
+
+/* --------------------------------------- */
+
 
 /* --------------------------------------- */
