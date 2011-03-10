@@ -14,13 +14,10 @@ int main(int argc, char **argv) {
     int fd;
     char str[] = "hello, world\n";
 
-    printf("-------\n");
-    printf("argv[0]: %s...\n", argv[0]);
-    printf("------\n");
     if (fork()==0){
-        //while(1) printf("2");
+        while(1) printf("2");
     }
-    else if(fork()==0){
+    else if(fork()){
         while(1) printf("1");;
     }
     else {

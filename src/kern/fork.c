@@ -51,7 +51,7 @@ int find_pid(){
  * */
 struct proc* kspawn(void (*func)()){
     uint nr;
-    int fd;
+    int fd, n;
     struct file *fp;
     struct proc *p;
 
@@ -90,6 +90,12 @@ struct proc* kspawn(void (*func)()){
             fp->f_ino->i_count++;
             p->p_ofile[fd] = fp;
         }
+    }
+    // signals
+    p->p_sig = cu->p_sig;
+    p->p_sigmask = cu->p_sigmask;
+    for (n=0; n<NSIG; n++) {
+        p->p_sigact[n] = cu->p_sigact[n];
     }
     // clone kernel's address space.
     vm_clone(&p->p_vm);

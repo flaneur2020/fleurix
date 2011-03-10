@@ -103,7 +103,7 @@ int pm_init(){
         coremap[pn].pg_flag = PG_RSVD;
         coremap[pn].pg_count = 100;
     }
-    for (pn=640*1024/PAGE; pn<PPN(&__kend__); pn++){
+    for (pn=640*1024/PAGE; pn<PPN(&__kend__)+1; pn++){
         coremap[pn].pg_num = pn;
         coremap[pn].pg_flag = PG_RSVD;
         coremap[pn].pg_count = 100;

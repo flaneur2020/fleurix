@@ -58,15 +58,11 @@ struct pte* find_pte(struct pde *pgd, uint vaddr, uint creat){
         pg = pgalloc();
         pde->pd_flag = PTE_P | PTE_U | PTE_W;
         pde->pd_off = pg->pg_num;
-        pt = (struct pte*)(pde->pd_off << 12);
-        // memset pt[] as zero
-        for (pn=0; pn<1024; pn++) {
-            pt[pn].pt_off = 0;
-            pt[pn].pt_flag = 0;
-        }
+        pt = (struct pte*)(pde->pd_off * PAGE);
+        memset(pt, 0, PAGE);
         flmmu();
     }
-    pt = (struct pte*)(pde->pd_off << 12);
+    pt = (struct pte*)(pde->pd_off * PAGE);
     return &pt[PTX(vaddr)];
 }
 
@@ -88,34 +84,38 @@ int pgd_init(struct pde *pgd){
     }
 }
 
-/* copy the page tables of a range of virtual memory of the current process
- * , and set both pte's flag. 
+/* copy the page tables, and set both pte's flag. 
  * note: on Copy On Write, both parent and child process will be marked 
  * write-protected, and increase the reference count of each shared physical 
  * page. 
  * */
-int pt_copy(struct pde *pgd, uint base, uint size){
-    struct pde *pde;
+int pt_copy(struct pde *npgd, struct pde *opgd){
+    struct pde *opde, *npde;
     struct pte *opte, *npte, *old_pt, *new_pt;
     struct page *pg;
-    uint off, addr;
+    uint pdn, pn;
 
-    if (base<KMEM_END) {
-        panic("pt_copy(): bad memory");
-    }
-    for (off=0; off<size; off+=PAGE) {
-        addr = base + off;
-        opte = find_pte(cu->p_vm.vm_pgd, addr, 0);
-        if (opte!=NULL) {
-            npte = find_pte(pgd, addr, 1);
-            if (npte->pt_flag & PTE_P) {
-                npte->pt_off = opte->pt_off;
-                // set each's pt_flag the same
-                npte->pt_flag = PTE_P|PTE_U;
-                opte->pt_flag = PTE_P|PTE_U;
-                // increase the ref count of the physical page
-                pg = pgfind(opte->pt_off);
-                pg->pg_count++;
+    for(pdn=PDX(KMEM_END); pdn<1024; pdn++) {
+        opde = &opgd[pdn];
+        npde = &npgd[pdn];
+        npde->pd_flag = opde->pd_flag;
+        if (opde->pd_flag & PTE_P) {
+            old_pt = (struct pte*)(opde->pd_off * PAGE);
+            new_pt = (struct pte*)kmalloc(PAGE);
+            npde->pd_off = PPN(new_pt);
+            for(pn=0; pn<1024; pn++){
+                opte = &old_pt[pn];
+                npte = &new_pt[pn];
+                npte->pt_off  = opte->pt_off;
+                npte->pt_flag = opte->pt_flag;
+                if (opte->pt_flag & PTE_P) {
+                    // turn off each pte's PTE_W
+                    npte->pt_flag &= ~PTE_W;
+                    opte->pt_flag &= ~PTE_W;
+                    // increase the ref count
+                    pg = pgfind(opte->pt_off);
+                    pg->pg_count++;
+                }
             }
         }
     }
@@ -123,15 +123,12 @@ int pt_copy(struct pde *pgd, uint base, uint size){
 }
 
 /* decrease all the pages' reference count, and free the page tables. */
-int pt_free(struct pde *pgd, uint base, uint size){
+int pt_free(struct pde *pgd){
     struct pde *pde;
     struct pte *pte, *pt;
     struct page *pg;
     uint pdn, pn;
 
-    if (base<KMEM_END) {
-        panic("pt_free(): bad memory");
-    }
     //
     // TODO: rewrote this.
     return 0;

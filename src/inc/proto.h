@@ -45,6 +45,7 @@ int vm_clone(struct vm *to);
 struct pte* find_pte(struct pde *pgd, uint vaddr, uint creat);
 struct vma* find_vma(uint addr);
 int vma_init(struct vma *vp, uint base, uint size, uint flag, struct inode *ip, uint ioff);
+int pt_copy(struct pde *npgd, struct pde *opgd);
 
 // mm/malloc.c
 void* kmalloc(uint size);

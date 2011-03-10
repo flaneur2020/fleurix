@@ -49,7 +49,6 @@ void do_no_page(uint vaddr){
         buf = PG_ADDR(vaddr);
         off = buf - vp->v_base + vp->v_ioff;
         lock_ino(vp->v_ino);
-        printk("ino: %d off: %x\n", vp->v_ino->i_num, off );
         readi(vp->v_ino, buf, off, PAGE);
         unlk_ino(vp->v_ino);
         pte->pt_flag &= ~(vp->v_flag&VMA_RDONLY? 0:PTE_W);
@@ -84,10 +83,9 @@ void do_wp_page(uint vaddr){
         pg = pgfind(pte->pt_off);
         if (pg->pg_count > 1) {
             pg->pg_count--; //decrease the reference count of the old page.
-            old_page = (char*)(pg->pg_num * PAGE);
+            old_page = (char*)(pte->pt_off * PAGE);
             new_page = (char*)kmalloc(PAGE);
             memcpy(new_page, old_page, PAGE);
-            printk("new_page:%x old_page:%x\n", new_page, old_page);
             pte->pt_off = PPN(new_page);
             pte->pt_flag |= PTE_W;
             flmmu();
@@ -108,13 +106,11 @@ void do_pgfault(struct trap *tf){
     asm volatile("movl %%cr2, %0":"=a"(addr));
     // invalid page
     if ((tf->err_code & PFE_P)==0) {
-        printk("do_no_page(): pid: %x err: %x addr:%x\n", cu->p_pid, tf->err_code, addr);
         do_no_page(addr);
         return;
     }
     // write procted page
     if (tf->err_code & PFE_W) {
-        printk("do_wp_page(): pid: %x err: %x addr:%x\n", cu->p_pid, tf->err_code, addr);
         do_wp_page(addr);
         return;
     }

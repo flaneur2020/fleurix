@@ -37,9 +37,10 @@ int vm_clone(struct vm *to){
         vp = &(cu->p_vm.vm_area[i]);
         if (vp->v_flag != 0) {
             to->vm_area[i] = *vp;
-            pt_copy(to->vm_pgd, vp->v_base, vp->v_size); // turn off both's PTE_W
         }
     }
+    // copy pages tables, with PTE_W turned off.
+    pt_copy(to->vm_pgd, cu->p_vm.vm_pgd);
     return 0;
 }
 

@@ -122,7 +122,6 @@ void swtch_to(struct proc *to){
     from = cu;
     cu = to;
     lpgd(to->p_vm.vm_pgd);
-    printk("swtch_to(%d):\n", to->p_pid);
     //dump_procs();
     _do_swtch(&(from->p_contxt), &(to->p_contxt));
 }
