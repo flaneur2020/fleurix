@@ -12,5 +12,5 @@ int main(int argc, char **argv) {
         write(fd, "\n", 1);
         write(fd, argv[i], strlen(argv[i]));
     }
-    return 0;
+    return 1;
 }

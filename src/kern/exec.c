@@ -79,7 +79,6 @@ int do_exec(char *path, char **argv){
     // push arguments to the end of user stack, which always the same address.
     esp = VM_STACK;
     argc = upush_argv(&esp, path, argv);
-    printk(".........\n");
     if (argc<0)
         panic("exec(): bad mem");
     upush(&esp, &argc, sizeof(uint));

@@ -28,6 +28,7 @@ int do_waitpid(int pid, int *stat, int opt){
         syserr(EFAULT);
         return -1;
     }
+    //
 _repeat:
     for(nr=1; nr<NPROC; nr++){
         if ((p=proc[nr]) && p!=cu) {
@@ -49,7 +50,8 @@ _repeat:
             }
         }
     }
-    // no child has exited
+_not_found:
+    // no child has found
     if (opt & WNOHANG) {
         return 0;
     }
@@ -61,6 +63,10 @@ _found:
     if (p->p_stat == SZOMB) {
         kfree(p, PAGE);
         proc[p->p_pid] = NULL;
+        return p->p_pid;
     }
-    return 0;
+    if (p->p_stat == SSTOP) {
+        // TODO
+    }
+    goto _not_found;
 }
