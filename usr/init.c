@@ -3,12 +3,12 @@
 #include <unistd.h>
 
 int main(int argc, char **argv){
-    uint ret;
+    uint ret, pid;
     if (fork()==0) {
-        exec("/bin/hello", NULL);
-        return 0;
+        exec("/bin/test_exit", NULL);
     }
     while(1) {
-        waitpid(0, &ret, 0);
+        pid = waitpid(0, &ret, 0);
+        printf("%d exited (%x)\n", pid, ret);
     }
 }

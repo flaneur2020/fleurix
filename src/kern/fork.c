@@ -88,8 +88,8 @@ struct proc* kspawn(void (*func)()){
         fp = cu->p_ofile[fd];
         if (fp != NULL) {
             fp->f_ino->i_count++;
-            p->p_ofile[fd] = fp;
         }
+        p->p_ofile[fd] = fp;
     }
     // signals
     p->p_sig = cu->p_sig;
@@ -133,6 +133,8 @@ int do_fork(struct trap *tf){
  * and make current as proc[0]
  */
 void proc0_init(){
+    int fd;
+
     struct proc *p = cu = proc[0] = (struct proc *)(uint) kstack0;
     p->p_pid = 0;
     p->p_ppid = 0;
@@ -150,7 +152,9 @@ void proc0_init(){
     // init tss
     tss.ss0  = KERN_DS;
     tss.esp0 = (uint)p + PAGE;
-    // init its ldt
+    for (fd=0; fd<NOFILE; fd++){
+        p->p_ofile[fd] = NULL;
+    }
 }
 
 /* --------------------------------------------------- */

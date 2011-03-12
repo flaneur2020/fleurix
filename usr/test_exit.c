@@ -20,9 +20,10 @@ int main(int argc, char **argv) {
         printf("child2\n");
         _exit(0);
     }
-    while(1){
-        pid = wait(&ret);
-        printf("--pid:%d ret:%x\n", pid, ret);
+    if (fork()==0){
+        int *badmem = (int *)0;
+        *badmem = 1;
+        printf("so bad~~~\n");
     }
     return 1;
 }

@@ -87,9 +87,13 @@ void psig(){
     }
     // on SIG_DFL
     switch(n){
+        // ignored on default
         case SIGCHLD:
         case SIGCONT:
             return;
+        // exited on default
+        case SIGSEGV:
+            printk("seg fault.\n");
         case SIGINT:
         case SIGKILL:
         default:

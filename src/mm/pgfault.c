@@ -29,8 +29,7 @@ void do_no_page(uint vaddr){
     // else
     vp = find_vma(vaddr);
     if (vp==NULL) {
-        printk("vaddr: %x\n", vaddr);
-        panic("bad mem;");
+        sigsend(cu->p_pid, SIGSEGV, 1);
         return;
     }
     // demand zero
@@ -74,8 +73,7 @@ void do_wp_page(uint vaddr){
 
     vp = find_vma(vaddr);
     if (vp->v_flag & VMA_RDONLY) {
-        printk("vaddr: %x\n", vaddr);
-        panic("do_wp_page(): rdonly vma.");
+        sigsend(cu->p_pid, SIGSEGV, 1);
         return;
     }
     if (vp->v_flag & VMA_PRIVATE) {
@@ -108,18 +106,16 @@ void do_pgfault(struct trap *tf){
     // invalid page
     if ((tf->err_code & PFE_P)==0) {
         do_no_page(addr);
-        return;
+        return ;
     }
     // write procted page
     if (tf->err_code & PFE_W) {
         do_wp_page(addr);
-        return;
+        return ;
     }
-    // TODO: raise a signal here, hence segmention fault.
+    // raise a signal here, hence segmention fault.
     if (tf->err_code & PFE_U) {
-        dump_tf(tf);
-        //printk("do_pgfault(): eip: %x addr: %x\n", tf->eip, addr);
-        panic("PFE_U");
+        sigsend(cu->p_pid, SIGSEGV, 1);
     }
 }
 

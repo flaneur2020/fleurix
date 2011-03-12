@@ -85,7 +85,7 @@ int do_exec(char *path, char **argv){
     // close all the file descriptors with FD_CLOEXEC
     for (fd=0; fd<NOFILE; fd++) {
         fp = cu->p_ofile[fd];
-        if (fp!=NULL && (fp->f_fdflag & FD_CLOEXEC)) {
+        if ((fp!=NULL) && (fp->f_fdflag & FD_CLOEXEC)) {
             do_close(fd);
         }
     }

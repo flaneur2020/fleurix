@@ -59,6 +59,7 @@ int do_open(char *path, uint flag, uint mode){
                 break;
             case S_IFCHR:
                 (*cdevsw[MAJOR(dev)].d_open)(&tty[MINOR(dev)]);
+                break;
             default:
                 break;
         }
