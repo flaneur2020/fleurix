@@ -17,6 +17,6 @@ struct bdevsw   bdevsw[NBLKDEV] = {
 
 struct cdevsw   cdevsw[NCHRDEV] = {
     { 0, }, /* NODEV */
-    { &nulldev, &nulldev, &tty_read, &tty_write, &nulldev}
+    { &tty_open, &nulldev, &tty_read, &tty_write, &nulldev}
 };
 

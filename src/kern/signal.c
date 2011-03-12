@@ -127,6 +127,8 @@ void usigsav(struct jmp_buf *buf, struct trap *tf, uint mask){
 }
 
 /* ----------------------------------------------------- */
+
+/* send a signal to a process.*/
 int sigsend(int pid, int n, int priv){
     struct proc *p;
     
@@ -141,9 +143,24 @@ int sigsend(int pid, int n, int priv){
     }
     if (p->p_sigact[n-1].sa_handler==SIG_IGN && n!=SIGKILL) 
         return -1;
+
     p->p_sig |= (1<<(n-1));
+    // wakeup the process if nesscary
     if (p->p_stat == SWAIT) {
         setrun(p);
+    }
+    return 0;
+}
+
+/* send a signal to a process group. */
+int sigsend_g(int pgrp, int n, int priv){
+    int nr;
+    struct proc *p;
+
+    for (nr=0; nr<NPROC; nr++) {
+        if ((p=proc[nr]) && p->p_pgrp==pgrp) {
+            sigsend(p->p_pid, n, priv);
+        }
     }
     return 0;
 }
@@ -161,26 +178,15 @@ int do_kill(int pid, int sig){
     struct proc *p;
     int nr, ret;
 
-    if (pid>0) {
+    if (pid>0) 
         return sigsend(pid, sig, 0);
-    }
-    if (pid==0) {
-        for (nr=1; nr<NPROC; nr++) {
-            if (p=proc[nr] && (p!=cu) && (p->p_pgrp==cu->p_pid))
-                ret = sigsend(nr, sig, 0);
-        }
-        return ret;
-    }
+    if (pid==0) 
+        return sigsend_g(cu->p_pid, sig, 0);
+    if (pid < -1) 
+        return sigsend_g(-pid, sig, 0);
     if (pid==-1) {
         for (nr=1; nr<NPROC; nr++) {
-            if (p=proc[nr] && (p!=cu)) 
-                ret = sigsend(nr, sig, 0);
-        }
-        return ret;
-    }
-    if (pid < -1) {
-        for (nr=1; nr<NPROC; nr++) {
-            if (p=proc[nr] && (p!=cu) && (p->p_pgrp==(-pid)))
+            if (p=proc[nr]) 
                 ret = sigsend(nr, sig, 0);
         }
         return ret;

@@ -36,7 +36,7 @@ extern struct tty tty[NTTY];
 #define TTY_WANTED  0x10
 
 /* control characters */
-#define CINTR   003  /* ctrl-C */
+#define CINTR    28  /* ctrl-C */
 #define CQUIT   034  /* ctrl-\ */
 #define CERASE  '\b' /* DEL, BS */
 #define CKILL   025  /* ctrl-X */

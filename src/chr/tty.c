@@ -121,8 +121,10 @@ int tty_input(struct tty *tp, char ch){
         tty_start(tp);
     }
 
-    if (tp->t_flag & TTY_RAW){
-        // TODO
+    if ((tp->t_flag & TTY_RAW)==0){
+        if (CINTR==ch) {
+            sigsend_g(tp->t_pgrp, SIGINT, 0);
+        }
     }
     if (ch==CEOF || ch=='\n') {
         eraseq(&tp->t_canq);

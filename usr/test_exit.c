@@ -25,5 +25,8 @@ int main(int argc, char **argv) {
         *badmem = 1;
         printf("so bad~~~\n");
     }
+    if (fork()==0) {
+        while(1) ;
+    }
     return 1;
 }

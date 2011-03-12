@@ -80,6 +80,7 @@ struct file* falloc(int fd);
 // chr/tty.c
 int tty_read(struct tty *tp, char *buf, uint cnt);
 int tty_write(struct tty *tp, char *buf, uint cnt);
+int tty_open(struct tty *tp);
 
 /* --------------------------------------------------- */
 /* panic */
