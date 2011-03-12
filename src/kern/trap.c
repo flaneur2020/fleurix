@@ -157,12 +157,10 @@ void hwint_common(struct trap *tf) {
     func = hwint_routines[tf->int_no];
     if (tf->int_no < 32) {
         // trap
-        if (func==NULL){
-            printk("hwint_common: unhandled exception: %s \n", fault_str[tf->int_no]);
-            dump_tf(tf);
-            for(;;);
-        }
-        func(tf);
+        if (func)
+            func(tf);
+        else 
+            sigsend(cu->p_pid, SIGTRAP, 1);
     }
     else {
         // irq, syscall
@@ -216,4 +214,5 @@ void idt_init(){
     hwint_init();
     lidt(idt_desc);
 }
+
 

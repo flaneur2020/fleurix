@@ -17,6 +17,7 @@ struct qbuf {
  * */
 struct tty {
     int     t_flag;
+    uint    t_pgrp;
     int     t_dev;  // device number.
     int     t_col;  // position x of the cursor
     int     t_row;  // position y of the cursor

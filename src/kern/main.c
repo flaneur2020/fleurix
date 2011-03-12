@@ -44,20 +44,21 @@ void main(){
 
 char *argv[] = {"abc\n", "testt\n", NULL};
 
-void init(){
-    int fd;
-    static char buf[255] = {0, };
+void init() {
+    cu->p_pgrp = 1;
+    // mount rootfs
     do_mount(rootdev, NULL);
     cu->p_iroot = cu->p_wdir;
     cu->p_iroot->i_count++;
+    // stdin, stdout, stderr
     do_open("/dev/tty0", O_RDWR, 0); //stdin
     do_dup(0); // stdout
     do_dup(0); // stderr
     do_fcntl(0, F_SETFD, 0); // turn off FD_CLOEXEC
     do_fcntl(1, F_SETFD, 0);
     do_fcntl(2, F_SETFD, 0);
-    do_exec("/bin/test_pause", NULL);
-
+    // enter user mode, never returns.
+    do_exec("/bin/init", NULL);
     for(;;);
 }
 

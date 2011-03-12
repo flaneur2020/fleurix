@@ -22,6 +22,7 @@ struct file file[NFILE];
 int do_read(int fd, char *buf, int cnt){
     struct file *fp;
     struct inode *ip;
+    uint dev;
     int r;
 
     fp = cu->p_ofile[fd];
@@ -39,9 +40,11 @@ int do_read(int fd, char *buf, int cnt){
     lock_ino(fp->f_ino);
     switch(ip->i_mode & S_IFMT) {
         case S_IFBLK:
-            // TODO:
+            // TODO;
+            break;
         case S_IFCHR:
-            r = tty_read(&tty[MINOR(ip->i_dev)], buf, cnt);
+            dev = ip->i_dev;
+            r = (*cdevsw[MAJOR(dev)].d_read)(&tty[MINOR(dev)], buf, cnt);
             break;
         case S_IFDIR:
         case S_IFREG:
@@ -61,6 +64,7 @@ int do_write(int fd, char *buf, int cnt){
     struct file *fp;
     struct inode *ip;
     int r, off;
+    uint dev;
     
     fp = cu->p_ofile[fd];
     if ( fd<0 || fd>NOFILE || fp==NULL) {
@@ -84,9 +88,11 @@ int do_write(int fd, char *buf, int cnt){
     lock_ino(ip);
     switch(ip->i_mode & S_IFMT) {
     case S_IFBLK:
-        // TODO
+        // TODO: 
+        break;
     case S_IFCHR:
-        r = tty_write(&tty[MINOR(ip->i_dev)], buf, cnt);
+        dev = ip->i_dev;
+        r = (*cdevsw[MAJOR(dev)].d_write)(&tty[MINOR(dev)], buf, cnt);
         break;
     case S_IFDIR:
     case S_IFREG:

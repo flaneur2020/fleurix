@@ -27,6 +27,7 @@ struct file file[NFILE];
 int do_open(char *path, uint flag, uint mode){
     struct inode *ip;
     struct file *fp;
+    ushort dev;
     int fd;
 
     // on create a new file.
@@ -49,7 +50,18 @@ int do_open(char *path, uint flag, uint mode){
             syserr(ENFILE);
             return -1;
         }
-        // TODO: check access and special files
+        // TODO: check access 
+        // on special files
+        dev = ip->i_dev;
+        switch(ip->i_mode & S_IFMT) {
+            case S_IFBLK:
+                // TODO:
+                break;
+            case S_IFCHR:
+                (*cdevsw[MAJOR(dev)].d_open)(&tty[MINOR(dev)]);
+            default:
+                break;
+        }
     } 
     if (((fd=ufalloc())<0) || (fp=falloc(fd))==NULL) {
         iput(ip);

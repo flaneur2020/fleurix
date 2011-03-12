@@ -146,6 +146,10 @@ int tty_start(struct tty *tp){
 
 /* ---------------------------------------------- */
 
+int tty_open(struct tty *tp){
+    tp->t_pgrp = cu->p_pgrp;
+}
+
 /*
  * If the list is not full, wait until
  * */
