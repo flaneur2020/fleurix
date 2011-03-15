@@ -23,7 +23,7 @@ typedef unsigned int    uint;
 #define NFILE   128
 #define NOFILE  16
 #define NMOUNT  16
-#define NTTY    1
+#define NTTY    8
 #define NKPAGE  (LO_MEM/PAGE)
 #define NPAGE   (PMEM/PAGE)
 

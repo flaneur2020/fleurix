@@ -13,10 +13,10 @@ struct bdevsw {
 extern struct bdevsw    bdevsw[NBLKDEV];   
 
 struct cdevsw {
-    int             (*d_open)   (struct tty *tp);
-    int             (*d_close)  (struct tty *tp);
-    int             (*d_read)   (struct tty *tp, char *buf, uint cnt);
-    int             (*d_write)  (struct tty *tp, char *buf, uint cnt);
+    int             (*d_open)   (ushort dev);
+    int             (*d_close)  (ushort dev);
+    int             (*d_read)   (ushort dev, char *buf, uint cnt);
+    int             (*d_write)  (ushort dev, char *buf, uint cnt);
     int             (*d_sgtty)();
 };
 

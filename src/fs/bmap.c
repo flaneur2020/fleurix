@@ -107,7 +107,6 @@ int bmap(struct inode *ip, ushort nr, uchar creat) {
 /*
  * Discard inode's content.
  * Called from routines like open(), iput(). 
- * TODO: comments
  * */
 int itrunc(struct inode *ip){
     int i,j; 

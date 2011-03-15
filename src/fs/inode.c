@@ -91,6 +91,8 @@ _loop:
  * also check the link count, if zero, trucate it.
  * */
 void iput(struct inode *ip){
+    ushort dev;
+
     ip->i_flag |= I_LOCK;
     if (ip->i_count > 0) {
         ip->i_count--;
@@ -99,6 +101,16 @@ void iput(struct inode *ip){
         if (ip->i_nlink==0) {
             itrunc(ip);
             ifree(ip->i_dev, ip->i_num);
+        }
+        // if it's a device file, the dev number is stored in zone[0].
+        dev = ip->i_zone[0];
+        switch (ip->i_mode & S_IFMT) {
+            case S_IFBLK:
+                (*bdevsw[MAJOR(dev)].d_close)(dev);
+                break;
+            case S_IFCHR:
+                (*cdevsw[MAJOR(dev)].d_close)(dev);
+                break;
         }
         iupdate(ip);
         ip->i_flag = 0;

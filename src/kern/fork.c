@@ -74,8 +74,8 @@ struct proc* kspawn(void (*func)()){
     p->p_nice = cu->p_nice;
     p->p_pri  = PUSER;
     //
-    p->p_uid  = cu->p_uid;
-    p->p_gid  = cu->p_gid;
+    p->p_euid = cu->p_euid;
+    p->p_egid = cu->p_egid;
     p->p_ruid = cu->p_ruid;
     p->p_rgid = cu->p_rgid;
     // increase the reference count of inodes, and dup files
@@ -145,8 +145,8 @@ void proc0_init(){
     p->p_pri = 0;
     p->p_nice = 20;
     // on user
-    p->p_uid = 0;
-    p->p_gid = 0;
+    p->p_euid = 0;
+    p->p_egid = 0;
     // attach the page table
     p->p_vm.vm_pgd = pgd0;
     // init tss

@@ -2,11 +2,12 @@
 #include <x86.h>
 #include <proto.h>
 #include <proc.h>
-
+//
+#include <conf.h>
 #include <tty.h>
 #include <keybd.h>
 
-struct tty tty[1];
+struct tty tty[NTTY];
 
 /* ---------------------------------------------- */
 
@@ -148,18 +149,44 @@ int tty_start(struct tty *tp){
 
 /* ---------------------------------------------- */
 
-int tty_open(struct tty *tp){
+int tty_open(ushort dev){
+    struct tty *tp;
+
+    if (MINOR(dev) >= NTTY){
+        syserr(ENODEV);
+        return -1;
+    }
+    tp = &tty[MINOR(dev)];
+    tp->t_flag = TTY_ECHO;
+    tp->t_putc = &putch;
+    tp->t_rawq.q_count = 0;
+    tp->t_canq.q_count = 0;
+    tp->t_outq.q_count = 0;
     tp->t_pgrp = cu->p_pgrp;
+    return 0;
 }
+
+/* called in iput() */
+int tty_close(ushort dev){
+    return 0;
+}
+
+/* ---------------------------------------------- */
 
 /*
  * If the list is not full, wait until
  * */
-int tty_read(struct tty *tp, char *buf, uint cnt){
+int tty_read(ushort dev, char *buf, uint cnt){
+    struct tty *tp;
     struct qbuf qb;
     char ch;
     int i;
 
+    if (MINOR(dev) >= NTTY){
+        syserr(ENODEV);
+        return -1;
+    }
+    tp = &tty[MINOR(dev)];
     // if no data on canonical list
     if (tp->t_canq.q_count < cnt) {
         sleep(tp, PRITTY);
@@ -173,8 +200,15 @@ int tty_read(struct tty *tp, char *buf, uint cnt){
     return i+1;
 }
 
-int tty_write(struct tty *tp, char *buf, uint cnt){
+int tty_write(ushort dev, char *buf, uint cnt){
+    struct tty *tp;
     int i;
+
+    if (MINOR(dev) >= NTTY){
+        syserr(ENODEV);
+        return -1;
+    }
+    tp = &tty[MINOR(dev)];
     for (i=0; i<cnt; i++) {
         tty_output(tp, buf[i]);
     }

@@ -137,7 +137,7 @@ int sigsend(int pid, int n, int priv){
         syserr(EINVAL);
         return -1;
     }
-    if ((priv || cu->p_uid==p->p_uid || suser())==0) {
+    if ((priv || cu->p_euid==p->p_euid || suser())==0) {
         syserr(EPERM);
         return -1;
     }

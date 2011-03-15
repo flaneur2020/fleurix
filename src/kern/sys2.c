@@ -20,6 +20,7 @@
  *
  * */
 
+/* int access(char *path, int mode); */
 int sys_access(struct trap *tf){
     char *path = tf->ebx;
     int mode = tf->ecx;
@@ -116,6 +117,7 @@ int sys_mknod(struct trap *tf){
     return do_mknod(path, mode, dev);
 }
 
+/* int creat(char *path, int mode); */
 int sys_creat(struct trap *tf){
     char *path = (char*) tf->ebx;
     int mode = (int) tf->ecx;
@@ -123,46 +125,121 @@ int sys_creat(struct trap *tf){
     return do_creat(path, mode);
 }
 
+/* int truncate(char *path, int off) */
+int sys_truncate(struct trap *tf){
+    syserr(ENOSYS);
+    return -1;
+}
+
 /* --------------------------------- */
 
-/* int stat(const char *path, struct stat *buf); */
-int sys_stat(struct trap *tf){
-    char *path = (char*) tf->ebx;
-    struct stat *buf = (struct stat*) tf->ecx;
-    struct inode *ip;
-
-    ip = namei(path, 0);
-    if (ip==NULL){
+/* int fstat(int fd, struct stat *buf); */
+int sys_fstat(struct trap *tf){
+    int fd = (int)tf->ebx;
+    struct stat *sbuf = (struct stat*)tf->ecx;
+    struct file *fp;
+   
+    if (fd<0 || fd>=NOFILE || cu->p_ofile[fd]==NULL) {
+        syserr(EBADF);
         return -1;
     }
-    if (vm_verify(buf, sizeof(struct stat)) < 0) {
+    fp = cu->p_ofile[fd];
+    return do_stat(fp->f_ino, sbuf);
+}
+
+/* int stat(char *path, struct stat *buf); */
+int sys_stat(struct trap *tf){
+    char *path = (char*)tf->ebx; 
+    struct stat *sbuf = (struct stat*)tf->ecx;
+    struct inode *ip;
+
+    if (vm_verify(sbuf, sizeof(struct stat))<0) {
         syserr(EFAULT);
         return -1;
     }
-    return do_stat(ip, buf);
+    ip = namei(path, 0);
+    if (ip==NULL) {
+        syserr(ENOENT);
+        return -1;
+    }
+    return do_stat(ip, sbuf);
 }
-
-/* int stat(const char *path, struct stat *buf); */
-int sys_fstat(struct trap *tf){
-}
-
+ 
+/* int fcntl(int fd, int cmd, int arg); */
 int sys_fcntl(struct trap *tf){
+    int fd = (int)tf->ebx;
+    int cmd = (int)tf->ecx;
+    int arg = (int)tf->edx;
+
+    return do_fcntl(fd, cmd, arg);
 }
 
 int sys_ioctl(struct trap *tf){
+    syserr(ENOSYS);
+    return -1;
 }
 
 /* --------------------------------- */
 
 /* int dup(int oldfd); */
 int sys_dup(struct trap *tf){
+    int oldfd = (int)tf->ebx;
+
+    return do_dup(oldfd);
 }
 
 /* int dup2(int oldfd, int newfd); */
 int sys_dup2(struct trap *tf){
+    int oldfd = (int)tf->ebx;
+    int newfd = (int)tf->ecx;
+
+    return do_dup2(oldfd, newfd);
 }
 
 /* int pipe(int fd[2]); */
 int sys_pipe(struct trap *tf){
 }
 
+/* ----------------------------------------- */
+
+/* int chroot(char *path); */
+int sys_chroot(struct trap *tf){
+    char *path = (char*)tf->ebx;
+    struct inode *ip;
+
+    ip = namei(path, 0);
+    if (ip==NULL) {
+        syserr(ENOENT);
+        return -1;
+    }
+    if ((ip->i_mode&S_IFMT) != S_IFDIR) {
+        syserr(ENOTDIR);
+        iput(ip);
+        return -1;
+    }
+    iput(cu->p_iroot);
+    cu->p_iroot = ip;
+    unlk_ino(ip);
+    return 0;
+}
+
+/* int chdir(char *path); */
+int sys_chdir(struct trap *tf){
+    char *path = (char*)tf->ebx;
+    struct inode *ip;
+
+    ip = namei(path, 0);
+    if (ip==NULL) {
+        syserr(ENOENT);
+        return -1;
+    }
+    if ((ip->i_mode&S_IFMT) != S_IFDIR) {
+        syserr(ENOTDIR);
+        iput(ip);
+        return -1;
+    }
+    iput(cu->p_wdir);
+    cu->p_wdir = ip;
+    unlk_ino(ip);
+    return 0;
+}

@@ -117,9 +117,9 @@ int do_access(struct inode *ip, uint mode){
     }
     //
     m = ip->i_mode & 0777;
-    if (cu->p_uid == ip->i_uid)
+    if (cu->p_euid == ip->i_uid)
         m >>= 6;
-    else if (cu->p_gid == ip->i_gid)
+    else if (cu->p_egid == ip->i_gid)
         m >>= 3;
     // 
     if ((m & 07 & mode)==mode) {
@@ -162,8 +162,8 @@ int do_mknod(char *path, int mode, ushort dev){
     ip->i_mode = mode;
     ip->i_nlink = 1;
     ip->i_mtime = time();
-    ip->i_uid = cu->p_uid;
-    ip->i_gid = cu->p_gid;
+    ip->i_uid = cu->p_euid;
+    ip->i_gid = cu->p_egid;
     iupdate(ip);
     iput(ip);
     return 0;

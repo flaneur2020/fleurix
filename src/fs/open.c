@@ -36,8 +36,8 @@ int do_open(char *path, uint flag, uint mode){
         // if file is not existing yet.
         if (ip->i_nlink==0) {
             ip->i_mode = mode;
-            ip->i_uid = cu->p_uid;
-            ip->i_gid = cu->p_gid;
+            ip->i_uid = cu->p_euid;
+            ip->i_gid = cu->p_egid;
             ip->i_mtime = time();
             ip->i_nlink = 1;
             iupdate(ip);
@@ -51,16 +51,14 @@ int do_open(char *path, uint flag, uint mode){
             return -1;
         }
         // TODO: check access 
-        // on special files
-        dev = ip->i_dev;
+        // if it's a device file, the dev number is stored in zone[0].
+        dev = ip->i_zone[0];
         switch(ip->i_mode & S_IFMT) {
             case S_IFBLK:
-                // TODO:
+                (*bdevsw[MAJOR(dev)].d_open)(dev);
                 break;
             case S_IFCHR:
-                (*cdevsw[MAJOR(dev)].d_open)(&tty[MINOR(dev)]);
-                break;
-            default:
+                (*cdevsw[MAJOR(dev)].d_open)(dev);
                 break;
         }
     } 

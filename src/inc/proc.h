@@ -32,8 +32,8 @@ struct proc {
     uint                p_pid;          
     uint                p_ppid;         /* parent's pid */
     uint                p_pgrp;         /* process group */
-    uint                p_uid;          /* effective uid */
-    uint                p_gid;          /* effective gid */
+    uint                p_euid;         /* effective uid */
+    uint                p_egid;         /* effective gid */
     uint                p_ruid;         /* real uid */
     uint                p_rgid;         /* real gid */
     uint                p_umask;        /* umask for files */

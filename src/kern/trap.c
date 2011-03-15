@@ -169,7 +169,7 @@ void hwint_common(struct trap *tf) {
             func(tf);
     }
     // on signal
-    if (issig() && (cu->p_stat==SRUN) && ((tf->cs & 3)==RING3)) {
+    if (issig() && (cu->p_stat!=SZOMB) && ((tf->cs & 3)==RING3)) {
         psig();
     }
     // on sheduling 

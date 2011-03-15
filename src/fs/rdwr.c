@@ -44,7 +44,7 @@ int do_read(int fd, char *buf, int cnt){
             break;
         case S_IFCHR:
             dev = ip->i_dev;
-            r = (*cdevsw[MAJOR(dev)].d_read)(&tty[MINOR(dev)], buf, cnt);
+            r = (*cdevsw[MAJOR(dev)].d_read)(dev, buf, cnt);
             break;
         case S_IFDIR:
         case S_IFREG:
@@ -92,7 +92,7 @@ int do_write(int fd, char *buf, int cnt){
         break;
     case S_IFCHR:
         dev = ip->i_dev;
-        r = (*cdevsw[MAJOR(dev)].d_write)(&tty[MINOR(dev)], buf, cnt);
+        r = (*cdevsw[MAJOR(dev)].d_write)(dev, buf, cnt);
         break;
     case S_IFDIR:
     case S_IFREG:

@@ -78,9 +78,9 @@ struct inode* namei_parent(char *path, char **name);
 struct file* falloc(int fd);
 
 // chr/tty.c
-int tty_read(struct tty *tp, char *buf, uint cnt);
-int tty_write(struct tty *tp, char *buf, uint cnt);
-int tty_open(struct tty *tp);
+int tty_read(ushort dev, char *buf, uint cnt);
+int tty_write(ushort dev, char *buf, uint cnt);
+int tty_open(ushort dev);
 
 /* --------------------------------------------------- */
 /* panic */
