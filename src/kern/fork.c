@@ -79,10 +79,12 @@ struct proc* kspawn(void (*func)()){
     p->p_ruid = cu->p_ruid;
     p->p_rgid = cu->p_rgid;
     // increase the reference count of inodes, and dup files
-    p->p_wdir = cu->p_wdir;
-    p->p_wdir->i_count++;
-    p->p_iroot = cu->p_iroot;
-    p->p_iroot->i_count++;
+    if (cu->p_wdir != NULL) {
+        p->p_wdir = cu->p_wdir;
+        p->p_wdir->i_count++;
+        p->p_iroot = cu->p_iroot;
+        p->p_iroot->i_count++;
+    }
     // dup the files.
     for (fd=0; fd<NOFILE; fd++){
         fp = cu->p_ofile[fd];
@@ -149,6 +151,9 @@ void proc0_init(){
     p->p_egid = 0;
     // attach the page table
     p->p_vm.vm_pgd = pgd0;
+    //
+    p->p_wdir = NULL;
+    p->p_iroot = NULL;
     // init tss
     tss.ss0  = KERN_DS;
     tss.esp0 = (uint)p + PAGE;

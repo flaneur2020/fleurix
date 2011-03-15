@@ -53,11 +53,12 @@ int do_exec(char *path, char **argv){
     struct vma *vp;
     struct file *fp;
     uint bn, fd, argc, esp;
+    char **tmp;
 
     ip = namei(path, 0);
     if (ip==NULL) {
-        syserr(ENOENT);
-        goto _badf;
+        iput(iput);
+        return syserr(ENOENT);
     }
     // read the first block of file to get the a.out header.
     bn = bmap(ip, 0, 0);
@@ -72,16 +73,20 @@ int do_exec(char *path, char **argv){
         syserr(EINVAL);
         goto _badf;
     }
+    // restore the path and argv temporarily
+    tmp = store_argv(path, argv);
     // dettach the previous address space, and initialize a new one
     vm = &cu->p_vm;
     vm_clear(vm);
     vm_renew(vm, ah, ip);
     // push arguments to the end of user stack, which always the same address.
     esp = VM_STACK;
-    argc = upush_argv(&esp, path, argv);
+    argc = upush_argv(&esp, tmp);
     if (argc<0)
         panic("exec(): bad mem");
     upush(&esp, &argc, sizeof(uint));
+    //
+    free_argv(tmp);
     // close all the file descriptors with FD_CLOEXEC
     for (fd=0; fd<NOFILE; fd++) {
         fp = cu->p_ofile[fd];
@@ -99,35 +104,27 @@ int do_exec(char *path, char **argv){
 _badf:
     brelse(bp);
     iput(ip);
-    return NULL;
+    return -1;
 }
+
+/* --------------------------------------------------------- */
 
 /* push argv into user stack, returns argc.
  * note: vm_verify() may override proc's address space, take care.
  * */
-int upush_argv(uint *esp, char *path, char **argv){
+int upush_argv(uint *esp, char **tmp){
     uint arglen, argc, tmp_esp;
     int i,r;
-    char *str, **uargv, **tmp;
+    char *str, **uargv;
 
-    argc = 1;
-    arglen = strlen(path)+1;
-    if (argv != NULL) {
-        for (i=0; (str=argv[i])!=NULL; i++) {
+    argc = 0;
+    if (tmp != NULL) {
+        for (i=0; (str=tmp[i])!=NULL; i++) {
             arglen += strlen(str)+1;
             argc++;
         }
     }
     arglen += sizeof(char*) * argc;
-    // store the argv in temp
-    tmp    = (char**)kmalloc(PAGE);
-    tmp[0] = (char*) kmalloc(PAGE);
-    tmp[PAGE-1] = '\0';
-    for(i=1; i<argc; i++) {
-        tmp[i] = (char*)kmalloc(PAGE);
-        tmp[PAGE-1] = '\0';
-        strncpy(tmp[i], argv[i], PAGE-1);
-    }
     // note: vm_verify may modify proc's address space.
     if (vm_verify(*esp-arglen, arglen) < 0){
         syserr(EINVAL);
@@ -141,11 +138,6 @@ int upush_argv(uint *esp, char *path, char **argv){
         uargv[i] = (char *) *esp;
     }
     *esp = uargv;
-    // freeing tmp
-    for(i=0; i<argc; i++){
-        kfree(tmp[i], PAGE);
-    }
-    kfree(tmp, PAGE);
     // push argv[]
     upush(esp, &uargv, sizeof(uint));
     return argc;
@@ -162,6 +154,40 @@ int upush(uint *esp, char *buf, int len){
 }
 
 /* ---------------------------------------------------- */
+
+/* store the argv into some new-allocated pages temporily */
+static char** store_argv(char *path, char **argv){
+    char *str, **uargv, **tmp;
+    int argc, i;
+
+    argc = 1;
+    if (argv!=NULL) 
+        for (; argv[argc-1]; argc++);
+    // store the argv in temp
+    tmp    = (char**)kmalloc(PAGE);
+    tmp[0] = (char*) kmalloc(PAGE);
+    strncpy(tmp[0], path, PAGE-1);
+    tmp[0][PAGE-1] = '\0';
+    for(i=1; i<argc; i++) {
+        tmp[i] = (char*)kmalloc(PAGE);
+        strncpy(tmp[i], argv[i-1], PAGE-1);
+        tmp[i][PAGE-1] = '\0';
+    }
+    tmp[argc] = NULL;
+    return tmp;
+}
+
+static int free_argv(char **tmp){
+    int i;
+    // freeing tmp
+    for(i=0; tmp[i]!=NULL; i++){
+        kfree(tmp[i], PAGE);
+    }
+    kfree(tmp, PAGE);
+}
+
+/* ---------------------------------------------------------------*/
+
 
 /* for debug */
 int dump_ahead(struct ahead *ah){

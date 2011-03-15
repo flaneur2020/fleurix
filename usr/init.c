@@ -5,10 +5,10 @@
 int main(int argc, char **argv){
     uint ret, pid;
     if (fork()==0) {
-        exec("/bin/test_exit", NULL);
+        exec("/bin/sh", NULL);
     }
     while(1) {
-        pid = waitpid(0, &ret, 0);
-        printf("%d exited (%x)\n", pid, ret);
+        pid = wait(&ret);
+        //printf("exited - pid %d => %d\n", pid, ret);
     }
 }

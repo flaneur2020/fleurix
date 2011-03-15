@@ -82,6 +82,7 @@ _retu:
 ;; the routine _hwint_ret is the execution entry of a new proc. 
 ;;
 _hwint_common_stub:
+    sti
     pusha
     push dword ds
     push dword es

@@ -85,18 +85,18 @@ int do_write(int fd, char *buf, int cnt){
     }
     //
     ip = fp->f_ino;
-    lock_ino(ip);
     switch(ip->i_mode & S_IFMT) {
     case S_IFBLK:
         // TODO: 
         break;
     case S_IFCHR:
-        dev = ip->i_dev;
+        dev = ip->i_zone[0];
         r = (*cdevsw[MAJOR(dev)].d_write)(dev, buf, cnt);
         break;
     case S_IFDIR:
     case S_IFREG:
     default:
+        lock_ino(ip);
         r = writei(ip, buf, off, cnt);
     }
     if (r < 0){

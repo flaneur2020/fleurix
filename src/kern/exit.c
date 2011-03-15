@@ -32,13 +32,13 @@ int do_exit(int ret){
             do_close(fd);
         }
     }
-    iput(cu->p_wdir);
     iput(cu->p_iroot);
+    iput(cu->p_wdir);
+    // tell its parent
+    sigsend(cu->p_ppid, SIGCHLD, 1);
     // free the address space
     vm_clear(&cu->p_vm);
     kfree(cu->p_vm.vm_pgd, PAGE);
-    // tell its parent
-    sigsend(cu->p_ppid, SIGCHLD, 1);
     // make this process Zombie, give all the children to proc[1] 
     // and tell its parent
     cu->p_chan = 0;
@@ -50,7 +50,7 @@ int do_exit(int ret){
     }
     // wakeup proc[1] and its parent
     p = proc[cu->p_ppid];
-    wakeup(proc[1]);
     wakeup(p);
+    wakeup(proc[1]);
     return 0;
 }

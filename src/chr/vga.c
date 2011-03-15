@@ -119,6 +119,7 @@ void printn(uint n, uint b){
  * */
 void printk(char *fmt, ...){
     char c, *s;
+    int n;
     int *adx = (uint*)(void*)&fmt + 1;
 _loop:
     while((c = *fmt++) != '%'){
@@ -127,7 +128,13 @@ _loop:
     }
     c = *fmt++;
     if (c == 'd' || c == 'l'){
-        printn(*adx, 10);
+        n = *adx;
+        if (n<0){
+            putch('-');
+            printn(-n, 10);
+        }
+        else
+            printn(n, 10);
     }
     if (c == 'o' || c == 'x'){
         printn(*adx, c=='o'? 8:16 );

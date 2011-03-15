@@ -93,6 +93,8 @@ _loop:
 void iput(struct inode *ip){
     ushort dev;
 
+    if(ip==NULL)
+        panic("bad struct inode*");
     ip->i_flag |= I_LOCK;
     if (ip->i_count > 0) {
         ip->i_count--;

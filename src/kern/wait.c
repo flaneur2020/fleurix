@@ -33,20 +33,31 @@ _repeat:
     for(nr=1; nr<NPROC; nr++){
         if ((p=proc[nr]) && p!=cu) {
             if (pid < -1) {
-                if (p->p_ppid==cu->p_pid && p->p_pgrp==cu->p_pid) 
-                    goto _found;
+                if (p->p_ppid!=cu->p_pid || p->p_pgrp!=cu->p_pid) 
+                    continue;
             }
             else if (pid == -1) {
-                if (p->p_ppid==cu->p_pid) 
-                    goto _found;
+                if (p->p_ppid!=cu->p_pid) 
+                    continue;
             }
             else if (pid == 0) {
-                if (p->p_ppid==cu->p_pid && p->p_pgrp==cu->p_pgrp) 
-                    goto _found;
+                if (p->p_ppid!=cu->p_pid || p->p_pgrp!=cu->p_pgrp) 
+                    continue;
             }
             else if (pid > 0) {
-                if (p->p_ppid==cu->p_pid && p->p_pid==pid) 
-                    goto _found;
+                if (p->p_ppid!=cu->p_pid || p->p_pid!=pid) 
+                    continue;
+            }
+            // on found
+            switch(p->p_stat){
+                case SZOMB:
+                    *stat = p->p_ret;
+                    pid = p->p_pid;
+                    proc[pid] = NULL;
+                    kfree(p, PAGE);
+                    return pid;
+                default:
+                    continue;
             }
         }
     }
@@ -56,20 +67,5 @@ _not_found:
         return 0;
     }
     sleep(cu, PWAIT);
-    if (issig() == SIGCHLD) {
-        cu->p_sig &= ~SIGCHLD;
-    }
     goto _repeat;
-
-_found:
-    *stat = p->p_ret;
-    if (p->p_stat == SZOMB) {
-        kfree(p, PAGE);
-        proc[p->p_pid] = NULL;
-        return p->p_pid;
-    }
-    if (p->p_stat == SSTOP) {
-        // TODO
-    }
-    goto _not_found;
 }

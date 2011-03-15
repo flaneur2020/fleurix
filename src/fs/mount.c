@@ -19,9 +19,8 @@ struct super *rootsp = NULL;
  * of sleep until somebody frees like what getblk does.
  * if dev==rootdev, set a pointer rootsp for a quicker access.
  * 
- * TODO: mount flag.
  * */
-int do_mount(ushort dev, struct inode *ip){
+struct super* do_mount(ushort dev, struct inode *ip){
     struct buf *bp;
     struct super *sp;
 
@@ -42,7 +41,7 @@ int do_mount(ushort dev, struct inode *ip){
     }
     // not found
     printk("no free mount slot");
-    return -1;
+    return NULL;
 _found:
     // if the inode as mount point is not a directory
     if ((ip!=NULL) && (ip->i_mode & S_IFMT)!=S_IFDIR){
@@ -56,7 +55,7 @@ _found:
         ip->i_count++;
     sp->s_imnt = ip;
     unlk_sp(sp);
-    return 0;
+    return sp;
 }
 
 /*

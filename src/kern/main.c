@@ -45,11 +45,17 @@ void main(){
 char *argv[] = {"abc\n", "testt\n", NULL};
 
 void init() {
+    struct super *sp;
+    struct inode *ip;
+
     cu->p_pgrp = 1;
     // mount rootfs
     do_mount(rootdev, NULL);
-    cu->p_iroot = cu->p_wdir;
-    cu->p_iroot->i_count++;
+    ip = iget(rootdev, 1);
+    cu->p_wdir = ip;
+    cu->p_iroot = ip;
+    ip->i_count += 2;
+    iput(ip);
     // stdin, stdout, stderr
     do_open("/dev/tty0", O_RDWR, 0); //stdin
     do_dup(0); // stdout

@@ -26,7 +26,6 @@ int main(int argc, char **argv) {
         printf("so bad~~~\n");
     }
     if (fork()==0) {
-        while(1) ;
     }
     return 1;
 }

@@ -5,12 +5,9 @@
 int i;
 
 int main(int argc, char **argv) {
-    int fd;
-
-    printf("hello~\n");
-    for (i=0; i<argc; i++) {
-        write(fd, "\n", 1);
-        write(fd, argv[i], strlen(argv[i]));
+    printf("hello!\n");
+    for(i=0; i<argc; i++){
+        printf("%s\n", argv[i]);
     }
-    return 1;
+    return 0;
 }

@@ -35,6 +35,8 @@ int strlen(char *str){
     return sp-str;
 }
 
+/* ------------------------------------------------------ */
+
 char* strcpy(char *dst, const char *src) {
 	char *tmp = dst;
     while (*dst++ = *src++); 
@@ -49,6 +51,27 @@ char *strncpy(char *dst, const char *src, unsigned int cnt) {
         while (--cnt) 
             *dst++ = '\0';
     return tmp;
+}
+
+char *strcat(char *dst, const char *src){
+    char *tmp = dst;
+    for(;*tmp; tmp++);
+    while (*tmp++ = *src++);
+    return dst;
+}
+
+char *strncat(char *dst, const char *src, unsigned int n){
+    char *tmp = dst;
+    if (n==0) 
+        return dst;
+    for(;*tmp; tmp++);
+    while (*tmp++ = *src++) {
+        if (--n <= 0) {
+            *tmp = '\0';
+            break;
+        }
+    }
+    return dst;
 }
 
 /* 
