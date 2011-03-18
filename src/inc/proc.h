@@ -5,18 +5,7 @@
 #include <file.h>
 #include <vm.h>
 #include <signal.h>
-
-/* the regs saved in a task switch. */
-struct contxt {
-    int eip;
-    int esp;
-    int ebx;
-    int ecx;
-    int edx;
-    int esi;
-    int edi;
-    int ebp;
-};
+#include <setjmp.h>
 
 /*
  * struct proc indicated some info on sched.
@@ -47,7 +36,7 @@ struct proc {
     struct inode       *p_iroot;        /* the root dir */
     struct file        *p_ofile[NOFILE];/* file desciptors of the current opened files */
     struct vm           p_vm;
-    struct contxt       p_contxt;       /* - */
+    struct jmp_buf      p_contxt;       /* - */
     struct trap        *p_trap;         /* saved on entering kernel from user, for psig(). */
 };
 
