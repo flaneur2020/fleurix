@@ -25,6 +25,13 @@ struct stat {
 #define S_ISGID  0002000
 #define S_ISVTX  0001000
 
+/* predicates */
+#define S_ISREG(m)	(((m) & S_IFMT) == S_IFREG)
+#define S_ISDIR(m)	(((m) & S_IFMT) == S_IFDIR)
+#define S_ISCHR(m)	(((m) & S_IFMT) == S_IFCHR)
+#define S_ISBLK(m)	(((m) & S_IFMT) == S_IFBLK)
+#define S_ISFIFO(m)	(((m) & S_IFMT) == S_IFIFO)
+
 /* access */
 #define RWX_MODES 0000777	/* mode bits for RWX only */
 #define R_BIT    0000004	/* Rwx protection bit */

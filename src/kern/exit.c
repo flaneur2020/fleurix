@@ -31,6 +31,7 @@ int do_exit(int ret){
         if (fp != NULL) {
             do_close(fd);
         }
+        cu->p_ofile[fd] = NULL;
     }
     iput(cu->p_iroot);
     iput(cu->p_wdir);

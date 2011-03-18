@@ -8,6 +8,7 @@
 //
 #include <super.h>
 #include <inode.h>
+#include <dirent.h>
 #include <stat.h>
 
 
@@ -124,7 +125,6 @@ struct inode* _namei(char *path, uchar creat, uchar parent, char **name){
     // set it's root directory here.
     if (*path == '/') {
         wip = iget(rootdev, ROOTINO);
-        cu->p_wdir = wip;
     }
     else {
         cdp = cu->p_wdir;
@@ -139,8 +139,8 @@ struct inode* _namei(char *path, uchar creat, uchar parent, char **name){
         }
         // if working inode is root and componet is ".."
         if ((wip->i_num==ROOTINO) && (strncmp(path, "..", 2)==0)) {
-            continue;
         }
+
         // wip must be a directory
         if ((wip->i_mode & S_IFMT)!=S_IFDIR) {
             iput(wip);

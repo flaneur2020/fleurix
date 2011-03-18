@@ -37,18 +37,18 @@ int do_read(int fd, char *buf, int cnt){
     }
 
     ip = fp->f_ino;
-    lock_ino(fp->f_ino);
     switch(ip->i_mode & S_IFMT) {
         case S_IFBLK:
             // TODO;
             break;
         case S_IFCHR:
-            dev = ip->i_dev;
+            dev = ip->i_zone[0];
             r = (*cdevsw[MAJOR(dev)].d_read)(dev, buf, cnt);
             break;
         case S_IFDIR:
         case S_IFREG:
         default:
+            lock_ino(fp->f_ino);
             r = readi(ip, buf, fp->f_offset, cnt);
     }
     if (r < 0){

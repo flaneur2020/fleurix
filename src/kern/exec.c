@@ -47,12 +47,13 @@
 int do_exec(char *path, char **argv){
     struct inode *ip;
     struct buf *bp;
+    struct sigaction *sa;
     struct ahead *ah;
     struct page *pg;
     struct vm *vm;
     struct vma *vp;
     struct file *fp;
-    uint bn, fd, argc, esp;
+    uint bn, fd, argc, esp, nr;
     char **tmp;
 
     ip = namei(path, 0);
@@ -93,6 +94,14 @@ int do_exec(char *path, char **argv){
         if ((fp!=NULL) && (fp->f_fdflag & FD_CLOEXEC)) {
             do_close(fd);
         }
+    }
+    // clear all sigactions
+    for (nr=0; nr<NSIG; nr++){
+        sa = &cu->p_sigact[nr];
+        sa->sa_handler = SIG_DFL;
+        sa->sa_mask = 0;
+        sa->sa_flags = 0;
+        sa->sa_restorer = NULL;
     }
     // never forget this:
     brelse(bp);

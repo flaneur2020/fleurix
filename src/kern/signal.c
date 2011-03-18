@@ -64,14 +64,15 @@ void psig(){
     cu->p_sig &= ~(1<<(n-1));
     sa = &(cu->p_sigact[n-1]);
     // check blocked signal
-    if ((sa->sa_flags & SA_NOMASK)==0) {
-        cu->p_sigmask |= sa->sa_mask;
-    }
     cu->p_cursig = 0;
     if (sa->sa_handler != SIG_DFL) {
         tf = cu->p_trap;
-        // save registers and the old mask 
+        // save registers and the old sa_mask 
         usigsav(&jbuf, tf, cu->p_sigmask);
+        // store the new sa_mask
+        if ((sa->sa_flags & SA_NOMASK)==0) {
+            cu->p_sigmask |= sa->sa_mask;
+        }
         // push to the user stack, with a "shellcode"
         esp = tf->esp;
         usr = upush(&esp, &_usigret, 16);
@@ -91,7 +92,7 @@ void psig(){
         case SIGCHLD:
         case SIGCONT:
             return;
-        // exited on default
+            // exited on default
         case SIGSEGV:
             printk("seg fault.\n");
         case SIGINT:

@@ -10,6 +10,10 @@ char linebuf[LINEBUFSIZ];
 char* argvbuf[ARGVBUFSIZ];
 char pathbuf[PATHBUFSIZ];
 
+int hwsig(int sign){
+    printf("^C\n");
+}
+
 int lparse(char *lbuf) {
     char *lp, c;
     int argc, i;
@@ -33,8 +37,25 @@ int lparse(char *lbuf) {
 }
 
 int main(int argc, char **argv){
-    int r, i, cnt, ret; 
+    int r,fd, i, cnt, ret; 
+    struct sigaction sa;
 
+    setpgrp();
+    fd = open("/dev/tty0", O_RDWR, 0);
+    close(0);
+    close(1);
+    close(2);
+    dup(fd);
+    dup(fd);
+    dup(fd);
+    fcntl(0, F_SETFD, 0); // turn off FD_CLOEXEC
+    fcntl(1, F_SETFD, 0);
+    fcntl(2, F_SETFD, 0);
+    close(fd);
+    //
+    sa.sa_handler = &hwsig;
+    sigaction(SIGINT, &sa, NULL);
+    //
     while(1) {
         printf("$ ");
         memset(linebuf, 0, LINEBUFSIZ);
@@ -42,14 +63,19 @@ int main(int argc, char **argv){
         linebuf[r] = 0;
         cnt = lparse(linebuf);
         if (cnt > 0) {
-            if (fork()==0) {
-                exec(argvbuf[0], &argvbuf[1]);
-                strcpy(pathbuf, "/bin/");
-                strncat(pathbuf, argvbuf[0], PATHBUFSIZ);
-                exec(pathbuf, &argvbuf[1]);
-                exit(1);
+            if (strncmp(argvbuf[0], "cd", 2)==0) {
+                chdir(argvbuf[1]);
             }
-            wait(&ret);
+            else {
+                if (fork()==0) {
+                    exec(argvbuf[0], &argvbuf[1]);
+                    strcpy(pathbuf, "/bin/");
+                    strncat(pathbuf, argvbuf[0], PATHBUFSIZ);
+                    exec(pathbuf, &argvbuf[1]);
+                    exit(1);
+                }
+                wait(&ret);
+            }
         }
     }
 }

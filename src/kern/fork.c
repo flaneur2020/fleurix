@@ -89,6 +89,7 @@ struct proc* kspawn(void (*func)()){
     for (fd=0; fd<NOFILE; fd++){
         fp = cu->p_ofile[fd];
         if (fp != NULL) {
+            fp->f_count++;
             fp->f_ino->i_count++;
         }
         p->p_ofile[fd] = fp;

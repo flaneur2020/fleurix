@@ -9,5 +9,8 @@ int main(int argc, char **argv) {
     for(i=0; i<argc; i++){
         printf("%s\n", argv[i]);
     }
+    while(1){
+        printf("hello forever...\n");
+    }
     return 0;
 }

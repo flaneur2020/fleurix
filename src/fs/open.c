@@ -118,6 +118,7 @@ int do_dup(int fd){
     if ((newfd=ufalloc())<0) {
         return -1;
     }
+    fp->f_count++;
     fp->f_ino->i_count++;
     cu->p_ofile[newfd] = fp;
     return newfd;
@@ -134,6 +135,7 @@ int do_dup2(int fd, int newfd){
     }
 
     do_close(newfd);
+    fp->f_count++;
     fp->f_ino->i_count++;
     cu->p_ofile[newfd] = fp;
     return newfd;
@@ -170,5 +172,6 @@ struct file* falloc(int fd){
         }
     }
     syserr(EMFILE);
+    panic("no free file structure\n");
     return NULL;
 }
