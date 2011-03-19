@@ -15,7 +15,7 @@ _spin:
 
 ;;
 ;; on task switch
-;; _do_swtch(struct contxt *old, struct contxt *new);
+;; _do_swtch(struct jmp_buf *old, struct jmp_buf *new);
 ;;
 [global _do_swtch]
 _do_swtch:

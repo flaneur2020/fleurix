@@ -131,21 +131,11 @@ end
 
 # ----------------------------------------------------------------------
 
-usr_cfiles = Dir['usr/test/*.c'] + %w{
-  usr/init.c
-  usr/hello.c
-  usr/sh.c
-  usr/ls.c
-  usr/cat.c
-}
+usr_cfiles = Dir['usr/test/*.c'] + Dir['usr/*.c']
 usr_ofiles = usr_cfiles.map{|fn| 'bin/usr/'+File.basename(fn).ext('o') }
 usr_efiles = usr_cfiles.map{|fn| 'bin/usr/'+File.basename(fn).ext('') }
 
-libsys_cfiles = %w{
-  usr/libsys/printf.c
-  usr/libsys/string.c
-  usr/libsys/libsys.c
-}
+libsys_cfiles = Dir['usr/libsys/*.c']
 libsys_sfiles = %w{
   usr/libsys/entry.S
 }
