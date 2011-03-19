@@ -79,7 +79,7 @@ Compiling & Testing
 
 编译环境: ubuntu
 
-工具: rake, binutils(gcc, ld), nasm, bochs, mkfs.minix
+工具: rake, binutils(gcc, ld, as), nasm, bochs, mkfs.minix
 
     git clone git@github.com:Fleurer/fleurix.git
     cd fleurix
