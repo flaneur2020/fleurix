@@ -91,7 +91,7 @@ Write your own programs under Fleurix
 
 在usr目录下新建一个.c文件。
 
-rake
+    rake
 
 
 Contributing
