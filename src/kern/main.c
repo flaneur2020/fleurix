@@ -45,6 +45,7 @@ void main(){
 char *argv[] = {"abc\n", "testt\n", NULL};
 
 void init() {
+    int fd;
     struct super *sp;
     struct inode *ip;
 
@@ -57,7 +58,9 @@ void init() {
     ip->i_count += 2;
     iput(ip);
     // stdin, stdout, stderr
-    do_open("/dev/tty0", O_RDWR, 0); //stdin
+    if (do_open("/dev/tty0", O_RDWR, 0) < 0) {
+        panic("bad /dev/tty0.\n");
+    }
     do_dup(0); // stdout
     do_dup(0); // stderr
     do_fcntl(0, F_SETFD, 0); // turn off FD_CLOEXEC
