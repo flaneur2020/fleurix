@@ -1,7 +1,7 @@
 OUTPUT_FORMAT("a.out-i386-linux")
 ENTRY(_start)
+
 SECTIONS {
-    c = _start;
     . = 0x8000020;
     .text : {
         __text__ = .;
