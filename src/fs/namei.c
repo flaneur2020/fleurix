@@ -34,7 +34,7 @@ uint find_entry(struct inode* dip, char *name, uint len){
         bp = bread(dip->i_dev, bn);
         dep = (struct dirent *)bp->b_data;
         for(j=0; j<BLK/(sizeof(struct dirent))+1; j++) {
-            if (0==strncmp(name, dep[j].d_name, len)){
+            if (len==strlen(dep[j].d_name) && 0==strncmp(name, dep[j].d_name, len)){
                 ino = dep[j].d_ino;
                 brelse(bp);
                 return ino;
