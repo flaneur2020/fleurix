@@ -29,7 +29,9 @@ void printn(uint n, uint b){
  * */
 void printf(char *fmt, ...){
     char c, *s;
-    uint *adx = (uint*)(void*)&fmt + 1;
+    int n;
+    int *adx = (uint*)(void*)&fmt + 1;
+
 _loop:
     while((c = *fmt++) != '%'){
         if (c == '\0') return;
@@ -37,7 +39,12 @@ _loop:
     }
     c = *fmt++;
     if (c == 'd' || c == 'l'){
-        printn(*adx, 10);
+        n = *adx;
+        if (n<0) {
+            putch('-');
+            n *= -1;
+        }
+        printn(n, 10);
     }
     if (c == 'o' || c == 'x'){
         printn(*adx, c=='o'? 8:16 );

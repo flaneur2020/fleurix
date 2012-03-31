@@ -13,11 +13,11 @@ int cat(char *pathp){
     if (fd < 0) 
         return -1;
 
-    printf(pathp);
-
     while((n = read(fd, buf, 32)) > 0){
+        printf("n: %d, \n", n);
         write(0, buf, n);
     }
+    printf("n: %d, \n", n);
     write(0, "", 0);
     close(fd);
 }

@@ -129,12 +129,11 @@ _loop:
     c = *fmt++;
     if (c == 'd' || c == 'l'){
         n = *adx;
-        if (n<0){
+        if (n<0) {
             putch('-');
-            printn(-n, 10);
+            n *= -1;
         }
-        else
-            printn(n, 10);
+        printn(n, 10);
     }
     if (c == 'o' || c == 'x'){
         printn(*adx, c=='o'? 8:16 );
