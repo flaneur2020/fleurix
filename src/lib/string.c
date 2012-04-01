@@ -35,6 +35,12 @@ int strlen(char *str){
     return sp-str;
 }
 
+int strnlen(char *str, unsigned int len){
+    char *sp;
+    for (sp=str; *sp != '\0' && sp <= str+len; sp++);
+    return sp-str;
+}
+
 char* strcpy(char *dst, const char *src) {
 	char *tmp = dst;
     while (*dst++ = *src++); 

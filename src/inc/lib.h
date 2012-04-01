@@ -12,6 +12,7 @@ void*   memcpy(void *dest, void *src, unsigned int count);
 void*   memset(void *dest, char val, unsigned int count);
 short*  memsetw(short *dest, short val, unsigned int count);
 int     strlen(char *str);
+int     strnlen(char *str, unsigned int size);
 char*   strchr(const char *str, int c);
 char*   strrchr(const char *str, int c);
 int     strcmp(char *s1, char *s2);
