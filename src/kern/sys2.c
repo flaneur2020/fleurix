@@ -27,7 +27,10 @@ int sys_access(struct trap *tf){
     struct inode *ip;
     int r;
 
-    r = vm_verify(path, strlen(path)+1);
+    if (vm_verify(path, strlen(path)+1) < 0) {
+        syserr(EFAULT);
+        return -1;
+    }
 
     ip = namei(path, 0);
     if (ip==NULL) {
