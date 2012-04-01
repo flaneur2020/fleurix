@@ -14,10 +14,13 @@
         register int r;                         \
         asm volatile(                           \
             "int $0x80"                         \
-            :"=a"(r),                           \
-             "=b"(errno)                        \
+            :"=a"(r)                            \
             :"a"(NR_##FN)                       \
         );                                      \
+        if (r<0){                               \
+            errno = -r;                         \
+            return -1;                          \
+        }                                       \
         return r;                               \
     }
 
@@ -26,8 +29,7 @@
         register int r;                         \
         asm volatile(                           \
             "int $0x80"                         \
-            :"=a"(r),                           \
-             "=b"(errno)                        \
+            :"=a"(r)                            \
             :"a"(NR_##FN),                      \
              "b"((int)p1)                       \
         );                                      \
@@ -43,12 +45,15 @@
         register int r;                         \
         asm volatile(                           \
             "int $0x80"                         \
-            :"=a"(r),                           \
-             "=b"(errno)                        \
+            :"=a"(r)                            \
             :"a"(NR_##FN),                      \
              "b"((int)p1),                      \
              "c"((int)p2)                       \
         );                                      \
+        if (r<0){                               \
+            errno = -r;                         \
+            return -1;                          \
+        }                                       \
         return r;                               \
     }
 
@@ -57,13 +62,16 @@
         register int r;                         \
         asm volatile(                           \
             "int $0x80"                         \
-            :"=a"(r),                           \
-             "=b"(errno)                        \
+            :"=a"(r)                            \
             :"a"(NR_##FN),                      \
              "b"((int)p1),                      \
              "c"((int)p2),                      \
              "d"((int)p3)                       \
         );                                      \
+        if (r<0){                               \
+            errno = -r;                         \
+            return -1;                          \
+        }                                       \
         return r;                               \
     }
 
