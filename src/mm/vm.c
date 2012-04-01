@@ -93,7 +93,7 @@ int vm_renew(struct vm *vm, struct ahead *ah, struct inode *ip){
  * pointer, on writing a write protected page, x86 do not raise 
  * a page fault in ring0, so simulate a write only access as 
  * what mmu does if nessary.
- * note: only use this routine before writing, be aware that do 
+ * note: use this routine before reading and writing, be aware that do 
  * not touch kernel memory.
  * */
 int vm_verify(uint vaddr, uint size){
@@ -106,7 +106,7 @@ int vm_verify(uint vaddr, uint size){
     if (vaddr<KMEM_END || size<0) {
         return -1;
     }
-    // special case on checking string.
+    // TODO: special case on checking string.
     for (page=PG_ADDR(vaddr); page<=PG_ADDR(vaddr+size-1); page+=PAGE) {
         pte = find_pte(cu->p_vm.vm_pgd, page, 1);
         if ((pte->pt_flag & PTE_P)==0) {
