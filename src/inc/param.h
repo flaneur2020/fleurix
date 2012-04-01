@@ -29,6 +29,7 @@ typedef unsigned int    uint;
 
 #define NINDBLK (BLK/sizeof(ushort))
 #define MAX_FILESIZ ((7+NINDBLK+NINDBLK*NINDBLK)*BLK)
+#define MAX_PATHSIZ PAGE
 
 #define NULL ((void*)0)
 #define NUL  0
