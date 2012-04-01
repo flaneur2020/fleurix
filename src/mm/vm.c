@@ -93,8 +93,14 @@ int vm_renew(struct vm *vm, struct ahead *ah, struct inode *ip){
  * pointer, on writing a write protected page, x86 do not raise 
  * a page fault in ring0, so simulate a write only access as 
  * what mmu does if nessary.
- * note: use this routine before reading and writing, be aware that do 
- * not touch kernel memory.
+ *
+ * note:  
+ *   be aware that do NOT touch the memory in the second argument
+ *   like `vm_verify(path, strlen(path) + 1)`, which is a bug
+ *
+ * note2: 
+ *   use this routine only before reading and writing the 
+ *   user memory.
  * */
 int vm_verify(uint vaddr, uint size){
     struct pde *pgd;
