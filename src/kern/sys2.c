@@ -43,7 +43,10 @@ int sys_open(struct trap *tf){
     int mode = tf->edx;
     int r;
 
-    r = vm_verify(path, strlen(path)+1);
+    if (vm_verify(path, strlen(path)+1) < 0) {
+        syserr(EFAULT);
+        return -1;
+    }
 
     return do_open(path, flag, mode);
 }
