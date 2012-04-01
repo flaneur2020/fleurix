@@ -9,16 +9,13 @@ int cat(char *pathp){
     char buf[32];
     int n;
 
-    fd = open(pathp, "r", 0);
+    fd = open(pathp, O_RDONLY, 0);
     if (fd < 0) 
         return -1;
 
     while((n = read(fd, buf, 32)) > 0){
-        printf("n: %d, \n", n);
         write(0, buf, n);
     }
-    printf("n: %d, \n", n);
-    write(0, "", 0);
     close(fd);
 }
 
@@ -37,4 +34,5 @@ int main(int argc, char **argv){
     }
 
     printf("\n");
+    return 0;
 }
