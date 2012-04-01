@@ -203,7 +203,7 @@ int tty_read(ushort dev, char *buf, uint cnt){
 int tty_write(ushort dev, char *buf, uint cnt){
     struct tty *tp;
     int i;
-
+    
     if (MINOR(dev) >= NTTY){
         syserr(ENODEV);
         return -1;
