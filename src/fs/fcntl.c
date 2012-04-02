@@ -41,9 +41,9 @@ int do_fcntl(int fd, uint cmd, uint arg){
             fp->f_oflag = arg;
             return 0;
         case F_GETFD:
-            return fp->f_fdflag;
+            return cu->p_fdflag[fd];
         case F_SETFD:
-            fp->f_fdflag = arg;
+            cu->p_fdflag[fd] = arg;
             return 0;
         case F_GETLK:
         case F_SETLK:

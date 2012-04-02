@@ -85,7 +85,7 @@ struct proc* kspawn(void (*func)()){
         p->p_iroot = cu->p_iroot;
         p->p_iroot->i_count++;
     }
-    // dup the files.
+    // dup the files, and fdflag
     for (fd=0; fd<NOFILE; fd++){
         fp = cu->p_ofile[fd];
         if (fp != NULL) {
@@ -93,6 +93,7 @@ struct proc* kspawn(void (*func)()){
             fp->f_ino->i_count++;
         }
         p->p_ofile[fd] = fp;
+        p->p_fdflag[fd] = cu->p_fdflag[fd];
     }
     // signals
     p->p_sig = cu->p_sig;

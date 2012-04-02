@@ -34,7 +34,8 @@ struct proc {
     struct sigaction    p_sigact[NSIG]; /* signal handlers */
     struct inode       *p_wdir;         /* current working dir */
     struct inode       *p_iroot;        /* the root dir */
-    struct file        *p_ofile[NOFILE];/* file desciptors of the current opened files */
+    struct file        *p_ofile[NOFILE];  /* file desciptors of the current opened files */
+    uint                p_fdflag[NOFILE]; /* flags for the file descriptors(only FD_CLOEXEC yet), which is proc specific */
     struct vm           p_vm;
     struct jmp_buf      p_contxt;       /* - */
     struct trap        *p_trap;         /* saved on entering kernel from user, for psig(). */

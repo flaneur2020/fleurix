@@ -53,7 +53,7 @@ int do_exec(char *path, char **argv){
     struct vm *vm;
     struct vma *vp;
     struct file *fp;
-    uint bn, fd, argc, esp, nr;
+    uint bn, fd, fdflag, argc, esp, nr;
     char **tmp;
 
     ip = namei(path, 0);
@@ -90,7 +90,8 @@ int do_exec(char *path, char **argv){
     // close all the file descriptors with FD_CLOEXEC
     for (fd=0; fd<NOFILE; fd++) {
         fp = cu->p_ofile[fd];
-        if ((fp!=NULL) && (fp->f_fdflag & FD_CLOEXEC)) {
+        fdflag = cu->p_fdflag[fd];
+        if ((fp!=NULL) && (fdflag & FD_CLOEXEC)) {
             do_close(fd);
         }
     }

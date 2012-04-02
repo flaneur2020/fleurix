@@ -5,7 +5,6 @@
 
 struct file {
     char            f_oflag;
-    char            f_fdflag; // only one FD_CLOEXEC by default.
     char            f_count;
     uint            f_offset;
     struct inode   *f_ino;

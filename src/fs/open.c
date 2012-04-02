@@ -71,8 +71,8 @@ int do_open(char *path, uint flag, uint mode){
     }
     unlk_ino(ip);
     fp->f_oflag = flag;
-    fp->f_fdflag = FD_CLOEXEC;
     fp->f_ino = ip;
+    cu->p_fdflag[fd] = FD_CLOEXEC;
     return fd;
 }
 
