@@ -37,6 +37,7 @@ int vm_clone(struct vm *to){
         vp = &(cu->p_vm.vm_area[i]);
         if (vp->v_flag != 0) {
             to->vm_area[i] = *vp;
+            to->vm_area[i].v_ino->i_count++;
         }
     }
     // copy pages tables, with PTE_W turned off.
@@ -157,3 +158,10 @@ int vma_init(struct vma *vp, uint base, uint size, uint flag, struct inode *ip, 
     }
 }
 
+/* -------------------------------------------------- */
+
+void dump_vm(struct vm *vp){
+    printk("vm: %x\n", vp);
+    printk("vm: ino: %x\n", vp->vm_text.v_ino);
+    dump_inode(vp->vm_text.v_ino);
+}
