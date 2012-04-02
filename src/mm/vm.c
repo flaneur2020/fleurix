@@ -36,8 +36,11 @@ int vm_clone(struct vm *to){
     for (i=0; i<NVMA; i++) {
         vp = &(cu->p_vm.vm_area[i]);
         if (vp->v_flag != 0) {
+            // increase the reference count of inode
+            if (vp->v_ino) {
+                vp->v_ino->i_count++;
+            }
             to->vm_area[i] = *vp;
-            to->vm_area[i].v_ino->i_count++;
         }
     }
     // copy pages tables, with PTE_W turned off.
