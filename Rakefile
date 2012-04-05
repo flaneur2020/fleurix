@@ -1,8 +1,6 @@
-werror = '-Werror' if ENV['werror']
-
 cinc   = '-Isrc/inc -Isrc/inc/usr'
 cflag  = %{
-  -Wall #{werror}
+  -Wall
   -nostdinc -fno-builtin -fno-stack-protector
   -finline-functions -finline-small-functions -findirect-inlining -finline-functions -finline-functions-called-once 
 }.split(/\s/).join(' ')
@@ -33,6 +31,12 @@ task :build => ['bin/kernel.img', :rootfs, :ctags]
 
 task :clean do
   sh "rm -rf bin/* root/bin/* src/kern/entry.S .bochsout"
+end
+
+task :werror do
+  cflag += ' -Werror'
+  Rake::Task['clean'].invoke
+  Rake::Task['build'].invoke
 end
 
 ## helpers ##
