@@ -6,6 +6,12 @@
 #include <tty.h>
 #include <vm.h>
 
+struct trap;
+struct seg_desc;
+struct inode;
+struct pde;
+struct super;
+
 // tty.c
 void    tty_init();
 void    cls();
@@ -19,6 +25,8 @@ void sleep(uint chan, int pri);
 
 // sysent.c
 int syserr(uint err);
+uint suser();
+int nosys(struct trap *tf);
 
 // trap.c
 void idt_init();
@@ -41,7 +49,9 @@ void do_no_page(uint vaddr);
 void do_wp_page(uint vaddr);
 
 // timer.c
-void    do_timer();
+void do_timer();
+uint time();
+void timer_init();
 
 // kern/syscall.c
 void    do_syscall();
@@ -77,6 +87,15 @@ int kfree(void* addr, uint size);
 int     nodev();
 int     nulldev();
 
+// blk/buf.c
+struct buf* bread(int dev, uint blkno);
+void brelse(struct buf *bp);
+void bwrite(struct buf *bp);
+struct buf* getblk(int dev, uint blkno);
+void iodone(struct buf *bp);
+void iowait(struct buf *bp);
+void notavail(struct buf *bp);
+
 // fs/rdwri.c
 int readi(struct inode *ip, char *buf, uint off, uint cnt);
 int writei(struct inode *ip, char *buf, uint off, uint cnt);
@@ -97,12 +116,29 @@ int bfree(ushort dev, uint nr);
 int bzero(ushort dev, uint bn);
 int ialloc(ushort dev);
 void ifree(ushort dev, uint ino);
+int find_bit(char *bm, int size);
 
 // fs/namei.c
 struct inode* namei(char *path, uchar creat);
 struct inode* namei_parent(char *path, char **name);
 
 // fs/file.c 
+struct file* falloc(int fd);
+
+// fs/super.c
+struct super* getsp(ushort dev);
+int spload(struct super *sp);
+void spupdate(struct super *sp);
+void unlk_sp(struct super *sp);
+void putsp(struct super *sp);
+
+// fs/open.c
+int do_open(char *path, uint flag, uint mode);
+int do_dup(int fd);
+int do_close(int fd);
+int do_dup(int fd);
+int do_dup2(int fd, int newfd);
+int ufalloc();
 struct file* falloc(int fd);
 
 // chr/tty.c
