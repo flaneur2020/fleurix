@@ -21,7 +21,6 @@ int errno = 0;
 
 static void* sys_routines[NSYSC] = {
     [NR_debug]      = &sys_debug,
-    [NR_setup]      = &sys_setup,
     //
     [NR_access]     = &sys_access,
     [NR_creat]      = &sys_creat,

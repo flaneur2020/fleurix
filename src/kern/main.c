@@ -68,14 +68,3 @@ void init() {
     do_exec("/bin/init", NULL);
     for(;;);
 }
-
-/*
- * only called once in proc[1], make some initilizations and
- * enter user mode via set tf->cs to USER_CS.
- * */
-int sys_setup(struct trap *tf) {
-    tf->cs = USER_CS;
-    tf->ds = USER_DS;
-    tf->ss = USER_DS;
-    return 0;
-}
