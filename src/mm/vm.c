@@ -87,9 +87,9 @@ int vm_renew(struct vm *vm, struct ahead *ah, struct inode *ip){
     vm->vm_entry = ah->a_entry;
     vma_init(&(vm->vm_text),  text,  ah->a_tsize, VMA_MMAP | VMA_RDONLY | VMA_PRIVATE, ip, text-base);
     vma_init(&(vm->vm_data),  data,  ah->a_dsize, VMA_MMAP | VMA_PRIVATE, ip, data-base);
-    vma_init(&(vm->vm_bss),   bss,   ah->a_bsize, VMA_ZERO | VMA_PRIVATE, NULL, NULL);
-    vma_init(&(vm->vm_heap),  heap,  PAGE,        VMA_ZERO | VMA_PRIVATE, NULL, NULL);
-    vma_init(&(vm->vm_stack), VM_STACK, PAGE,     VMA_STACK | VMA_ZERO | VMA_PRIVATE, NULL, NULL);
+    vma_init(&(vm->vm_bss),   bss,   ah->a_bsize, VMA_ZERO | VMA_PRIVATE, NULL, 0);
+    vma_init(&(vm->vm_heap),  heap,  PAGE,        VMA_ZERO | VMA_PRIVATE, NULL, 0);
+    vma_init(&(vm->vm_stack), VM_STACK, PAGE,     VMA_STACK | VMA_ZERO | VMA_PRIVATE, NULL, 0);
     return 0;
 }
 
@@ -107,10 +107,7 @@ int vm_renew(struct vm *vm, struct ahead *ah, struct inode *ip){
  *   user memory.
  * */
 int vm_verify(uint vaddr, uint size){
-    struct pde *pgd;
     struct pte *pte;
-    struct page *pg;
-    struct vma *vma;
     uint page;
     
     if (vaddr<KMEM_END || size<0) {
@@ -159,6 +156,7 @@ int vma_init(struct vma *vp, uint base, uint size, uint flag, struct inode *ip, 
         ip->i_count++;
         vp->v_ino = ip;
     }
+    return 0;
 }
 
 /* -------------------------------------------------- */

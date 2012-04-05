@@ -29,12 +29,16 @@ void set_hwint(int nr, int (*func)(struct trap *tf));
 uint    get_seg_limit(struct seg_desc *seg);
 extern  struct seg_desc     gdt[];
 
-// pm.c
+// mm/pm.c
 int do_pgfault(struct trap *tf);
 struct page* pgalloc();
 struct page* pgfind(uint pn);
 int pgfree(struct page *pp);
 struct pte* pgattach(struct pde *pgd, uint vaddr, struct page *pp, uint flag);
+
+// mm/pgfault.c
+void do_no_page(uint vaddr);
+void do_wp_page(uint vaddr);
 
 // timer.c
 void    do_timer();
@@ -55,13 +59,14 @@ int sigsend(int pid, int n, int priv);
 
 // mm/vm.c
 int vm_clone(struct vm *to);
-struct pte* find_pte(struct pde *pgd, uint vaddr, uint creat);
 struct vma* find_vma(uint addr);
 int vma_init(struct vma *vp, uint base, uint size, uint flag, struct inode *ip, uint ioff);
-int pt_copy(struct pde *npgd, struct pde *opgd);
 
 // mm/pte.c
 int pgd_init(struct pde *pgd);
+struct pte* find_pte(struct pde *pgd, uint vaddr, uint creat);
+int pt_free(struct pde *pgd);
+int pt_copy(struct pde *npgd, struct pde *opgd);
 void flmmu();
 
 // mm/malloc.c
@@ -84,6 +89,7 @@ int iload(struct inode *ip);
 void iupdate(struct inode *ip);
 void lock_ino(struct inode *ip);
 void unlk_ino(struct inode *ip);
+void dump_inode(struct inode *ip);
 
 // fs/alloc.c
 int balloc(ushort dev);
