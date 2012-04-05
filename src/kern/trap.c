@@ -182,7 +182,7 @@ void hwint_common(struct trap *tf) {
     }
 }
 
-void set_hwint(int nr, void (*func)(struct trap *tf)){
+void set_hwint(int nr, int (*func)(struct trap *tf)){
     hwint_routines[nr] = func;
 }
 

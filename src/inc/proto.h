@@ -21,7 +21,9 @@ void sleep(uint chan, int pri);
 int syserr(uint err);
 
 // trap.c
-void    idt_init();
+void idt_init();
+void irq_enable(uchar irq);
+void set_hwint(int nr, int (*func)(struct trap *tf));
 
 // seg.c
 uint    get_seg_limit(struct seg_desc *seg);
@@ -88,6 +90,7 @@ struct file* falloc(int fd);
 int tty_read(ushort dev, char *buf, uint cnt);
 int tty_write(ushort dev, char *buf, uint cnt);
 int tty_open(ushort dev);
+int tty_input(struct tty *tp, char ch);
 
 /* --------------------------------------------------- */
 /* panic */
