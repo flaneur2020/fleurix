@@ -137,6 +137,7 @@ int nulldev(){
 
 /* it should raise an ENODEV error when being called.*/
 int nodev(){
+    syserr(ENODEV);
     return 0;
 }
 
