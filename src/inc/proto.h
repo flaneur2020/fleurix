@@ -96,6 +96,10 @@ void iodone(struct buf *bp);
 void iowait(struct buf *bp);
 void notavail(struct buf *bp);
 
+// blk/hd.c
+int hd_wait_ready();
+void hd_start();
+
 // fs/rdwri.c
 int readi(struct inode *ip, char *buf, uint off, uint cnt);
 int writei(struct inode *ip, char *buf, uint off, uint cnt);

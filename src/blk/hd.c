@@ -36,6 +36,7 @@ int hd_cmd(uint drive, uint cmd, uint lba, uchar ns) {
     outb(0x1F5, (lba >> 16) & 0xFF);
     outb(0x1F6, 0xE0 | ((drive&1)<<4) | ((lba>>24)&0x0F));
     outb(HD_CMD, cmd);
+    return 0;
 }
 
 /* 
@@ -58,7 +59,7 @@ int hd_wait_ready(){
  * */
 int hd_request(struct buf *bp){
     // prepend into the waiting list 
-    bp->av_prev = &hdtab;
+    bp->av_prev = (struct buf*)&hdtab;
     bp->av_next = hdtab.av_next;
     hdtab.av_next->av_prev = bp;
     hdtab.av_next = bp;
@@ -66,6 +67,7 @@ int hd_request(struct buf *bp){
     if (hdtab.d_active == 0) {
         hd_start();
     }
+    return 0;
 }
 
 /* if waiting list is not empty, then take the tail, send a request 
@@ -77,7 +79,7 @@ int hd_request(struct buf *bp){
 void hd_start(){
     struct buf *bp;
     // if waiting list is empty
-    if (hdtab.av_next == &hdtab) {
+    if ((struct devtab*)hdtab.av_next == &hdtab) {
         return;
     }
     // take the tail
@@ -102,7 +104,7 @@ int do_hd_intr(struct trap *tf){
     struct buf *bp;
 
     if (hdtab.d_active == 0) {
-        return;
+        return 0;
     } 
     hdtab.d_active = 0;
     bp = hdtab.av_prev;
@@ -114,6 +116,7 @@ int do_hd_intr(struct trap *tf){
     }
     iodone(bp);
     hd_start();
+    return 0;
 }
 
 /*
@@ -129,9 +132,11 @@ void hd_init(){
 
 /* empty routine */
 int nulldev(){
+    return 0;
 }
 
 /* it should raise an ENODEV error when being called.*/
 int nodev(){
+    return 0;
 }
 
