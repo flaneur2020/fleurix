@@ -43,7 +43,7 @@ int strnlen(char *str, unsigned int len){
 
 char* strcpy(char *dst, const char *src) {
 	char *tmp = dst;
-    while (*dst++ = *src++); 
+    while ((*dst++ = *src++)); 
 	return tmp;
 }
 
@@ -62,22 +62,24 @@ char *strncpy(char *dst, const char *src, unsigned int cnt) {
  * returns not a number but a pointer.
  * */
 char* strchr(const char *str, int c){
-    for(; *str!='\0'; str++) {
-        if (*str == (char)c) {
-            return str;
+    char *tmp = (char*)str;
+
+    for(; *tmp!='\0'; tmp++) {
+        if (*tmp == (char)c) {
+            return tmp;
         }
     }
-    if (*str == (char)c) 
-        return str;
+    if (*tmp == (char)c) 
+        return tmp;
     return NULL;
 }
 
 /* just like strchr, but in reverse order. */
 char* strrchr(const char *str, int c){
-    char *ret;
-    for(; *str!='\0'; str++){
-        if (*str == (char)c) {
-            ret = str;
+    char *ret, *tmp;
+    for(; *tmp!='\0'; tmp++){
+        if (*tmp == (char)c) {
+            ret = tmp;
         }
     }
     if (*ret == (char)c)

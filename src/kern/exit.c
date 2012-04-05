@@ -51,7 +51,7 @@ int do_exit(int ret){
     }
     // wakeup proc[1] and its parent
     p = proc[cu->p_ppid];
-    wakeup(p);
-    wakeup(proc[1]);
+    wakeup((uint)p);
+    wakeup((uint)proc[1]);
     return 0;
 }

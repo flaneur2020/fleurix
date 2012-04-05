@@ -11,6 +11,7 @@ struct seg_desc;
 struct inode;
 struct pde;
 struct super;
+struct sigaction;
 
 // tty.c
 void    tty_init();
@@ -54,11 +55,10 @@ uint time();
 void timer_init();
 
 // kern/syscall.c
-void    do_syscall();
-
-void    ltr(uint n);
-void    lldt(uint n);
-void    ljmp(ushort seg, uint offset);
+void do_syscall();
+void ltr(uint n);
+void lldt(uint n);
+void ljmp(ushort seg, uint offset);
 
 // kern/exec.c
 int upush(uint *esp, char *buf, int len);
@@ -66,9 +66,13 @@ int upush_argv(uint *esp, char **tmp);
 
 // kern/signal.c
 int sigsend(int pid, int n, int priv);
+int do_kill(int pid, int sig);
+int do_signal(int sig, void (*ufunc)(int));
+int do_sigaction(int sig, struct sigaction *sa, struct sigaction *old_sa);
 
 // mm/vm.c
 int vm_clone(struct vm *to);
+int vm_clear(struct vm *vm);
 struct vma* find_vma(uint addr);
 int vma_init(struct vma *vp, uint base, uint size, uint flag, struct inode *ip, uint ioff);
 
