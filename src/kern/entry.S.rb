@@ -84,10 +84,10 @@ _retu:
 _hwint_common_stub:
     sti
     pusha
-    push dword ds
-    push dword es
-    push dword fs
-    push dword gs
+    push ds
+    push es
+    push fs
+    push gs
     mov ax, 0x10
     mov ds, ax
     mov es, ax
@@ -97,10 +97,10 @@ _hwint_common_stub:
     call eax
     pop eax
 _hwint_ret:
-    pop dword gs
-    pop dword fs
-    pop dword es
-    pop dword ds
+    pop gs
+    pop fs
+    pop es
+    pop ds
     popa
     add esp, 8
     iret
