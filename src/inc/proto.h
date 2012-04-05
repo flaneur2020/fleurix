@@ -1,17 +1,16 @@
 #ifndef PROTO_H
 #define PROTO_H
 
-#include <idt.h>
-#include <inode.h>
-#include <tty.h>
-#include <vm.h>
-
 struct trap;
 struct seg_desc;
 struct inode;
 struct pde;
 struct super;
 struct sigaction;
+struct proc;
+struct vm;
+struct tty;
+struct stat;
 
 // tty.c
 void    tty_init();
@@ -23,6 +22,10 @@ void    printk(char *fmt, ...);
 // sched.c
 void wakeup(uint chan);
 void sleep(uint chan, int pri);
+void swtch();
+void sched_cpu();
+void setpri(struct proc *p);
+void setrun(struct proc *p);
 
 // sysent.c
 int syserr(uint err);
@@ -37,8 +40,16 @@ void set_hwint(int nr, int (*func)(struct trap *tf));
 // seg.c
 uint    get_seg_limit(struct seg_desc *seg);
 extern  struct seg_desc     gdt[];
+void gdt_init();
+
+// kern/fork.c
+void proc0_init();
+int do_fork(struct trap *tf);
+struct proc* kspawn(void (*func)());
+int find_pid();
 
 // mm/pm.c
+void mm_init();
 int do_pgfault(struct trap *tf);
 struct page* pgalloc();
 struct page* pgfind(uint pn);
@@ -63,6 +74,7 @@ void ljmp(ushort seg, uint offset);
 // kern/exec.c
 int upush(uint *esp, char *buf, int len);
 int upush_argv(uint *esp, char **tmp);
+int do_exec(char *path, char **argv);
 
 // kern/signal.c
 int sigsend(int pid, int n, int priv);
@@ -92,6 +104,7 @@ int     nodev();
 int     nulldev();
 
 // blk/buf.c
+void buf_init();
 struct buf* bread(int dev, uint blkno);
 void brelse(struct buf *bp);
 void bwrite(struct buf *bp);
@@ -103,10 +116,27 @@ void notavail(struct buf *bp);
 // blk/hd.c
 int hd_wait_ready();
 void hd_start();
+void hd_init();
+int hd_cmd(uint drive, uint cmd, uint lba, uchar ns);
+int hd_request(struct buf *bp);
+int hd_wait_ready();
+int do_hd_intr(struct trap *tf);
+
 
 // fs/rdwri.c
 int readi(struct inode *ip, char *buf, uint off, uint cnt);
 int writei(struct inode *ip, char *buf, uint off, uint cnt);
+
+// fs/mount.c
+struct super* do_mount(ushort dev, struct inode *ip);
+int do_umount(ushort dev);
+
+// fs/fcntl.c
+int do_fcntl(int fd, uint cmd, uint arg);
+int do_stat(struct inode *ip, struct stat *sbuf);
+int do_access(struct inode *ip, uint mode);
+int do_creat(char *path, int mode);
+int do_mknod(char *path, int mode, ushort dev);
 
 // fs/bmap.c
 int bmap(struct inode *ip, ushort nr, uchar creat);
@@ -160,6 +190,10 @@ int tty_read(ushort dev, char *buf, uint cnt);
 int tty_write(ushort dev, char *buf, uint cnt);
 int tty_open(ushort dev);
 int tty_input(struct tty *tp, char ch);
+
+// chr/keybd.c
+void keybd_init();
+int do_keybd_intr(struct trap *tf);
 
 /* --------------------------------------------------- */
 /* panic */

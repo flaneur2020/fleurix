@@ -5,10 +5,10 @@ puts %{
 [bits 32]
 
 ;;
-;; entry to main() in C, should never return
+;; entry to kmain() in C, should never return
 ;;
-[extern main]
-    jmp main
+[extern kmain]
+    jmp kmain
 _spin:
     jmp _spin
 

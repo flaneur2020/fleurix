@@ -9,6 +9,8 @@
 #include <signal.h>
 #include <stat.h>
 
+struct trap;
+
 #define _SYS0(T0, FN)                           \
     T0 FN(){                                    \
         register int r;                         \

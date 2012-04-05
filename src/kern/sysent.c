@@ -19,7 +19,7 @@
 
 int errno = 0;
 
-static uint sys_routines[NSYSC] = {
+static void* sys_routines[NSYSC] = {
     [NR_debug]      = &sys_debug,
     [NR_setup]      = &sys_setup,
     //
