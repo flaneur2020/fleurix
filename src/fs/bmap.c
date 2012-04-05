@@ -95,7 +95,7 @@ int bmap(struct inode *ip, ushort nr, uchar creat) {
     // read the secondary indirect zone map.
     bp2 = bread(dev, zmap[nr/NINDBLK]);
     zmap2 = (short*)bp2->b_data;
-    if (zmap2[nr%NINDBLK]==0 & creat) {
+    if ((zmap2[nr%NINDBLK]==0) & creat) {
         zmap2[nr%NINDBLK] = balloc(dev);
         bwrite(bp2);
     }
@@ -163,4 +163,5 @@ int itrunc(struct inode *ip){
     }
     ip->i_size = 0;
     iupdate(ip);
+    return 0;
 }

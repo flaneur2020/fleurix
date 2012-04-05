@@ -100,10 +100,13 @@ void notavail(struct buf *bp);
 int readi(struct inode *ip, char *buf, uint off, uint cnt);
 int writei(struct inode *ip, char *buf, uint off, uint cnt);
 
+// fs/bmap.c
+int bmap(struct inode *ip, ushort nr, uchar creat);
+int itrunc(struct inode *ip);
+
 // fs/inode.c
 struct inode* iget(ushort dev, uint num);
 void iput(struct inode *ip);
-int bmap(struct inode *ip, ushort nr, uchar creat);
 int iload(struct inode *ip);
 void iupdate(struct inode *ip);
 void lock_ino(struct inode *ip);
