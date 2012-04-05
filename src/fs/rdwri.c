@@ -52,7 +52,6 @@ int readi(struct inode *ip, char *buf, uint off, uint cnt){
  * */
 int writei(struct inode *ip, char *buf, uint off, uint cnt){
     struct buf *bp;
-    struct super *sp;
     uint tot=0, m=0, bn=0;
 
     if (off+cnt < off){

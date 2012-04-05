@@ -83,10 +83,8 @@ int unlink_entry(struct inode *dip, char *name, int len){
  * and i_nlinks is not adjusted here.
  * */
 uint link_entry(struct inode *dip, char *name, uint len, uint ino){
-    struct buf *bp;
-    struct inode *ip;
     struct dirent de;
-    int i, r, off;
+    int r, off;
 
     if ((dip->i_mode & S_IFMT)!=S_IFDIR) {
         syserr(ENOTDIR);
@@ -95,7 +93,7 @@ uint link_entry(struct inode *dip, char *name, uint len, uint ino){
     len = min(len, NAMELEN);
 
     for (off=0; off < dip->i_size; off+=sizeof(struct dirent)){
-        r = readi(dip, &de, off, sizeof(struct dirent));
+        r = readi(dip, (char*)&de, off, sizeof(struct dirent));
         if (r != sizeof(struct dirent)){
             panic("bad read dir ino");
         }
@@ -105,7 +103,7 @@ uint link_entry(struct inode *dip, char *name, uint len, uint ino){
     }
     strncpy(de.d_name, name, len+1);
     de.d_ino = ino;
-    r = writei(dip, &de, off, sizeof(struct dirent));
+    r = writei(dip, (char*)&de, off, sizeof(struct dirent));
     if (r != sizeof(struct dirent)){
         panic("bad inode");
     }
