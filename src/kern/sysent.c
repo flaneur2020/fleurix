@@ -89,7 +89,7 @@ int syserr(uint err){
 
 /* common handlers for all syscalls, if an syserr raised,
  * returns a negative number: 0 - cu->p_error. */
-void do_syscall(struct trap *tf){
+int do_syscall(struct trap *tf){
     int ret;
     int (*func)(struct trap *tf);
 
@@ -107,4 +107,5 @@ void do_syscall(struct trap *tf){
         tf->eax = 0 - cu->p_error;
     else
         tf->eax = ret;
+    return 0;
 }

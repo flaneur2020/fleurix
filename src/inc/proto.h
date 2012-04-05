@@ -66,7 +66,7 @@ uint time();
 void timer_init();
 
 // kern/syscall.c
-void do_syscall();
+int do_syscall(struct trap* tf);
 void ltr(uint n);
 void lldt(uint n);
 void ljmp(ushort seg, uint offset);
@@ -77,7 +77,10 @@ int upush_argv(uint *esp, char **tmp);
 int do_exec(char *path, char **argv);
 
 // kern/signal.c
+int issig();
+void psig();
 int sigsend(int pid, int n, int priv);
+int sigsend_g(int pgrp, int n, int priv);
 int do_kill(int pid, int sig);
 int do_signal(int sig, void (*ufunc)(int));
 int do_sigaction(int sig, struct sigaction *sa, struct sigaction *old_sa);
