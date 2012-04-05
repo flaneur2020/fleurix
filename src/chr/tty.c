@@ -10,6 +10,8 @@
 struct tty tty[NTTY];
 
 /* ---------------------------------------------- */
+int tty_start(struct tty *tp);
+
 
 /*
  * Append a character into a tty buf.
@@ -82,6 +84,7 @@ int tty_canon(struct tty *tp){
             break;
         }
     }
+    return 0;
 }
 
 /* output characters with buffering */
@@ -129,22 +132,24 @@ int tty_input(struct tty *tp, char ch){
     }
     if (ch==CEOF || ch=='\n') {
         eraseq(&tp->t_canq);
-        wakeup(tp);
+        wakeup((uint)tp);
         return 0;
     }
+    return 0;
 }
 
 /* ---------------------------------------- */
 
 /* output actually starts here. */
 int tty_start(struct tty *tp){
-    int (*putc)(char);
+    void (*putc)(char);
     char ch;
 
     putc = tp->t_putc;
     while((ch=getq(&tp->t_outq)) >= 0){
         putc(ch);
     }
+    return 0;
 }
 
 /* ---------------------------------------------- */
@@ -178,7 +183,6 @@ int tty_close(ushort dev){
  * */
 int tty_read(ushort dev, char *buf, uint cnt){
     struct tty *tp;
-    struct qbuf qb;
     char ch;
     int i;
 
@@ -189,7 +193,7 @@ int tty_read(ushort dev, char *buf, uint cnt){
     tp = &tty[MINOR(dev)];
     // if no data on canonical list
     if (tp->t_canq.q_count < cnt) {
-        sleep(tp, PRITTY);
+        sleep((uint)tp, PRITTY);
     }
     // 
     for (i=0; i<cnt; i++) {

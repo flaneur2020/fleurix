@@ -13,6 +13,13 @@ void    putch(char ch);
 void    puts(char *ch);
 void    printk(char *fmt, ...);
 
+// sched.c
+void wakeup(uint chan);
+void sleep(uint chan, int pri);
+
+// sysent.c
+int syserr(uint err);
+
 // trap.c
 void    idt_init();
 
