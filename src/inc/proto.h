@@ -11,6 +11,8 @@ struct proc;
 struct vm;
 struct tty;
 struct stat;
+struct jmp_buf;
+struct ahead;
 
 // tty.c
 void    tty_init();
@@ -23,9 +25,14 @@ void    printk(char *fmt, ...);
 void wakeup(uint chan);
 void sleep(uint chan, int pri);
 void swtch();
+void swtch_to(struct proc *to);
 void sched_cpu();
 void setpri(struct proc *p);
 void setrun(struct proc *p);
+
+// entry.S
+void _do_swtch(struct jmp_buf *old, struct jmp_buf *new);
+void _retu(uint eip, uint esp3);
 
 // sysent.c
 int syserr(uint err);
@@ -86,8 +93,10 @@ int do_signal(int sig, void (*ufunc)(int));
 int do_sigaction(int sig, struct sigaction *sa, struct sigaction *old_sa);
 
 // mm/vm.c
+int vm_verify(uint vaddr, uint size);
 int vm_clone(struct vm *to);
 int vm_clear(struct vm *vm);
+int vm_renew(struct vm *vm, struct ahead *ah, struct inode *ip);
 struct vma* find_vma(uint addr);
 int vma_init(struct vma *vp, uint base, uint size, uint flag, struct inode *ip, uint ioff);
 

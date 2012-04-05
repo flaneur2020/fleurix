@@ -53,9 +53,7 @@ int do_exec(char *path, char **argv){
     struct buf *bp;
     struct sigaction *sa;
     struct ahead *ah;
-    struct page *pg;
     struct vm *vm;
-    struct vma *vp;
     struct file *fp;
     uint bn, fd, fdflag, argc, esp, nr;
     char **tmp;
@@ -88,7 +86,7 @@ int do_exec(char *path, char **argv){
     argc = upush_argv(&esp, tmp);
     if (argc<0)
         panic("exec(): bad mem");
-    upush(&esp, &argc, sizeof(uint));
+    upush(&esp, (char*)&argc, sizeof(uint));
     //
     free_argv(tmp);
     // close all the file descriptors with FD_CLOEXEC
@@ -126,8 +124,8 @@ _badf:
  * note: vm_verify() may override proc's address space, take care.
  * */
 int upush_argv(uint *esp, char **tmp){
-    uint arglen, argc, tmp_esp;
-    int i,r;
+    uint arglen, argc;
+    int i;
     char *str, **uargv;
 
     argc = 0;
@@ -144,15 +142,15 @@ int upush_argv(uint *esp, char **tmp){
         return -1;
     }
     // push to ustack finally
-    uargv = *esp - arglen;
+    uargv = (char**)(*esp - arglen);
     for (i=argc-1; i>=0; i--){
         str = tmp[i];
         upush(esp, str, strlen(str)+1);
         uargv[i] = (char *) *esp;
     }
-    *esp = uargv;
+    *esp = (uint)uargv;
     // push argv[]
-    upush(esp, &uargv, sizeof(uint));
+    upush(esp, (char*)&uargv, sizeof(uint));
     return argc;
 }
 
@@ -162,7 +160,7 @@ int upush(uint *esp, char *buf, int len){
     if (vm_verify(tmp-=len, len) < 0) {
         panic("upush(): bad mem");
     }
-    memcpy(tmp, buf, len);
+    memcpy((void*)tmp, buf, len);
     return (*esp=tmp);
 }
 
@@ -170,7 +168,7 @@ int upush(uint *esp, char *buf, int len){
 
 /* store the argv into some new-allocated pages temporily */
 static char** store_argv(char *path, char **argv){
-    char *str, **uargv, **tmp;
+    char **tmp;
     int argc, i;
 
     argc = 1;
@@ -197,6 +195,7 @@ static int free_argv(char **tmp){
         kfree(tmp[i], PAGE);
     }
     kfree(tmp, PAGE);
+    return 0;
 }
 
 /* ---------------------------------------------------------------*/
@@ -213,4 +212,5 @@ int dump_ahead(struct ahead *ah){
     printk("a_entry: %x\n", ah->a_entry);
     printk("a_trsize: %x\n", ah->a_trsize);
     printk("a_drsize: %x\n", ah->a_drsize);
+    return 0;
 }

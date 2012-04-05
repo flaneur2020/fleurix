@@ -24,7 +24,7 @@ int do_waitpid(int pid, int *stat, int opt){
     struct proc *p;
     uint nr; 
 
-    if (vm_verify(stat, sizeof(int)) < 0){
+    if (vm_verify((uint)stat, sizeof(int)) < 0){
         syserr(EFAULT);
         return -1;
     }
@@ -61,11 +61,11 @@ _repeat:
             }
         }
     }
-_not_found:
-    // no child has found
+
+    // if no child has found
     if (opt & WNOHANG) {
         return 0;
     }
-    sleep(cu, PWAIT);
+    sleep((uint)cu, PWAIT);
     goto _repeat;
 }
