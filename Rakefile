@@ -1,6 +1,6 @@
 cinc   = '-Isrc/inc -Isrc/inc/usr'
 cflag  = %w{
-  -Wall 
+  -Wall -Werror
   -nostdinc -fno-builtin -fno-stack-protector
   -finline-functions -finline-small-functions -findirect-inlining -finline-functions -finline-functions-called-once 
 } * ' '
