@@ -29,8 +29,12 @@ void set_hwint(int nr, int (*func)(struct trap *tf));
 uint    get_seg_limit(struct seg_desc *seg);
 extern  struct seg_desc     gdt[];
 
-// mp.c
-void do_pgfault(struct trap *tf);
+// pm.c
+int do_pgfault(struct trap *tf);
+struct page* pgalloc();
+struct page* pgfind(uint pn);
+int pgfree(struct page *pp);
+struct pte* pgattach(struct pde *pgd, uint vaddr, struct page *pp, uint flag);
 
 // timer.c
 void    do_timer();
@@ -56,6 +60,10 @@ struct vma* find_vma(uint addr);
 int vma_init(struct vma *vp, uint base, uint size, uint flag, struct inode *ip, uint ioff);
 int pt_copy(struct pde *npgd, struct pde *opgd);
 
+// mm/pte.c
+int pgd_init(struct pde *pgd);
+void flmmu();
+
 // mm/malloc.c
 void* kmalloc(uint size);
 int kfree(void* addr, uint size);
@@ -64,6 +72,9 @@ int kfree(void* addr, uint size);
 int     nodev();
 int     nulldev();
 
+// fs/rdwri.c
+int readi(struct inode *ip, char *buf, uint off, uint cnt);
+int writei(struct inode *ip, char *buf, uint off, uint cnt);
 
 // fs/inode.c
 struct inode* iget(ushort dev, uint num);
@@ -71,6 +82,8 @@ void iput(struct inode *ip);
 int bmap(struct inode *ip, ushort nr, uchar creat);
 int iload(struct inode *ip);
 void iupdate(struct inode *ip);
+void lock_ino(struct inode *ip);
+void unlk_ino(struct inode *ip);
 
 // fs/alloc.c
 int balloc(ushort dev);

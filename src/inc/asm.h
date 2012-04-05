@@ -1,5 +1,7 @@
 /* all inlined. */
 
+struct pde;
+
 /* 
  * iodelay. On older machines its necessary to give the PIC some time to react to 
  * commands as they might not be processed quickly.
@@ -84,8 +86,8 @@ static inline void lldt(uint n){
 }
 
 /* flush the page directory */
-static inline void lpgd(uint pgdir){
-    asm volatile("mov %%eax, %%cr3":: "a"(pgdir));
+static inline void lpgd(struct pde *pgdir){
+    asm volatile("mov %%eax, %%cr3":: "a"((uint)pgdir));
 }
 
 /* set the cr0 bit and enable mmu */

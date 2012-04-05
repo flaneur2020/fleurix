@@ -93,7 +93,7 @@ struct pte* pgattach(struct pde *pgd, uint vaddr, struct page *pp, uint flag){
 /* initialize pages' free list. */
 int pm_init(){
     struct page *pp, *ph;
-    uint i, pn;
+    uint pn;
 
     // mark the reserved pages
     // 640kb ~ 1mb is system reserved, BIOS and blah
@@ -123,6 +123,8 @@ int pm_init(){
         ph->pg_next = pp;
         ph = pp;
     }
+
+    return 0;
 }
 
 /* Map the top 128mb virtual memory as physical memory. Initiliaze
