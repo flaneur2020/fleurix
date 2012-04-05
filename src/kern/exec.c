@@ -27,6 +27,10 @@
  * space, make it demand-reading.
  * */
 
+static char** store_argv(char *path, char **argv);
+static int free_argv(char **tmp);
+
+/* ---------------------------------------------- */
 
 /* initialize a new struct vm according to an a.out executable 
  * image.

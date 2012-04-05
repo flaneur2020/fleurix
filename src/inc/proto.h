@@ -43,8 +43,6 @@ void    ljmp(ushort seg, uint offset);
 // kern/exec.c
 int upush(uint *esp, char *buf, int len);
 int upush_argv(uint *esp, char **tmp);
-static char** store_argv(char *path, char **argv);
-static int free_argv(char **tmp);
 
 // kern/signal.c
 int sigsend(int pid, int n, int priv);

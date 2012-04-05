@@ -5,7 +5,6 @@
 //
 #include <conf.h>
 #include <tty.h>
-#include <keybd.h>
 
 struct tty tty[NTTY];
 
