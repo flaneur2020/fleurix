@@ -22,10 +22,9 @@
 
 /* int access(char *path, int mode); */
 int sys_access(struct trap *tf){
-    char *path = tf->ebx;
+    char *path = (char*)tf->ebx;
     int mode = tf->ecx;
     struct inode *ip;
-    int r;
 
     if (vm_verify(path, MAX_PATHSIZ) < 0) {
         syserr(EFAULT);
@@ -46,10 +45,9 @@ int sys_access(struct trap *tf){
 }
 
 int sys_open(struct trap *tf){
-    char *path = tf->ebx;
-    int flag = tf->ecx;
+    char *path = (char*)tf->ebx;
+    int flag = (int)tf->ecx;
     int mode = tf->edx;
-    int r;
 
     if (vm_verify(path, MAX_PATHSIZ) < 0) {
         syserr(EFAULT);
@@ -76,8 +74,7 @@ int sys_close(struct trap *tf){
 int sys_read(struct trap *tf){
     int fd = tf->ebx;
     int cnt = tf->edx;
-    char *buf = tf->ecx; 
-    int r;
+    char *buf = (char*)tf->ecx; 
 
     if(vm_verify(buf, cnt) < 0){
         syserr(EFAULT);
@@ -90,8 +87,7 @@ int sys_read(struct trap *tf){
 int sys_write(struct trap *tf){
     int fd = tf->ebx;
     int cnt = tf->edx;
-    char *buf = tf->ecx;
-    int r;
+    char *buf = (char*)tf->ecx;
 
     if (vm_verify(buf, cnt) < 0) {
         syserr(EFAULT);
@@ -214,6 +210,7 @@ int sys_dup2(struct trap *tf){
 
 /* int pipe(int fd[2]); */
 int sys_pipe(struct trap *tf){
+    return syserr(ENOSYS);
 }
 
 /* ----------------------------------------- */

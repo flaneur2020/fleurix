@@ -12,9 +12,9 @@ struct idt_desc    idt_desc;
 
 // handlers to each int_no
 // which inited as 0
-static uint hwint_routines[256] = {0, }; 
+static void* hwint_routines[256] = {0, }; 
 
-static char *fault_str[] = {
+static char *trap_str[] = {
     "Division By Zero",
     "Debug",
     "Non Maskable Interrupt",
@@ -182,7 +182,7 @@ void hwint_common(struct trap *tf) {
     }
 }
 
-void set_hwint(int nr, void (*func)(struct trap *tf)){
+void set_hwint(int nr, int (*func)(struct trap *tf)){
     hwint_routines[nr] = func;
 }
 
@@ -200,6 +200,7 @@ void dump_tf(struct trap *tf){
     printk("cr2 = %x, ", cr2);
     asm("mov %%ss, %%eax":"=a"(kern_ss));
     printk("kern_ss = %x\n", kern_ss);
+    printk("trap_str: %s", trap_str[tf->int_no]);
 }
 
 /***********************************************************************************/
@@ -207,7 +208,7 @@ void dump_tf(struct trap *tf){
 void idt_init(){
     // init idt_desc
     idt_desc.limit = (sizeof(struct gate_desc) * 256) - 1;
-    idt_desc.base = &idt;
+    idt_desc.base = (uint)&idt;
     // init irq
     irq_init();
     // load intr vectors and lidt 

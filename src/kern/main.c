@@ -20,7 +20,7 @@
 
 void init();
 
-void main(){
+void kmain(){
     cls();
     gdt_init();         puts("* init gdt\n");
     idt_init();         puts("* init idt\n");
@@ -45,8 +45,6 @@ void main(){
 char *argv[] = {"abc\n", "testt\n", NULL};
 
 void init() {
-    int fd;
-    struct super *sp;
     struct inode *ip;
 
     cu->p_pgrp = 1;
@@ -69,14 +67,4 @@ void init() {
     // enter user mode, never returns.
     do_exec("/bin/init", NULL);
     for(;;);
-}
-
-/*
- * only called once in proc[1], make some initilizations and
- * enter user mode via set tf->cs to USER_CS.
- * */
-int sys_setup(struct trap *tf) {
-    tf->cs = USER_CS;
-    tf->ds = USER_DS;
-    tf->ss = USER_DS;
 }

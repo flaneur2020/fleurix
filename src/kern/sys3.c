@@ -15,6 +15,7 @@ int sys_nice(struct trap *tf){
     int n = tf->ebx & 0xff;
     if (n > 20) n = 40;
     if (n < -39) n = -39;
+    return 0;
 }
 
 int sys_getpid(struct trap *tf){
@@ -90,6 +91,7 @@ int sys_setregid(struct trap *tf){
 /* int setpgrp(void); */
 int sys_setpgrp(struct trap *tf){
     cu->p_pgrp = cu->p_pid;
+    return 0;
 }
 
 /* -------------------------------- */
@@ -106,11 +108,14 @@ int sys_umask(struct trap *tf){
 /* -------------------------------- */
 
 int sys_stime(struct trap *tf){
+    return syserr(ENOSYS);
 }
 
 int sys_utime(struct trap *tf){
+    return syserr(ENOSYS);
 }
 
 int sys_time(){
+    return syserr(ENOSYS);
 }
 

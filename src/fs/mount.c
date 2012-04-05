@@ -21,7 +21,6 @@ struct super *rootsp = NULL;
  * 
  * */
 struct super* do_mount(ushort dev, struct inode *ip){
-    struct buf *bp;
     struct super *sp;
 
     for(sp=&mnt[0]; sp<&mnt[NMOUNT]; sp++){
@@ -42,11 +41,12 @@ struct super* do_mount(ushort dev, struct inode *ip){
     // not found
     printk("no free mount slot");
     return NULL;
+
 _found:
     // if the inode as mount point is not a directory
     if ((ip!=NULL) && (ip->i_mode & S_IFMT)!=S_IFDIR){
         putsp(sp);
-        return -1;
+        return NULL;
     }
     if (dev==rootdev) {
         rootsp = sp;

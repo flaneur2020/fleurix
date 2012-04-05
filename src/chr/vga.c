@@ -42,7 +42,7 @@ void flush_csr(){
 
 /* clear screen */
 void cls(){
-    memsetw(vgamem, VC_BLANK, 80*25);
+    memsetw((short*)vgamem, VC_BLANK, 80*25);
     px = 0;
     py = 0;
     flush_csr();
@@ -53,7 +53,7 @@ void scroll(void) {
     if(py >= 25) {
         uint pos = py-25+1;
         memcpy(vgamem, &vgamem[pos][0], (25-pos)*80*sizeof(struct vchar));
-        memsetw(&vgamem[25-pos][0], VC_BLANK, 80);
+        memsetw((short*)&vgamem[25-pos][0], VC_BLANK, 80);
         py = 25-1;
     }
 }
@@ -107,7 +107,7 @@ void puts(char *str){
 void printn(uint n, uint b){
     static char *ntab = "0123456789ABCDEF";
     uint a, m;
-    if (a = n / b){
+    if ((a = n / b)){
         printn(a, b);  
     }
     m = n % b;
@@ -118,9 +118,10 @@ void printn(uint n, uint b){
  * refer to unix v6 
  * */
 void printk(char *fmt, ...){
-    char c, *s;
+    char c;
     int n;
-    int *adx = (uint*)(void*)&fmt + 1;
+    int *adx = (int*)(void*)&fmt + 1;
+
 _loop:
     while((c = *fmt++) != '%'){
         if (c == '\0') return;
@@ -142,7 +143,7 @@ _loop:
         putch(*adx);
     }
     if (c == 's'){
-        puts(*adx);
+        puts((char*)*adx);
     }
     adx++;
     goto _loop;

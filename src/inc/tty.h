@@ -21,7 +21,7 @@ struct tty {
     int     t_dev;  // device number.
     int     t_col;  // position x of the cursor
     int     t_row;  // position y of the cursor
-    int     (*t_putc)(char);
+    void    (*t_putc)(char);
     struct qbuf    t_rawq; 
     struct qbuf    t_canq;
     struct qbuf    t_outq;
@@ -45,6 +45,10 @@ extern struct tty tty[NTTY];
 #define CSTART  021 /* ctrl-Q */
 #define CSTOP   023 /* ctrl-S */
 #define CSUSP   032 /* ctrl-Z */
+
+/* ------------------------------------ */
+
+int sigsend_g(int pgrp, int n, int priv);
 
 #endif
 

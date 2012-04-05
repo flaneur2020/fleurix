@@ -22,7 +22,7 @@ int sys_kill(struct trap *tf){
 }
 
 int sys_pause(struct trap *tf){
-    sleep(&sys_pause, PWAIT);
+    sleep((uint)&sys_pause, PWAIT);
     return 0;
 }
 
@@ -33,14 +33,14 @@ int sys_signal(struct trap *tf){
     int sig = (int)tf->ebx;
     uint ufunc = (uint)tf->ecx;
 
-    return do_signal(sig, ufunc);
+    return do_signal(sig, (void*)ufunc);
 }
 
 /* sigaction(int sig, struct sigaction *sa, struct sigaction *old_sa); */
 int sys_sigaction(struct trap *tf){
     int sig = (int) tf->ebx;
-    int sa = (struct sigaction*) tf->ecx;
-    int old_sa = (struct sigaction*)tf->edx;
+    struct sigaction *sa = (struct sigaction*) tf->ecx;
+    struct sigaction *old_sa = (struct sigaction*)tf->edx;
 
     return do_sigaction(sig, sa, old_sa);
 }
@@ -64,11 +64,14 @@ int sys_sigreturn(struct trap *tf){
 }
 
 int sys_alarm(struct trap *tf){
+    syserr(ENOSYS);
+    return -1;
 }
 
 /* --------------------------- */
 
 int sys_sync(struct trap *tf){
     syserr(ENOSYS);
+    return -1;
 }
 

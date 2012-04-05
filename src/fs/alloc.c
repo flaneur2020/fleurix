@@ -60,6 +60,7 @@ int bfree(ushort dev, uint nr){
     bwrite(bp);
     brelse(bp);
     unlk_sp(sp);
+    return 0;
 }
 
 /* zero one disk block.
@@ -82,7 +83,6 @@ int bzero(ushort dev, uint bn){
 int ialloc(ushort dev){
     uint nr, ino;
     int r;
-    struct inode *ip;
     struct super *sp;
     struct buf *bp;
 

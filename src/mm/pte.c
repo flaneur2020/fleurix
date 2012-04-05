@@ -45,7 +45,6 @@ struct pte* find_pte(struct pde *pgd, uint vaddr, uint creat){
     struct pde *pde; 
     struct pte *pt;
     struct page *pg;
-    uint pn;
 
     if (vaddr < KMEM_END) {
         panic("find_pte(): don't touch kernel's address space.");
@@ -82,6 +81,7 @@ int pgd_init(struct pde *pgd){
         pgd[pn].pd_off = 0;
         pgd[pn].pd_flag = PTE_U;
     }
+    return 0;
 }
 
 /* copy the page tables, and set both pte's flag. 

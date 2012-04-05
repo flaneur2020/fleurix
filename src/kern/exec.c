@@ -27,6 +27,10 @@
  * space, make it demand-reading.
  * */
 
+static char** store_argv(char *path, char **argv);
+static int free_argv(char **tmp);
+
+/* ---------------------------------------------- */
 
 /* initialize a new struct vm according to an a.out executable 
  * image.
@@ -49,9 +53,7 @@ int do_exec(char *path, char **argv){
     struct buf *bp;
     struct sigaction *sa;
     struct ahead *ah;
-    struct page *pg;
     struct vm *vm;
-    struct vma *vp;
     struct file *fp;
     uint bn, fd, fdflag, argc, esp, nr;
     char **tmp;
@@ -84,7 +86,7 @@ int do_exec(char *path, char **argv){
     argc = upush_argv(&esp, tmp);
     if (argc<0)
         panic("exec(): bad mem");
-    upush(&esp, &argc, sizeof(uint));
+    upush(&esp, (char*)&argc, sizeof(uint));
     //
     free_argv(tmp);
     // close all the file descriptors with FD_CLOEXEC
@@ -121,9 +123,9 @@ _badf:
 /* push argv into user stack, returns argc.
  * note: vm_verify() may override proc's address space, take care.
  * */
-int upush_argv(uint *esp, char **tmp){
-    uint arglen, argc, tmp_esp;
-    int i,r;
+int upush_argv(uint *esp, char *tmp[]){
+    uint arglen, argc;
+    int i, r, tmp_esp; // TODO: some bugs hide here, when you deleted the unused variables.
     char *str, **uargv;
 
     argc = 0;
@@ -135,27 +137,29 @@ int upush_argv(uint *esp, char **tmp){
     }
     arglen += sizeof(char*) * argc;
     // note: vm_verify may modify proc's address space.
-    if (vm_verify(*esp-arglen, arglen) < 0){
+    if (vm_verify((void*)(*esp-arglen), arglen) < 0){
         syserr(EINVAL);
         return -1;
     }
     // push to ustack finally
-    uargv = *esp - arglen;
+    uargv = (char**)(*esp - arglen);
     for (i=argc-1; i>=0; i--){
         str = tmp[i];
         upush(esp, str, strlen(str)+1);
         uargv[i] = (char *) *esp;
     }
-    *esp = uargv;
+    *esp = (uint)uargv;
     // push argv[]
-    upush(esp, &uargv, sizeof(uint));
+    upush(esp, (char*)&uargv, sizeof(uint));
     return argc;
 }
 
 /* push one string into the user stack. returns the new esp */
 int upush(uint *esp, char *buf, int len){
     uint tmp = *esp; // take care, *esp may overlaps *buf
-    if (vm_verify(tmp-=len, len) < 0) {
+
+    tmp -= len;
+    if (vm_verify((void*)tmp, len) < 0) {
         panic("upush(): bad mem");
     }
     memcpy(tmp, buf, len);
@@ -166,7 +170,7 @@ int upush(uint *esp, char *buf, int len){
 
 /* store the argv into some new-allocated pages temporily */
 static char** store_argv(char *path, char **argv){
-    char *str, **uargv, **tmp;
+    char **tmp;
     int argc, i;
 
     argc = 1;
@@ -193,6 +197,7 @@ static int free_argv(char **tmp){
         kfree(tmp[i], PAGE);
     }
     kfree(tmp, PAGE);
+    return 0;
 }
 
 /* ---------------------------------------------------------------*/

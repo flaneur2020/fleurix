@@ -1,4 +1,4 @@
-ENTRY(main)
+ENTRY(kmain)
 SECTIONS {
     __bios__ = 0xa0000;
     vgamem = 0xb8000;

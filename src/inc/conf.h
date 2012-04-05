@@ -3,6 +3,8 @@
 #ifndef CONF_H
 #define CONF_H
 
+struct buf;
+
 struct bdevsw {
     int             (*d_open)(); 
     int             (*d_close)();

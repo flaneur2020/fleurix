@@ -14,7 +14,7 @@ void do_no_page(uint vaddr){
     struct vma *vp;
     struct pte *pte;
     struct page *pg;
-    uint off, flag;
+    uint off;
     char *buf;
 
     vm = &cu->p_vm;
@@ -36,7 +36,7 @@ void do_no_page(uint vaddr){
     if (vp->v_flag & VMA_ZERO) {
         pg = pgalloc();
         pgattach(vm->vm_pgd, PG_ADDR(vaddr), pg, PTE_U|PTE_W|PTE_P);
-        memset(PG_ADDR(vaddr), 0, PAGE);
+        memset((void*)PG_ADDR(vaddr), 0, PAGE);
         return;
     }
     // demand file
@@ -45,8 +45,8 @@ void do_no_page(uint vaddr){
         pte = pgattach(vm->vm_pgd, PG_ADDR(vaddr), pg, PTE_U|PTE_W|PTE_P);
         // fill this new-allocated page
         // hint: vaddr is *ALWAYS* greater than or equal with vp->v_base
-        buf = PG_ADDR(vaddr);
-        off = buf - vp->v_base + vp->v_ioff;
+        buf = (char*)PG_ADDR(vaddr);
+        off = (uint)buf - vp->v_base + vp->v_ioff;
         lock_ino(vp->v_ino);
         readi(vp->v_ino, buf, off, PAGE);
         unlk_ino(vp->v_ino);
@@ -98,7 +98,7 @@ void do_wp_page(uint vaddr){
 /*
  * the common handler of all page faults, as a dispatcher.
  * */
-void do_pgfault(struct trap *tf){
+int do_pgfault(struct trap *tf){
     uint addr;
 
     asm volatile("movl %%cr2, %0":"=a"(addr));
@@ -106,16 +106,18 @@ void do_pgfault(struct trap *tf){
     // invalid page
     if ((tf->err_code & PFE_P)==0) {
         do_no_page(addr);
-        return ;
+        return 0;
     }
     // write procted page
     if (tf->err_code & PFE_W) {
         do_wp_page(addr);
-        return ;
+        return 0;
     }
     // raise a signal here, hence segmention fault.
     if (tf->err_code & PFE_U) {
         sigsend(cu->p_pid, SIGSEGV, 1);
     }
+    
+    return 0;
 }
 

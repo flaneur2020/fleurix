@@ -63,12 +63,12 @@ _loop:
             panic("error devtab. ");
         }
         // 1. found in the dev's cache list
-        if (bp=incore(dev, blkno)) {
+        if ((bp=incore(dev, blkno))) {
             // 2. found in the dev's cache list but busy
             cli();
             if (bp->b_flag & B_BUSY) {
                 bp->b_flag |= B_WANTED;
-                sleep(bp, PRIBIO);
+                sleep((uint)bp, PRIBIO);
                 sti();
                 goto _loop;
             } 
@@ -81,7 +81,7 @@ _loop:
     cli();
     if (bfreelist.av_next==&bfreelist) {
         bfreelist.b_flag |= B_WANTED;
-        sleep(&bfreelist, PRIBIO);
+        sleep((uint)&bfreelist, PRIBIO);
         sti();
         goto _loop;
     }
@@ -100,10 +100,8 @@ _loop:
     cli();
     bp->b_prev->b_next = bp->b_next;
     bp->b_next->b_prev = bp->b_prev;
-    bp->b_next = dtp->b_next;
-    bp->b_prev = (struct buf *)dtp;
     // prepend it into the target dev's cache list.
-    bp->b_prev = dtp;
+    bp->b_prev = (struct buf*)dtp;
     bp->b_next = dtp->b_next;
     dtp->b_next->b_prev = bp;
     dtp->b_next = bp;
@@ -121,14 +119,13 @@ _loop:
  * TODO: consider B_ERROR
  * */
 void brelse(struct buf *bp){
-    struct buf *tmp;
 
     if (bp->b_flag & B_WANTED) {
-        wakeup(bp);
+        wakeup((uint)bp);
     }
     if (bfreelist.b_flag & B_WANTED) {
         bfreelist.b_flag &= ~B_WANTED;
-        wakeup(&bfreelist);
+        wakeup((uint)&bfreelist);
     }
     if (bp->b_flag & B_ERROR) {
         bp->b_dev = NODEV;
@@ -151,7 +148,7 @@ void notavail(struct buf *bp){
 
 void iowait(struct buf *bp){
     while((bp->b_flag&B_DONE)==0){
-        sleep(bp, PRIBIO);
+        sleep((uint)bp, PRIBIO);
     }
 }
 
@@ -159,7 +156,7 @@ void iodone(struct buf *bp){
     bp->b_flag |= B_DONE;
     bp->b_flag &= ~B_WANTED; 
     //brelse(bp);
-    wakeup(bp);
+    wakeup((uint)bp);
 }
 
 /**********************************************/

@@ -104,7 +104,7 @@ struct proc* kspawn(void (*func)()){
     // clone kernel's address space.
     vm_clone(&p->p_vm);
     p->p_contxt = cu->p_contxt;
-    p->p_contxt.eip = func;
+    p->p_contxt.eip = (uint)func;
     p->p_contxt.esp = (uint)p+PAGE;
     p->p_stat = SRUN;
     return p;
@@ -124,7 +124,7 @@ int do_fork(struct trap *tf){
     ntf = (struct trap *)((uint)p+PAGE) - 1;
     *ntf = *tf;
     ntf->eax = 0; // this is why fork() returns 0.
-    p->p_contxt.esp = ntf;
+    p->p_contxt.esp = (uint)ntf;
     p->p_trap = ntf;
     return p->p_pid;
 }
@@ -166,6 +166,11 @@ void proc0_init(){
 
 /* --------------------------------------------------- */
 
+void dump_proc(struct proc *p){
+    printk("%s ", (p==cu)? "-":" " );
+    printk("pid:%d pri:%d cpu:%d nice:%d stat:%d esp0:%x eip:%x \n", p->p_pid, p->p_pri, p->p_cpu, p->p_nice, p->p_stat, p->p_contxt.esp, p->p_contxt.eip);
+}
+
 void dump_procs(){
     int i;
     struct proc *p;
@@ -176,10 +181,4 @@ void dump_procs(){
         }
     }
 }
-
-void dump_proc(struct proc *p){
-    printk("%s ", (p==cu)? "-":" " );
-    printk("pid:%d pri:%d cpu:%d nice:%d stat:%d esp0:%x eip:%x \n", p->p_pid, p->p_pri, p->p_cpu, p->p_nice, p->p_stat, p->p_contxt.esp, p->p_contxt.eip);
-}
-
 

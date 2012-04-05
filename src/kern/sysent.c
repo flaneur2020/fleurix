@@ -19,9 +19,8 @@
 
 int errno = 0;
 
-static uint sys_routines[NSYSC] = {
+static void* sys_routines[NSYSC] = {
     [NR_debug]      = &sys_debug,
-    [NR_setup]      = &sys_setup,
     //
     [NR_access]     = &sys_access,
     [NR_creat]      = &sys_creat,
@@ -90,7 +89,7 @@ int syserr(uint err){
 
 /* common handlers for all syscalls, if an syserr raised,
  * returns a negative number: 0 - cu->p_error. */
-void do_syscall(struct trap *tf){
+int do_syscall(struct trap *tf){
     int ret;
     int (*func)(struct trap *tf);
 
@@ -108,4 +107,5 @@ void do_syscall(struct trap *tf){
         tf->eax = 0 - cu->p_error;
     else
         tf->eax = ret;
+    return 0;
 }

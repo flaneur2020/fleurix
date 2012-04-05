@@ -37,7 +37,6 @@ struct inode inode[NINODE];
  *
  * */
 struct inode* iget(ushort dev, uint num){
-    struct buf *bp;
     struct inode *ip;
     struct super *sp;
 
@@ -47,7 +46,7 @@ _loop:
             // if found but locked.
             if (ip->i_flag & I_LOCK) {
                 ip->i_flag |= I_WANTED;
-                sleep(ip, PINOD);
+                sleep((uint)ip, PINOD);
                 goto _loop;
             }
             // if this is an mount point, redirect to the mount
@@ -129,7 +128,6 @@ int iload(struct inode *ip){
     struct super *sp;
     struct d_inode *itab; /* note this is an d_inode, 32 bytes. */
     struct buf *bp;
-    uint lba;
 
     sp = getsp(ip->i_dev);
     if (sp==NULL){
@@ -151,7 +149,6 @@ void iupdate(struct inode *ip){
     struct super *sp;
     struct d_inode *itab;
     struct buf *bp;
-    uint lba;
 
     /*
     if ((ip->i_flag & I_DIRTY)==0){
@@ -174,14 +171,14 @@ void iupdate(struct inode *ip){
     ip->i_flag &= ~I_DIRTY;
     bwrite(bp);
     brelse(bp);
-    return 0;
+    return;
 }
 
 /*************************************************************/
 
 void lock_ino(struct inode *ip){
     while(ip->i_flag & I_LOCK){
-        sleep(ip, PINOD);
+        sleep((uint)ip, PINOD);
     }
     ip->i_flag |= I_LOCK;
 }
@@ -190,7 +187,7 @@ void lock_ino(struct inode *ip){
 void unlk_ino(struct inode *ip){
     cli();
     if (ip->i_flag & I_WANTED) {
-        wakeup(ip);
+        wakeup((uint)ip);
     }
     ip->i_flag &= ~(I_LOCK | I_WANTED);
     sti();

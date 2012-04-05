@@ -9,6 +9,8 @@
 #include <signal.h>
 #include <stat.h>
 
+struct trap;
+
 #define _SYS0(T0, FN)                           \
     T0 FN(){                                    \
         register int r;                         \
@@ -79,8 +81,6 @@ extern int errno;
 
 enum {
     //
-    NR_setup, 
-    //
     NR_fork,
     NR_exec,
     NR__exit,
@@ -131,7 +131,6 @@ enum {
 };
 
 int nosys       (struct trap *);
-int sys_setup   (struct trap *);
 //
 int sys_access  (struct trap *);
 int sys_open    (struct trap *);
@@ -196,7 +195,6 @@ static inline _SYS1(int, unlink, char*);
 static inline _SYS2(int, stat, char*, struct stat*); 
 static inline _SYS2(int, fstat, int, struct stat*); 
 //
-static inline _SYS0(int, setup);
 static inline _SYS0(int, fork); 
 static inline _SYS2(int, exec, char*, char**);
 static inline _SYS1(int, _exit, int);

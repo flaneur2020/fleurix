@@ -39,7 +39,8 @@ void wakeup(uint chan){
     struct proc *p;
     int i;
     for(i=0; i<NPROC; i++){
-        if ((p = proc[i]) == NULL) continue;
+        if ((p = proc[i]) == NULL) 
+            continue;
         if (p->p_chan == chan) {
             setrun(p);
         }

@@ -3,7 +3,7 @@
 #include <proto.h>
 #include <proc.h>
 
-struct seg_desc     gdt[NSEG] = {0, };
+struct seg_desc     gdt[NSEG] = { { 0, }, };
 struct gdt_desc     gdt_desc;
 
 /* ------------------------------------------------------ */
@@ -48,8 +48,8 @@ void gdt_init(){
     set_seg(&gdt[2], 0, 0xffffffff, RING0, STA_W);
     set_seg(&gdt[3], 0, 0xffffffff, RING3, STA_X | STA_R);
     set_seg(&gdt[4], 0, 0xffffffff, RING3, STA_W);
-    set_tss(&gdt[TSS0], &tss);
-    gdt_desc.base   = &gdt;
+    set_tss(&gdt[TSS0], (uint)&tss);
+    gdt_desc.base   = (uint)&gdt;
     gdt_desc.limit  = (sizeof (struct seg_desc) * NSEG) - 1;
     // load gdt
     asm volatile( "lgdt %0" :: "m"(gdt_desc));

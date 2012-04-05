@@ -1,9 +1,11 @@
+werror = '-Werror' if ENV['werror']
+
 cinc   = '-Isrc/inc -Isrc/inc/usr'
-cflag  = %w{
-  -Wall 
+cflag  = %{
+  -Wall #{werror}
   -nostdinc -fno-builtin -fno-stack-protector
   -finline-functions -finline-small-functions -findirect-inlining -finline-functions -finline-functions-called-once 
-} * ' '
+}.split(/\s/).join(' ')
 
 mkdir_p 'bin'
 mkdir_p 'bin/usr'

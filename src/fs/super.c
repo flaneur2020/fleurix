@@ -10,7 +10,7 @@
 #include <stat.h>
 #include <inode.h>
 
-struct super    mnt[NMOUNT] = {0, };
+struct super    mnt[NMOUNT] = { {0, }, };
 
 /* search the mount table.
  * note: super block is meaningless until the device is mounted 
@@ -23,7 +23,7 @@ _loop:
         if (dev == sp->s_dev) {
             if (sp->s_flag & S_LOCK) {
                 sp->s_flag |= S_WANTED;
-                sleep(sp, PINOD);
+                sleep((uint)sp, PINOD);
                 goto _loop;
             }
             return sp;
@@ -41,7 +41,6 @@ _loop:
  * */
 int spload(struct super *sp){
     struct buf *bp;
-    struct inode *ip;
 
     // read and check.
     bp = bread(sp->s_dev, 1);
@@ -63,11 +62,10 @@ int spload(struct super *sp){
  * write changes back to disk.
  * */
 void spupdate(struct super *sp){
-    struct inode *ip;
     struct buf *bp;
     
-    bp = iget(sp->s_dev, 1);
-    memcpy(bp->b_data, sp, sizeof(struct d_super));
+    bp = getblk(sp->s_dev, 1);
+    memcpy(bp->b_data, (char*)sp, sizeof(struct d_super));
     bwrite(bp);
     brelse(bp);
 }
@@ -85,7 +83,7 @@ void update(){
 void unlk_sp(struct super *sp){
     cli();
     if (sp->s_flag & S_WANTED) {
-        wakeup(sp);
+        wakeup((uint)sp);
     }
     sp->s_flag &= ~(S_LOCK | S_WANTED);
     sti();

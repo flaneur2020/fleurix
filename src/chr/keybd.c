@@ -43,7 +43,7 @@ char shift(char sc){
  * */
 int do_keybd_intr(struct trap *tf){
     uchar sc, ch, m;
-    char *map = keybd_map;
+    uchar *map = keybd_map;
 
     // got no data
     if ((inb(KB_STAT) & KB_STAT_DIB)==0){
@@ -60,7 +60,7 @@ int do_keybd_intr(struct trap *tf){
         mode |= E0ESC;
 
     // check shift, ctrl and alt
-    if (m = shift(sc)) {
+    if ((m = shift(sc))) {
         if (sc & 0x80) 
             mode &= ~m;
         else 
@@ -83,13 +83,15 @@ int do_keybd_intr(struct trap *tf){
     }
 
     // on pressed 
-    if ((sc & 0x80)==0 && ch!=NULL) {
+    if ((sc & 0x80)==0 && ch!='\0') {
         tty_input(&tty[0], ch);
     }
     // on released
     else {
         mode &= ~E0ESC;
     }
+
+    return 0;
 }
 
 void keybd_init(){

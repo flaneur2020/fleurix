@@ -61,11 +61,11 @@ _repeat:
             }
         }
     }
-_not_found:
-    // no child has found
+
+    // if no child has found
     if (opt & WNOHANG) {
         return 0;
     }
-    sleep(cu, PWAIT);
+    sleep((uint)cu, PWAIT);
     goto _repeat;
 }
