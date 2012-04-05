@@ -95,7 +95,7 @@ int do_unlink(char *path){
     ip = iget(dip->i_dev, ino);
     // can't unlink a directory, undo something.
     if ((ip->i_mode & S_IFMT) == S_IFDIR) {
-        link_entry(dip, name, strlen(name));
+        link_entry(dip, name, strlen(name), ip->i_num);
         iput(ip);
         iput(dip);
         syserr(EPERM);

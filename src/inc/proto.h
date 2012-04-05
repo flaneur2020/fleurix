@@ -121,6 +121,9 @@ int find_bit(char *bm, int size);
 // fs/namei.c
 struct inode* namei(char *path, uchar creat);
 struct inode* namei_parent(char *path, char **name);
+uint find_entry(struct inode* dip, char *name, uint len);
+uint link_entry(struct inode *dip, char *name, uint len, uint ino);
+int unlink_entry(struct inode *dip, char *name, int len);
 
 // fs/file.c 
 struct file* falloc(int fd);
