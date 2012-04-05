@@ -85,7 +85,7 @@ void ljmp(ushort seg, uint offset);
 
 // kern/exec.c
 int upush(uint *esp, char *buf, int len);
-int upush_argv(uint *esp, char **tmp);
+int upush_argv(uint *esp, char *tmp[]);
 int do_exec(char *path, char **argv);
 
 // kern/signal.c

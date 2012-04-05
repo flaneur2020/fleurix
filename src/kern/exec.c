@@ -123,9 +123,9 @@ _badf:
 /* push argv into user stack, returns argc.
  * note: vm_verify() may override proc's address space, take care.
  * */
-int upush_argv(uint *esp, char **tmp){
+int upush_argv(uint *esp, char *tmp[]){
     uint arglen, argc;
-    int i;
+    int i, r, tmp_esp; // TODO: some bugs hide here, when you deleted the unused variables.
     char *str, **uargv;
 
     argc = 0;
@@ -158,10 +158,11 @@ int upush_argv(uint *esp, char **tmp){
 int upush(uint *esp, char *buf, int len){
     uint tmp = *esp; // take care, *esp may overlaps *buf
 
-    if (vm_verify((void*)(tmp -= len), len) < 0) {
+    tmp -= len;
+    if (vm_verify((void*)tmp, len) < 0) {
         panic("upush(): bad mem");
     }
-    memcpy((void*)tmp, buf, len);
+    memcpy(tmp, buf, len);
     return (*esp=tmp);
 }
 
@@ -213,5 +214,4 @@ int dump_ahead(struct ahead *ah){
     printk("a_entry: %x\n", ah->a_entry);
     printk("a_trsize: %x\n", ah->a_trsize);
     printk("a_drsize: %x\n", ah->a_drsize);
-    return 0;
 }
