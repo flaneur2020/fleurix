@@ -55,6 +55,12 @@ int do_fork(struct trap *tf);
 struct proc* kspawn(void (*func)());
 int find_pid();
 
+// kern/wait.c
+int do_waitpid(int pid, int *stat, int opt);
+
+// kern/exit.c
+int do_exit(int ret);
+
 // mm/pm.c
 void mm_init();
 int do_pgfault(struct trap *tf);
@@ -68,7 +74,6 @@ void do_no_page(uint vaddr);
 void do_wp_page(uint vaddr);
 
 // timer.c
-void do_timer();
 uint time();
 void timer_init();
 
@@ -91,9 +96,10 @@ int sigsend_g(int pgrp, int n, int priv);
 int do_kill(int pid, int sig);
 int do_signal(int sig, void (*ufunc)(int));
 int do_sigaction(int sig, struct sigaction *sa, struct sigaction *old_sa);
+void usigsav(struct jmp_buf *buf, struct trap *tf, uint mask);
 
 // mm/vm.c
-int vm_verify(uint vaddr, uint size);
+int vm_verify(void* vaddr, uint size);
 int vm_clone(struct vm *to);
 int vm_clear(struct vm *vm);
 int vm_renew(struct vm *vm, struct ahead *ah, struct inode *ip);
@@ -138,6 +144,15 @@ int do_hd_intr(struct trap *tf);
 // fs/rdwri.c
 int readi(struct inode *ip, char *buf, uint off, uint cnt);
 int writei(struct inode *ip, char *buf, uint off, uint cnt);
+
+// fs/rdwr.c
+int do_read(int fd, char *buf, int cnt);
+int do_write(int fd, char *buf, int cnt);
+int do_lseek(uint fd, int off, int whence);
+
+// fs/link.c
+int do_link(char *path1, char *path2);
+int do_unlink(char *path);
 
 // fs/mount.c
 struct super* do_mount(ushort dev, struct inode *ip);

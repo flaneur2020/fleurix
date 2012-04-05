@@ -137,7 +137,7 @@ int upush_argv(uint *esp, char **tmp){
     }
     arglen += sizeof(char*) * argc;
     // note: vm_verify may modify proc's address space.
-    if (vm_verify(*esp-arglen, arglen) < 0){
+    if (vm_verify((void*)(*esp-arglen), arglen) < 0){
         syserr(EINVAL);
         return -1;
     }
@@ -157,7 +157,8 @@ int upush_argv(uint *esp, char **tmp){
 /* push one string into the user stack. returns the new esp */
 int upush(uint *esp, char *buf, int len){
     uint tmp = *esp; // take care, *esp may overlaps *buf
-    if (vm_verify(tmp-=len, len) < 0) {
+
+    if (vm_verify((void*)(tmp -= len), len) < 0) {
         panic("upush(): bad mem");
     }
     memcpy((void*)tmp, buf, len);

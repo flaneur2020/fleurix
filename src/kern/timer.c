@@ -52,7 +52,7 @@ uint time(){
 
 /*****************************************************/
 
-void do_timer(struct trap *tf){
+int do_timer(struct trap *tf){
     tick++;
     // on shedule
     if (cu->p_cpu+1 <= 127) {
@@ -63,6 +63,7 @@ void do_timer(struct trap *tf){
         sched_cpu();
         timestamp++;
     }
+    return 0;
 }
 
 /* Initialize PIC and CMOS time. */

@@ -106,15 +106,16 @@ int vm_renew(struct vm *vm, struct ahead *ah, struct inode *ip){
  *   use this routine only before reading and writing the 
  *   user memory.
  * */
-int vm_verify(uint vaddr, uint size){
+int vm_verify(void *vaddr, uint size){
     struct pte *pte;
     uint page;
+    uint addr = (uint)vaddr;
     
-    if (vaddr<KMEM_END || size<0) {
+    if (addr<KMEM_END || size<0) {
         return -1;
     }
     // TODO: special case on checking string.
-    for (page=PG_ADDR(vaddr); page<=PG_ADDR(vaddr+size-1); page+=PAGE) {
+    for (page=PG_ADDR(addr); page<=PG_ADDR(addr+size-1); page+=PAGE) {
         pte = find_pte(cu->p_vm.vm_pgd, page, 1);
         if ((pte->pt_flag & PTE_P)==0) {
             do_no_page(page);

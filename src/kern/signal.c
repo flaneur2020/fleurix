@@ -23,7 +23,6 @@ void _usigret();
  * */
 int issig(){
     uint n, sig;
-    struct sigaction sa;
 
     sig = cu->p_sig;
     if (sig==0)
@@ -53,10 +52,11 @@ int issig(){
  *      psig();
  * */
 void psig(){
-    uint n, ufunc, esp, usr;
+    uint n, esp, usr;
     struct trap *tf;
     struct sigaction *sa;
     struct jmp_buf jbuf, *ujbuf;
+    void *ufunc;
 
     n = cu->p_cursig;
     if (n==0 || n>NSIG)
@@ -75,15 +75,15 @@ void psig(){
         }
         // push to the user stack, with a "shellcode"
         esp = tf->esp;
-        usr = upush(&esp, &_usigret, 16);
-        ujbuf = upush(&esp, &jbuf, sizeof(struct jmp_buf));
-        upush(&esp, &n, sizeof(uint));
-        upush(&esp, &usr, sizeof(uint));
+        usr = upush(&esp, (char*)&_usigret, 16);
+        ujbuf = (struct jmp_buf*)upush(&esp, (char*)&jbuf, sizeof(struct jmp_buf));
+        upush(&esp, (char*)&n, sizeof(uint));
+        upush(&esp, (char*)&usr, sizeof(uint));
         ufunc = sa->sa_handler;
         if (sa->sa_flags & SA_ONESHOT) {
             sa->sa_handler = NULL;
         }
-        _retu(ufunc, esp);
+        _retu((uint)ufunc, esp);
         return;
     }
     // on SIG_DFL
@@ -187,7 +187,7 @@ int do_kill(int pid, int sig){
         return sigsend_g(-pid, sig, 0);
     if (pid==-1) {
         for (nr=1; nr<NPROC; nr++) {
-            if (p=proc[nr]) 
+            if ((p=proc[nr])) 
                 ret = sigsend(nr, sig, 0);
         }
         return ret;

@@ -16,7 +16,6 @@
 /* --------------------------- */
 
 int sys_debug(struct trap *tf){
-    dump_tf(tf);
     for(;;);
     return 0;
 }
@@ -32,7 +31,6 @@ int sys__exit(struct trap *tf){
 
 /* exec(char *path, char **argv) */
 int sys_exec(struct trap *tf){
-    int r;
     char *path = (char*)tf->ebx;
     char **argv = (char**)tf->ecx;
 
@@ -40,6 +38,7 @@ int sys_exec(struct trap *tf){
 }
 
 int sys_brk(struct trap *tf){
+    return syserr(ENOSYS);
 }
 
 /* waitpid(int pid, int *stat, int opt) */
