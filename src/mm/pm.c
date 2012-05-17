@@ -96,9 +96,10 @@ int pm_init(){
     uint pn;
 
     // mark the reserved pages
-    // 640kb ~ 1mb is system reserved, BIOS and blah
-    // 1mb ~ __kend__ is kernel reserved.
-    for (pn=0; pn<3; pn++) {
+    // 0~4kb is reserved for the kernel stack of proc0;
+    // 640kb ~ 1mb is system reserved, BIOS and blah;
+    // 1mb ~ __kend__ is reserved for the kernel image.;
+    for (pn=0; pn<1; pn++) {
         coremap[pn].pg_num = pn;
         coremap[pn].pg_flag = PG_RSVD;
         coremap[pn].pg_count = 100;

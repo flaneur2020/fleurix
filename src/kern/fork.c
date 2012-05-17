@@ -15,8 +15,7 @@
  *
  * */
 
-/* the kernel stack of proc0, one page size */
-uchar kstack0[PAGE] __attribute__((aligned(PAGE)));        
+struct proc proc0;
 
 struct proc *proc[NPROC] = {NULL, };
 struct proc *cu = NULL;
@@ -139,7 +138,7 @@ int do_fork(struct trap *tf){
 void proc0_init(){
     int fd;
 
-    struct proc *p = cu = proc[0] = (struct proc *)(uint) kstack0;
+    struct proc *p = cu = proc[0] = &proc0;
     p->p_pid = 0;
     p->p_ppid = 0;
     p->p_stat = SRUN;
@@ -158,7 +157,7 @@ void proc0_init(){
     p->p_iroot = NULL;
     // init tss
     tss.ss0  = KERN_DS;
-    tss.esp0 = (uint)p + PAGE;
+    tss.esp0 = KSTACK0;
     for (fd=0; fd<NOFILE; fd++){
         p->p_ofile[fd] = NULL;
     }

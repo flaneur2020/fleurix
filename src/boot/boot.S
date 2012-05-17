@@ -113,8 +113,8 @@ _start_pm:
     mov     ss,  ax
     mov     es,  ax
     mov     gs,  ax
-    ; move stack to 0x2000, temporily
-    mov     esp, 2000h
+    ; move stack to 0x1000
+    mov     esp, 1000h
 
     ; copy 0x10000 to 0x100000
     cld

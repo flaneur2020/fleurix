@@ -9,6 +9,7 @@ typedef unsigned int    uint;
 #define PMEM     0x8000000  /* 128mb physical memory. */
 #define KMEM_END 0x8000000  /* 128mb, the kernel's address space. */
 #define KHEAP    0x300000   /* kernel's heap starts at 3mb. */
+#define KSTACK0  0x1000     /* proc0's stack, takes one page and grows downward. */
 
 #define ROOTINO 1
 
