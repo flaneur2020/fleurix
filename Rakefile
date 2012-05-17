@@ -33,7 +33,7 @@ task :clean do
   sh "rm -rf bin/* root/bin/* src/kern/entry.S .bochsout"
 end
 
-task :werror do
+task :werr do
   cflag += ' -Werror'
   Rake::Task['clean'].invoke
   Rake::Task['build'].invoke
