@@ -118,8 +118,6 @@ void usigsav(struct jmp_buf *buf, struct trap *tf, uint mask){
     buf->eip = tf->eip;
     // save callee-saved registers
     buf->ebx = tf->ebx;
-    buf->ecx = tf->ecx;
-    buf->edx = tf->edx;
     buf->edi = tf->edi;
     buf->esi = tf->esi;
     buf->ebp = tf->ebp;
