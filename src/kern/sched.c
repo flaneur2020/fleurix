@@ -98,7 +98,7 @@ void swtch(){
     runrun = 0;
     // find the proc
     for(i=0;i<NPROC;i++){
-        if ((p=proc[i]) && (p->p_stat==SRUN)) {
+        if ((p=proc[i]) && (p->p_stat==SRUN || p->p_pid==0)) {
             if (p->p_pri <= n){
                 n = p->p_pri;
                 np = p;
