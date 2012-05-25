@@ -66,7 +66,7 @@ int do_timer(struct trap *tf){
     return 0;
 }
 
-/* Initialize PIC and CMOS time. */
+/* Initialize PIT and CMOS time. */
 void timer_init(){
     uint di = 1193180/HZ;
     outb(0x43, 0x36);

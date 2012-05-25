@@ -5,12 +5,12 @@
 
 #include <conf.h>
 
+/* TODO: the algorithm on runrun seems break */
 uint runrun = 0; 
 
 /*******************************************************************************/
 
 /* mark a proccess SWAIT, commonly used on waiting a resource.
- * TODO: race condition should consider later.
  * */
 void sleep(uint chan, int pri){
     if (pri < 0) {
