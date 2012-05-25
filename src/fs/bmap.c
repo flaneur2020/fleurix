@@ -29,7 +29,7 @@ int bmap(struct inode *ip, ushort nr, uchar creat) {
     short *zmap, *zmap2;
     ushort dev;
 
-    if ((nr > MAX_FILESIZ) || ((nr > (ip->i_size/BLK) && (creat==0)))) {
+    if ((nr > MAX_FILESIZ/BLK) || ((nr > (ip->i_size/BLK) && (creat==0)))) {
         panic("blk nr too big.");
     }
 
