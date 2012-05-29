@@ -40,7 +40,7 @@ int hd_cmd(uint drive, uint cmd, uint lba, uchar ns) {
 }
 
 /* 
- * When we send a command, we should wait for 400 nanosecond, then read the Status 
+ * After we've send a command, we should wait for 400 nanosecond, then read the Status 
  * port. If the Busy bit is on, we should read the status port again until the Busy bit is 0; 
  * then we can read the results of the command. This operation is called "Polling". We can also 
  * use IRQs instead of polling.

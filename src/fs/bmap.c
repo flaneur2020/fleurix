@@ -22,7 +22,8 @@
  *
  * ip->i_size is adjusted in writei();
  *
- * TODO: maybe we can remove all the updatei and bwrite stuff, but sync() required first.
+ * TODO: maybe we can remove all the updatei and bwrite stuff, but sync() is to be implemented 
+ * first.
  */
 int bmap(struct inode *ip, ushort nr, uchar creat) {
     struct buf *bp, *bp2;
