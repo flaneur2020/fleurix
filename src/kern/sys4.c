@@ -54,6 +54,8 @@ int sys_sigreturn(struct trap *tf){
     tf->esp = ujbuf->esp;
     tf->eip = ujbuf->eip;
     tf->ebx = ujbuf->ebx;
+    tf->ecx = ujbuf->ecx;
+    tf->edx = ujbuf->edx;
     tf->edi = ujbuf->edi;
     tf->esi = ujbuf->esi;
     tf->ebp = ujbuf->ebp;
