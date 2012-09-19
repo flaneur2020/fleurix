@@ -1,3 +1,5 @@
+/* this file is modified from xv6 */
+
 #ifndef IDT_H
 #define IDT_H
 

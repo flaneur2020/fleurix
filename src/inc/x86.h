@@ -1,3 +1,5 @@
+/* this file is modified from xv6 */
+
 #ifndef X86_H
 #define X86_H
 

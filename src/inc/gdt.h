@@ -1,3 +1,5 @@
+/* This file is modified from xv6 */
+
 struct seg_desc {
     uint        limit_lo:16;    // Low bits of segment limit
     uint        base_lo :16;    // Low bits of segment base address
