@@ -58,7 +58,7 @@ int do_exec(char *path, char **argv){
 
     ip = namei(path, 0);
     if (ip==NULL) {
-        iput(iput);
+        iput(ip);
         return syserr(ENOENT);
     }
     // read the first block of file to get the a.out header.
