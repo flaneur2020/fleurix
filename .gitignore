@@ -3,7 +3,6 @@
 *.o
 bin/*
 root/bin/*
-src/kern/entry.S
 .bochsout
 main.sym
 tags
