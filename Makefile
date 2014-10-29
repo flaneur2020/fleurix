@@ -3,7 +3,7 @@ LD = i386-elf-ld
 OBJCOPY = i386-elf-objcopy
 AS = nasm
 
-CFLAGS = -Wall -Werror -Isrc/inc -Isrc/inc/usr -nostdinc -fno-builtin \
+CFLAGS = -Wall -Isrc/inc -Isrc/inc/usr -nostdinc -fno-builtin \
 		 -fno-stack-protector -finline-functions -finline-small-functions \
 		 -findirect-inlining -finline-functions-called-once
 
@@ -15,19 +15,34 @@ bochs: kernel.img
 debug: kernel.img
 	bochs-dbg -q -f .bochsrc
 
-kernel.img: bin/boot.bin bin/main.bin
-	cat bin/boot.bin bin/main.bin > bin/kernel.img
+kernel.img: boot.bin kernel.bin
+	cat boot.bin kernel.bin > kernel.img
 
 # --------------------------------------------------------------------
-# the bootloader part
-# => boot.bin
-bin/boot.bin: bin/boot.o tool/boot.ld
-	$(LD) bin/boot.o -o bin/boot.bin -T tool/boot.ld
+# bootloader
+boot.bin: src/boot/boot.o
+	$(LD) $< -o $@ -T tool/boot.ld
 
-bin/boot.o: src/boot/boot.S
-	$(AS) -f elf -o bin/boot.o src/boot/boot.S
+# --------------------------------------------------------------------
+# kernel
+HEADERS  = $(wildcard src/**/*.h)
+SRCS = $(wildcard src/**/*.c)
+OBJS = src/kern/entry.o $(SRCS:.c=.o)
+
+kernel.bin: kernel.elf
+	$(OBJCOPY) -R .pdr -R .comment -R .note -S -O binary $< $@
+
+kernel.elf: $(OBJS)
+	$(LD) $^ -o $@ -T tool/main.ld
+
+%.o: %.S
+	$(AS) -f elf -o $@ $<
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	-rm -rf bin/* root/bin/* src/kern/entry.S .bochsout
+	rm -f src/boot/boot.o src/kern/entry.o $(OBJS)
+	rm -f kernel.img boot.bin kernel.bin kernel.elf
 
 .PHONY: all bochs build debug clean
