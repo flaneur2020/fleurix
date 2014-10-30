@@ -2,7 +2,7 @@
 #include <x86.h>
 #include <proto.h>
 #include <proc.h>
-// 
+//
 #include <buf.h>
 #include <conf.h>
 //
@@ -16,15 +16,15 @@ struct file file[NFILE];
 /* -------------------------------------------------------------- */
 
 /*
- * fcntl() performs one of the operations described below on the 
+ * fcntl() performs one of the operations described below on the
  * open file descriptor fd. The operation is determined by cmd.
- * Also there is an optional thrid argument, which associated with 
+ * Also there is an optional thrid argument, which associated with
  * the second argument cmd.
  * */
 /* TODO: add other commands */
 int do_fcntl(int fd, uint cmd, uint arg){
     struct file *fp;
-    
+
     fp = cu->p_ofile[fd];
     if (fd>=NOFILE || fd<0 || fp==NULL){
         syserr(EBADF);
@@ -75,7 +75,7 @@ int do_stat(struct inode *ip, struct stat *sbuf){
 
 /* -------------------------------------------------------------- */
 
-/* check file access and permssion. mode is R_OK, W_OK and X_OK. 
+/* check file access and permssion. mode is R_OK, W_OK and X_OK.
  * In the case of write, the read-only status of the file system is
  * checked.
  * The super user is granted all permissions except for EXEC where
@@ -86,7 +86,7 @@ int do_stat(struct inode *ip, struct stat *sbuf){
 int do_access(struct inode *ip, uint mode){
     struct super *sp;
     uint m;
-    
+
     if (ip==NULL) {
         syserr(EACCES);
         return -1;
@@ -121,7 +121,7 @@ int do_access(struct inode *ip, uint mode){
         m >>= 6;
     else if (cu->p_egid == ip->i_gid)
         m >>= 3;
-    // 
+    //
     if ((m & 07 & mode)==mode) {
         return 0;
     }
@@ -131,7 +131,7 @@ int do_access(struct inode *ip, uint mode){
 
 /* -------------------------------------------------------------- */
 
-/* 
+/*
  * creat a new file if not existing yet. if existed, truncate it.
  * this routine also returns a file descriptor just like do_open().
  * */
@@ -139,7 +139,7 @@ int do_creat(char *path, int mode){
     return do_open(path, O_CREAT | O_TRUNC, mode);
 }
 
-/* 
+/*
  * */
 int do_mknod(char *path, int mode, ushort dev){
     struct inode *ip;

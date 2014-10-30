@@ -18,7 +18,7 @@ struct super *rootsp = NULL;
  * if did not got any free slot, just simply raise an error instead
  * of sleep until somebody frees like what getblk does.
  * if dev==rootdev, set a pointer rootsp for a quicker access.
- * 
+ *
  * */
 struct super* do_mount(ushort dev, struct inode *ip){
     struct super *sp;
@@ -51,7 +51,7 @@ _found:
     if (dev==rootdev) {
         rootsp = sp;
     }
-    if (ip!=NULL) 
+    if (ip!=NULL)
         ip->i_count++;
     sp->s_imnt = ip;
     unlk_sp(sp);
@@ -71,7 +71,7 @@ int do_umount(ushort dev){
         if (ip->i_num!=0 && ip->i_dev==dev) {
             syserr(EBUSY);
             return -1;
-        } 
+        }
     }
     spupdate(sp);
     sp->s_dev = 0;

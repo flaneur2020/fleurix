@@ -26,7 +26,7 @@ int putq(struct qbuf *qb, char ch){
     return 0;
 }
 
-/* Get the first character from a tty buf. 
+/* Get the first character from a tty buf.
  * */
 char getq(struct qbuf *qb){
     char ch;
@@ -58,7 +58,7 @@ char eraseq(struct qbuf *qb){
 int tty_canon(struct tty *tp){
     char ch;
     int i;
-    
+
     // if raw mode
     if (tp->t_flag & TTY_RAW) {
         while ((ch=getq(&tp->t_rawq)) >= 0) {
@@ -89,11 +89,11 @@ int tty_canon(struct tty *tp){
 /* output characters with buffering */
 int tty_output(struct tty *tp, char ch){
     int i;
-    // 
+    //
     switch(ch){
     case '\t':
         // expand tab into spaces
-        for(i=0; i<4-(tp->t_col%4); i++) 
+        for(i=0; i<4-(tp->t_col%4); i++)
             putq(&tp->t_outq, ' ');
         break;
     default:
@@ -104,7 +104,7 @@ int tty_output(struct tty *tp, char ch){
 }
 
 /*
- * Place a character on raw TTY input queue, if a carriage character 
+ * Place a character on raw TTY input queue, if a carriage character
  * arrives, wake up the awaitors.
  * */
 int tty_input(struct tty *tp, char ch){
@@ -194,7 +194,7 @@ int tty_read(ushort dev, char *buf, uint cnt){
     if (tp->t_canq.q_count < cnt) {
         sleep((uint)tp, PRITTY);
     }
-    // 
+    //
     for (i=0; i<cnt; i++) {
         if ((ch=getq(&tp->t_canq)) < 0)
             break;
@@ -206,7 +206,7 @@ int tty_read(ushort dev, char *buf, uint cnt){
 int tty_write(ushort dev, char *buf, uint cnt){
     struct tty *tp;
     int i;
-    
+
     if (MINOR(dev) >= NTTY){
         syserr(ENODEV);
         return -1;

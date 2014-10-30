@@ -10,13 +10,13 @@ include build/user.mk
 
 all: bochs
 
-bochs: build 
+bochs: build
 	bochs -q -f .bochsrc
 
 debug: build
 	bochs-dbg -q -f .bochsrc
 
-build: 
+build:
 	echo
 
 clean:

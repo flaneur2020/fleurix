@@ -17,19 +17,19 @@
 /* pte.c
  * some operations on page tables.
  * note: PGD and page tables are all one page size, allocated via the routine kmalloc().
- * 
- * note: on *Copy-On-Write*, both parent and child process will be marked 
- * write-protected, and increase the reference count of each shared page 
- * frame. 
- * On write-proctection fault occured, if the reference count greater 
- * than 1, allocate one page frame, attach it to where it deserves and 
+ *
+ * note: on *Copy-On-Write*, both parent and child process will be marked
+ * write-protected, and increase the reference count of each shared page
+ * frame.
+ * On write-proctection fault occured, if the reference count greater
+ * than 1, allocate one page frame, attach it to where it deserves and
  * decrease the reference count;
  * If the reference count equals 1,  just mark it Writeable.
  *
  * */
 
 /*
- * the proc[0]'s page directory, as initialized, it will map the top 128mb virtual memory 
+ * the proc[0]'s page directory, as initialized, it will map the top 128mb virtual memory
  * as physical memory, by the 4mb big page tables.
  * */
 struct pde pgd0[1024] __attribute__((aligned(4096)));
@@ -37,12 +37,12 @@ struct pde pgd0[1024] __attribute__((aligned(4096)));
 /* --------------------------------------------------------- */
 
 /*
- * given the current proc's page directory, find the pte where 
+ * given the current proc's page directory, find the pte where
  * the virtual address lied in. If the 'creat' parameter is set,
  * allocate a page as middle page table and always success.
  * */
 struct pte* find_pte(struct pde *pgd, uint vaddr, uint creat){
-    struct pde *pde; 
+    struct pde *pde;
     struct pte *pt;
     struct page *pg;
 
@@ -84,10 +84,10 @@ int pgd_init(struct pde *pgd){
     return 0;
 }
 
-/* copy the page tables, and set both pte's flag. 
- * note: on Copy On Write, both parent and child process will be marked 
- * write-protected, and increase the reference count of each shared physical 
- * page. 
+/* copy the page tables, and set both pte's flag.
+ * note: on Copy On Write, both parent and child process will be marked
+ * write-protected, and increase the reference count of each shared physical
+ * page.
  * */
 int pt_copy(struct pde *npgd, struct pde *opgd){
     struct pde *opde, *npde;

@@ -1,7 +1,7 @@
 #ifndef INODE_H
 #define INODE_H
 
-/* 
+/*
  * the Minix v1 fs, you could build one via mkfs.minix under linux.
  * */
 

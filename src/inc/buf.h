@@ -18,16 +18,16 @@ extern struct buf   buff[NBUF];
 
 /*
  * Each block device has a devtab, which contains private
- * state stuff and 2 list head: the b_head/b_tail list, 
- * which is doubly linked and has all the buffers currently 
+ * state stuff and 2 list head: the b_head/b_tail list,
+ * which is doubly linked and has all the buffers currently
  * associated with that major device;
- * and the av_head/av_tail list, which is private to the 
+ * and the av_head/av_tail list, which is private to the
  * device but in fact is always used for the head and tail
  * of the IO queue for the device.
  * Various routines in bio.c look at b_head/b_tail
- * but the rest is private to each device driver. 
+ * but the rest is private to each device driver.
  *
- * note: Little trick here, devtab's header can be also 
+ * note: Little trick here, devtab's header can be also
  * visited via a struct buf *.
  * */
 struct devtab {

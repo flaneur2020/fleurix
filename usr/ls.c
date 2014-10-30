@@ -12,7 +12,7 @@ int ls(char *pathp){
 
     if (pathp==NULL)
         strcpy(pathbuf, ".");
-    else 
+    else
         strncpy(pathbuf, pathp, 1024);
     //
     fd = open(pathbuf, O_RDONLY, 0);
@@ -31,7 +31,7 @@ int ls(char *pathp){
 int main(int argc, char **argv){
     int i = 0;
 
-    if (argc==1) 
+    if (argc==1)
         ls(NULL);
     else{
         for(i=1; i<argc; i++)

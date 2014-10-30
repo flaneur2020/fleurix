@@ -27,7 +27,7 @@ static inline _SYS3(int, open, char*, int, int);
 static inline _SYS2(int, creat, char*, int);
 static inline _SYS1(int, close, int);
 static inline _SYS3(int, fcntl, int, int, int);
-static inline _SYS3(int, mknod, char*, int, int); 
+static inline _SYS3(int, mknod, char*, int, int);
 static inline _SYS3(int, write, int, char*, int);
 static inline _SYS3(int, read, int, char*, int);
 static inline _SYS3(int, lseek, int, int, int);
@@ -36,11 +36,11 @@ static inline _SYS1(int, chroot, char*);
 static inline _SYS1(int, dup, int);
 static inline _SYS2(int, dup2, int, int);
 static inline _SYS2(int, link, char*, char*);
-static inline _SYS1(int, unlink, char*); 
-static inline _SYS2(int, stat, char*, struct stat*); 
-static inline _SYS2(int, fstat, int, struct stat*); 
+static inline _SYS1(int, unlink, char*);
+static inline _SYS2(int, stat, char*, struct stat*);
+static inline _SYS2(int, fstat, int, struct stat*);
 //
-static inline _SYS0(int, fork); 
+static inline _SYS0(int, fork);
 static inline _SYS2(int, exec, char*, char**);
 static inline _SYS1(int, _exit, int);
 //

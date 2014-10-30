@@ -10,7 +10,7 @@ int cat(char *pathp){
     int n;
 
     fd = open(pathp, O_RDONLY, 0);
-    if (fd < 0) 
+    if (fd < 0)
         return -1;
 
     while((n = read(fd, buf, 32)) > 0){

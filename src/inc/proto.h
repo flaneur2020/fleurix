@@ -193,7 +193,7 @@ uint find_entry(struct inode* dip, char *name, uint len);
 uint link_entry(struct inode *dip, char *name, uint len, uint ino);
 int unlink_entry(struct inode *dip, char *name, int len);
 
-// fs/file.c 
+// fs/file.c
 struct file* falloc(int fd);
 
 // fs/super.c

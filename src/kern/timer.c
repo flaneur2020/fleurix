@@ -27,7 +27,7 @@ uint cmos_time(){
     int year, month, mday, hour, min, sec;
     uint r;
     year  = cmos_read(RTC_CENTURY)*100 + cmos_read(RTC_YEAR) - 1970; // start at UNIX era
-    month = cmos_read(RTC_MONTH); 
+    month = cmos_read(RTC_MONTH);
     mday  = cmos_read(RTC_MDAY);
     hour  = cmos_read(RTC_HOUR);
     min   = cmos_read(RTC_MIN);

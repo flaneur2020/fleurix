@@ -12,7 +12,7 @@ ushort rootdev = DEVNO(1, 0);
 
 struct bdevsw   bdevsw[NBLKDEV] = {
     { 0, }, /* NODEV */
-    { &nulldev, &nulldev, &hd_request, &hdtab } 
+    { &nulldev, &nulldev, &hd_request, &hdtab }
 };
 
 struct cdevsw   cdevsw[NCHRDEV] = {

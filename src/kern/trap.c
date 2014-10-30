@@ -12,7 +12,7 @@ struct idt_desc    idt_desc;
 
 // handlers to each int_no
 // which inited as 0
-static void* hwint_routines[256] = {0, }; 
+static void* hwint_routines[256] = {0, };
 
 static char *trap_str[] = {
     "Division By Zero",
@@ -55,12 +55,12 @@ static char *trap_str[] = {
 /* ------------------------------------------------------------ */
 
 /*
- * Remap the irq and initialize the IRQ mask. 
+ * Remap the irq and initialize the IRQ mask.
  *
- * note:If you do not remap irq, a Double Fault comes 
+ * note:If you do not remap irq, a Double Fault comes
  * along with every interrupt.
- * After initialization, register 0xA1 and 0x21 are the 
- * hi/lo bytes of irq mask, respectively. 
+ * After initialization, register 0xA1 and 0x21 are the
+ * hi/lo bytes of irq mask, respectively.
  * */
 void irq_init(){
     // hard coded, don't touch.
@@ -68,7 +68,7 @@ void irq_init(){
     outb(PIC2, 0x11);
     outb(PIC1+1, IRQ0); // offset 1, 0-7
     outb(PIC2+1, IRQ0+8); // offset 2, 7-15
-    outb(PIC1+1, 4); 
+    outb(PIC1+1, 4);
     outb(PIC2+1, 2);
     outb(PIC1+1, 0x01);
     outb(PIC2+1, 0x01);
@@ -119,13 +119,13 @@ void hwint_init(){
     int i;
     for(i=0;  i<32; i++)
         trap_gate(i, _hwint[i]);
-    for(i=32; i<48; i++) 
+    for(i=32; i<48; i++)
         intr_gate(i, _hwint[i]);
     syst_gate(0x03, _hwint[0x03]); // int3
     syst_gate(0x04, _hwint[0x04]); // overflow
     syst_gate(0x05, _hwint[0x05]); // bound
     syst_gate(0x80, _hwint[0x80]); // syscall
-    // Each handler handled in his file.  
+    // Each handler handled in his file.
     set_hwint(0x80, &do_syscall);      // in syscall.c
 }
 
@@ -138,13 +138,13 @@ void lidt(struct idt_desc idtd){
 /* ------------------------------------------------------------------- */
 
 /*
- * The comman handler for all IRQ request as a dispatcher. Each irq 
+ * The comman handler for all IRQ request as a dispatcher. Each irq
  * handler were held inside the array *hwint_routines*.
  *
  * note: While an IRQ were recieved, we have to notice the 8259 chip
- * that End of Interrupt via a PIC_EOI. If the IRQ came from the Master 
- * PIC, it is sufficient to issue this command only to the Master PIC; 
- * however if the IRQ came from the Slave PIC, it is necessary to issue 
+ * that End of Interrupt via a PIC_EOI. If the IRQ came from the Master
+ * PIC, it is sufficient to issue this command only to the Master PIC;
+ * however if the IRQ came from the Slave PIC, it is necessary to issue
  * the command to both PIC chips.
  * */
 void hwint_common(struct trap *tf) {
@@ -152,14 +152,14 @@ void hwint_common(struct trap *tf) {
 
     // save the current trap frame
     if ((tf->cs & 3)==RING3) {
-        cu->p_trap = tf; 
+        cu->p_trap = tf;
     }
     func = hwint_routines[tf->int_no];
     if (tf->int_no < 32) {
         // trap
         if (func)
             func(tf);
-        else 
+        else
             sigsend(cu->p_pid, SIGTRAP, 1);
     }
     else {
@@ -172,7 +172,7 @@ void hwint_common(struct trap *tf) {
     if (issig() && (cu->p_stat!=SZOMB) && ((tf->cs & 3)==RING3)) {
         psig();
     }
-    // on sheduling 
+    // on sheduling
     // if the re-schedule flag is set, make an task swtch.
     // and make sure only swtch on returning to user mode,
     // thus to keep the kernel nonpremtive.
@@ -211,7 +211,7 @@ void idt_init(){
     idt_desc.base = (uint)&idt;
     // init irq
     irq_init();
-    // load intr vectors and lidt 
+    // load intr vectors and lidt
     hwint_init();
     lidt(idt_desc);
 }

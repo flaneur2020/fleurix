@@ -2,7 +2,7 @@
 #include <x86.h>
 #include <proto.h>
 #include <proc.h>
-// 
+//
 #include <buf.h>
 #include <conf.h>
 //
@@ -12,7 +12,7 @@
 #include <stat.h>
 
 
-/* 
+/*
  * fetch an inode number from a single directory file (via a locked inode, make sure
  * it's an directory).
  * returns 0 on fail.
@@ -78,7 +78,7 @@ int unlink_entry(struct inode *dip, char *name, int len){
 }
 
 /*
- * assign a new directory entry with a given inode. 
+ * assign a new directory entry with a given inode.
  * note: this routine do NOT check the existence of the given name,
  * and i_nlinks is not adjusted here.
  * */
@@ -119,7 +119,7 @@ struct inode* _namei(char *path, uchar creat, uchar parent, char **name){
     char* tmp;
 
     // if path starts from root
-    // note if p_wdir==NULL, it's an early initialized process, 
+    // note if p_wdir==NULL, it's an early initialized process,
     // set it's root directory here.
     if (*path == '/') {
         wip = iget(rootdev, ROOTINO);

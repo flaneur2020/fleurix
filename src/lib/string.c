@@ -43,22 +43,22 @@ int strnlen(char *str, unsigned int len){
 
 char* strcpy(char *dst, const char *src) {
 	char *tmp = dst;
-    while ((*dst++ = *src++)); 
+    while ((*dst++ = *src++));
 	return tmp;
 }
 
 char *strncpy(char *dst, const char *src, unsigned int cnt) {
     char *tmp = dst;
-    while (cnt && (*dst++ = *src++)) 
+    while (cnt && (*dst++ = *src++))
         cnt--;
-    if (cnt > 0) 
-        while (--cnt) 
+    if (cnt > 0)
+        while (--cnt)
             *dst++ = '\0';
     return tmp;
 }
 
-/* 
- * note that '\0' is considered to be part of the string. 
+/*
+ * note that '\0' is considered to be part of the string.
  * returns not a number but a pointer.
  * */
 char* strchr(const char *str, int c){
@@ -69,7 +69,7 @@ char* strchr(const char *str, int c){
             return tmp;
         }
     }
-    if (*tmp == (char)c) 
+    if (*tmp == (char)c)
         return tmp;
     return NULL;
 }
@@ -87,7 +87,7 @@ char* strrchr(const char *str, int c){
     return NULL;
 }
 
-/* 
+/*
  * TODO: debug all these.
  * */
 int strcmp(char *s1, char *s2){
@@ -105,6 +105,6 @@ int strncmp(char *s1, char* s2, unsigned int n) {
             return (*(unsigned char*)s1 - *(unsigned char*)(s2-1));
         if (*s1++ == 0)
             break;
-    } 
+    }
     return 0;
 }

@@ -8,7 +8,7 @@
 /*
  * sys3.c
  * misc syscalls.
- * 
+ *
  * */
 
 int sys_nice(struct trap *tf){
@@ -56,13 +56,13 @@ int sys_setreuid(struct trap *tf){
     if (ruid > 0) {
         if ((cu->p_euid==ruid) || (old_ruid==ruid) || suser())
             cu->p_ruid = ruid;
-        else 
+        else
             return syserr(EPERM);
     }
     if (euid > 0) {
         if ((cu->p_euid==euid) || (old_ruid==euid) || suser())
             cu->p_euid = euid;
-        else 
+        else
             return syserr(EPERM);
     }
     return 0;
@@ -74,15 +74,15 @@ int sys_setregid(struct trap *tf){
     int egid = tf->ecx;
 
     if (rgid > 0) {
-        if ((cu->p_rgid==rgid) || suser()) 
+        if ((cu->p_rgid==rgid) || suser())
             cu->p_rgid = rgid;
-        else 
+        else
             return syserr(EPERM);
     }
     if (egid > 0) {
-        if (cu->p_egid==egid || cu->p_rgid==egid || suser()) 
+        if (cu->p_egid==egid || cu->p_rgid==egid || suser())
             cu->p_egid = egid;
-        else 
+        else
             return syserr(EPERM);
     }
     return 0;

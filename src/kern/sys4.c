@@ -8,7 +8,7 @@
 #include <unistd.h>
 
 /*
- * sys4.c 
+ * sys4.c
  * syscalls on signal
  *
  * */
@@ -17,7 +17,7 @@
 int sys_kill(struct trap *tf){
     int pid = (int)tf->ebx;
     int sig = (int)tf->ecx;
-    
+
     return do_kill(pid, sig);
 }
 
@@ -45,7 +45,7 @@ int sys_sigaction(struct trap *tf){
     return do_sigaction(sig, sa, old_sa);
 }
 
-/* called on returning from the signal handler. 
+/* called on returning from the signal handler.
  * note: this syscall should NEVER be called directly.
  * */
 int sys_sigreturn(struct trap *tf){

@@ -37,7 +37,7 @@ void kmain(){
     //
     kspawn(&init);
     for(;;){
-        sti(); 
+        sti();
         swtch();
     }
 }

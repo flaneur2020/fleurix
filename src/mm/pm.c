@@ -16,14 +16,14 @@
 #include <file.h>
 
 /* pm.c
- * this file implies some routines on the allocation, free, and modification of 
+ * this file implies some routines on the allocation, free, and modification of
  * physical pages(.aka page frames).
  * */
 
 
 /*
  * the map for page frames. Each physical page is associated with one reference
- * count, and it's free on 0. Only 0 can be allocated via pgalloc().  
+ * count, and it's free on 0. Only 0 can be allocated via pgalloc().
  * Reference count is increased on a fork.
  *
  * */
@@ -38,10 +38,10 @@ struct page* pgfind(uint pn){
     return &coremap[pn];
 }
 
-/* 
+/*
  * allocate an free physical page. (always success)
  * get the head of the freelist, remove it and increase the refcount.
- * */ 
+ * */
 struct page* pgalloc(){
     struct page *pp;
 
@@ -49,7 +49,7 @@ struct page* pgalloc(){
         panic("no free page.\n");
         return NULL;
     }
-    
+
     cli();
     pp = pgfreelist.pg_next;
     pgfreelist.pg_next = pp->pg_next;
@@ -60,7 +60,7 @@ struct page* pgalloc(){
 
 /*
  * free a physical page. decrease the reference count and put it back
- * to the freelist. 
+ * to the freelist.
  */
 int pgfree(struct page *pp){
     if (pp->pg_count==0) {
@@ -129,7 +129,7 @@ int pm_init(){
 }
 
 /* Map the top 128mb virtual memory as physical memory. Initiliaze
- * the page-level allocator, setup the fault handler, enable paging 
+ * the page-level allocator, setup the fault handler, enable paging
  * and misc.
  * */
 void mm_init(){

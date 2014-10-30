@@ -26,7 +26,7 @@ struct pte {
 #define PTE_PS		0x080	// Page Size
 #define PTE_MBZ		0x180	// Bits must be zero
 
-/* 
+/*
  * A linear address 'la' has a three-part structure as follows:
  *
  * +--------10------+-------10-------+---------12----------+
@@ -44,7 +44,7 @@ struct pte {
 
 #define PG_ADDR(addr)   ((uint)(addr) & ~0xFFF)
 
-/* CR2 stores the virtual address on which raised the page fault. 
+/* CR2 stores the virtual address on which raised the page fault.
  * error code stores inside the trap frame.
  * */
 

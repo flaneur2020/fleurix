@@ -21,9 +21,9 @@ int lparse(char *lbuf) {
     argc = 0;
     lp = lbuf;
     while((c=*lp++) && lp<&linebuf[LINEBUFSIZ]) {
-        if (c == ' ') 
+        if (c == ' ')
             continue;
-        argvbuf[argc] = lp-1; 
+        argvbuf[argc] = lp-1;
         argc++;
         while(*lp++ != ' ');
     }
@@ -37,7 +37,7 @@ int lparse(char *lbuf) {
 }
 
 int main(int argc, char **argv){
-    int r,fd, i, cnt, ret; 
+    int r,fd, i, cnt, ret;
     struct sigaction sa;
 
     setpgrp();

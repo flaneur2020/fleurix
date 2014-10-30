@@ -36,11 +36,11 @@ struct buf* incore(ushort dev, uint blkno){
 /* allocate a block.
  *
  * noet: getblk *ALWAYS* returns a B_BUSY block, so the other processes
- * can not access this. so never forget brelse it after a getblk, just 
+ * can not access this. so never forget brelse it after a getblk, just
  * as malloc/free.
  * so codes like
  *      bp = bread(dev, 1);
- *      bp = bread(dev, 1); 
+ *      bp = bread(dev, 1);
  * may sleep forever.
  *
  * TODO: ignored the B_DIRTY scenary.
@@ -53,7 +53,7 @@ struct buf* getblk(int dev, uint blkno){
         panic("error devno.");
     }
 
-_loop: 
+_loop:
     if (dev < 0){
         dtp = (struct devtab*) &bfreelist;
     }
@@ -71,7 +71,7 @@ _loop:
                 sleep((uint)bp, PRIBIO);
                 sti();
                 goto _loop;
-            } 
+            }
             sti();
             notavail(bp);
             return bp;
@@ -96,7 +96,7 @@ _loop:
         bwrite(bp);
         goto _loop;
     }
-    // finally, take it from the old dev's cache list and 
+    // finally, take it from the old dev's cache list and
     cli();
     bp->b_prev->b_next = bp->b_next;
     bp->b_next->b_prev = bp->b_prev;
@@ -106,7 +106,7 @@ _loop:
     dtp->b_next->b_prev = bp;
     dtp->b_next = bp;
     sti();
-    // 
+    //
     bp->b_dev = dev;
     bp->b_blkno = blkno;
     return bp;
@@ -154,7 +154,7 @@ void iowait(struct buf *bp){
 
 void iodone(struct buf *bp){
     bp->b_flag |= B_DONE;
-    bp->b_flag &= ~B_WANTED; 
+    bp->b_flag &= ~B_WANTED;
     //brelse(bp);
     wakeup((uint)bp);
 }
@@ -169,7 +169,7 @@ void iodone(struct buf *bp){
 struct buf* bread(int dev, uint blkno){
     struct buf *bp;
     bp = getblk(dev, blkno);
-    if (bp->b_flag & B_DONE) { 
+    if (bp->b_flag & B_DONE) {
         return bp;
     }
     bp->b_flag |= B_READ;
@@ -213,7 +213,7 @@ void buf_init() {
     bfreelist.b_prev = bfreelist.b_next = &bfreelist;
     bfreelist.av_prev = bfreelist.av_next = &bfreelist;
     for(i=0; i<NBUF; i++){
-        bp = &buff[i]; 
+        bp = &buff[i];
         bp->b_dev = NODEV;
         bp->b_data = buffers[i];
         bp->b_flag = B_BUSY;

@@ -18,14 +18,14 @@ void printn(uint n, uint b){
     static char *ntab = "0123456789ABCDEF";
     uint a, m;
     if (a = n / b){
-        printn(a, b);  
+        printn(a, b);
     }
     m = n % b;
     putch( ntab[m] );
 }
 
 /* a simpler printk
- * refer to unix v6 
+ * refer to unix v6
  * */
 void printf(char *fmt, ...){
     char c, *s;

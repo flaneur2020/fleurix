@@ -22,7 +22,7 @@ struct tty {
     int     t_col;  // position x of the cursor
     int     t_row;  // position y of the cursor
     void    (*t_putc)(char);
-    struct qbuf    t_rawq; 
+    struct qbuf    t_rawq;
     struct qbuf    t_canq;
     struct qbuf    t_outq;
 };

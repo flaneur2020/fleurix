@@ -6,7 +6,7 @@ S_FILES = src/kern/entry.S
 O_FILES = $(addprefix bin/, $(basename $(C_FILES:.c=.o) $(S_FILES:.S=.o)))
 
 bin/%.o: $(wildcard src/**/%.c) $(H_FILES)
-	gcc $(CFLAG) $(CINC) -o $@ -c $< 
+	gcc $(CFLAG) $(CINC) -o $@ -c $<
 
 bin/entry.o: src/kern/entry.S
 	nasm -f elf -o $@ $<

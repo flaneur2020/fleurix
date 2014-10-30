@@ -2,8 +2,8 @@
 
 struct pde;
 
-/* 
- * iodelay. On older machines its necessary to give the PIC some time to react to 
+/*
+ * iodelay. On older machines its necessary to give the PIC some time to react to
  * commands as they might not be processed quickly.
  * */
 static inline void io_delay(){

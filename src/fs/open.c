@@ -2,7 +2,7 @@
 #include <x86.h>
 #include <proto.h>
 #include <proc.h>
-// 
+//
 #include <buf.h>
 #include <conf.h>
 //
@@ -16,11 +16,11 @@ struct file file[NFILE];
 /* ------------------------------------------------------------- */
 
 /*
- * open a file. flag indicated opened type like O_RDONLY, O_TRUNC, O_CREAT and blah. And 
+ * open a file. flag indicated opened type like O_RDONLY, O_TRUNC, O_CREAT and blah. And
  * mode only used in the O_CREAT scenary, indicated the file (inode) type.
  *
  * each proc has got one user file table(p_ofile[NOFILE]), it's each entry is also a number,
- * indicated the number in the system file table(file[NFILE]). when user opened a file, it 
+ * indicated the number in the system file table(file[NFILE]). when user opened a file, it
  * first allocate a user file table entry(aka. file descriptor), then attach it with a system
  * file table entry. It's reference count is increased in fork() or dup().
  * */
@@ -50,7 +50,7 @@ int do_open(char *path, uint flag, uint mode){
             syserr(ENFILE);
             return -1;
         }
-        // TODO: check access 
+        // TODO: check access
         // if it's a device file, the dev number is stored in zone[0].
         dev = ip->i_zone[0];
         switch(ip->i_mode & S_IFMT) {
@@ -61,7 +61,7 @@ int do_open(char *path, uint flag, uint mode){
                 (*cdevsw[MAJOR(dev)].d_open)(dev);
                 break;
         }
-    } 
+    }
     if (((fd=ufalloc())<0) || (fp=falloc(fd))==NULL) {
         iput(ip);
         return -1;
@@ -78,7 +78,7 @@ int do_open(char *path, uint flag, uint mode){
 
 /*
  * close a user file discriptor.
- * remove the entry in the user file table, and decrease the entry in system 
+ * remove the entry in the user file table, and decrease the entry in system
  * file table's ref count. and iput the inode.
  * */
 int do_close(int fd){
@@ -146,7 +146,7 @@ int do_dup2(int fd, int newfd){
 /* allocate a user file descriptor. */
 int ufalloc(){
     int i;
-    
+
     for(i=0; i<NOFILE; i++){
         if (cu->p_ofile[i]==NULL) {
             return i;

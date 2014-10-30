@@ -2,7 +2,7 @@
 #include <x86.h>
 #include <proto.h>
 #include <proc.h>
-// 
+//
 #include <buf.h>
 #include <conf.h>
 //
@@ -15,7 +15,7 @@
  * TODO: ignored special files yet.
  * */
 
-/* 
+/*
  * read data from a locked inode.
  * returns -1 on error.
  * */
@@ -23,7 +23,7 @@ int readi(struct inode *ip, char *buf, uint off, uint cnt){
     struct buf *bp;
     uint tot=0, m=0, bn=0;
 
-    // file size limit 
+    // file size limit
     if ((off > ip->i_size) || (off+cnt < off)){
         cu->p_error = E2BIG;
         return -1;

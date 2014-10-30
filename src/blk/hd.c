@@ -10,22 +10,22 @@
 /*
  * hd.c - driver for the hard disk.
  * Ingore the second ide drive right now.
- * 
+ *
  * Many constants, refered from http://wiki.osdev.org/IDE.
  * Thanks buddy.
  * */
 
 struct devtab hdtab = { 0 , };
 
-/* 
+/*
  * Drive number can only be 0 or 1.
  * lba is 28-bit.
  * Number of sectors must <= 255.
  *
  * note: 0x1F6 is the register HD_DEVSEL, which (might) stands for HD DEV SELECTOR.
  * if bit 6 of this register is set, we are going to use LBA as addressing mode.
- * In LBA mode, the (8 bits) register 0x1F3,0x1f4,0x1F5 and the lower 4 bits of 0x1F6, 
- * forms a 28-bit LBA address, so called LBA-28.  
+ * In LBA mode, the (8 bits) register 0x1F3,0x1f4,0x1F5 and the lower 4 bits of 0x1F6,
+ * forms a 28-bit LBA address, so called LBA-28.
  * */
 int hd_cmd(uint drive, uint cmd, uint lba, uchar ns) {
     hd_wait_ready();
@@ -39,10 +39,10 @@ int hd_cmd(uint drive, uint cmd, uint lba, uchar ns) {
     return 0;
 }
 
-/* 
- * After we've send a command, we should wait for 400 nanosecond, then read the Status 
- * port. If the Busy bit is on, we should read the status port again until the Busy bit is 0; 
- * then we can read the results of the command. This operation is called "Polling". We can also 
+/*
+ * After we've send a command, we should wait for 400 nanosecond, then read the Status
+ * port. If the Busy bit is on, we should read the status port again until the Busy bit is 0;
+ * then we can read the results of the command. This operation is called "Polling". We can also
  * use IRQs instead of polling.
  * */
 int hd_wait_ready(){
@@ -55,10 +55,10 @@ int hd_wait_ready(){
 
 /* prepend it into devtab's waiting list(via av_prev, av_next),
  * if it's not active, send a request for the hard disk drive right
- * now. 
+ * now.
  * */
 int hd_request(struct buf *bp){
-    // prepend into the waiting list 
+    // prepend into the waiting list
     bp->av_prev = (struct buf*)&hdtab;
     bp->av_next = hdtab.av_next;
     hdtab.av_next->av_prev = bp;
@@ -70,9 +70,9 @@ int hd_request(struct buf *bp){
     return 0;
 }
 
-/* if waiting list is not empty, then take the tail, send a request 
+/* if waiting list is not empty, then take the tail, send a request
  * for the hard disk drive and mark it active.
- * note: BLK = (sizeof logical block) / (sizeof disk block), so 
+ * note: BLK = (sizeof logical block) / (sizeof disk block), so
  * physical address = lba * BLK
  * TODO: don't support two hd disk yet.
  * */
@@ -83,7 +83,7 @@ void hd_start(){
         return;
     }
     // take the tail
-    bp = hdtab.av_prev; 
+    bp = hdtab.av_prev;
     hdtab.d_active = 1;
     // read or write.
     if (bp->b_flag & B_READ) {
@@ -95,8 +95,8 @@ void hd_start(){
     }
 }
 
-/* interrupt handler of the hard disk drive, triggered on got 
- * data from the hard disk. get and remove the tail from the 
+/* interrupt handler of the hard disk drive, triggered on got
+ * data from the hard disk. get and remove the tail from the
  * waiting list, if there's still something inside it, hd_start()
  * again.
  * */
@@ -105,7 +105,7 @@ int do_hd_intr(struct trap *tf){
 
     if (hdtab.d_active == 0) {
         return 0;
-    } 
+    }
     hdtab.d_active = 0;
     bp = hdtab.av_prev;
     bp->av_prev->av_next = bp->av_next;

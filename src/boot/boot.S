@@ -13,9 +13,9 @@ _read_sect:
     mov     ax, si              ; disk sector number
     mov     bx, di              ; buffer address.
     ; ch = cylinder = sn / 36
-    mov     cl, 36              
-    div     cl                  
-    mov     ch, al              
+    mov     cl, 36
+    div     cl
+    mov     ch, al
     ; dh = head = (sn%36)/18
     mov     al, ah
     mov     ah, 0
@@ -23,11 +23,11 @@ _read_sect:
     div     cl
     mov     dh, al
     ; cl = sector = (ln%36)%18+1
-    mov     cl, ah 
+    mov     cl, ah
     inc     cl
-    ; dl = drive = 0; 
+    ; dl = drive = 0;
     mov     dl, 0
-    ; raise int 13h 
+    ; raise int 13h
     mov     ax, 201h
     int     13h
     pop     bx
@@ -37,7 +37,7 @@ _read_sect:
 ;; -----------------------------------------------------------------------
 ;;
 ;; bootloader starts here
-;; 
+;;
 
 [global _start]
 _start:
@@ -57,8 +57,8 @@ _reset_drive:
     ;
     mov     ax, 0x1000
     mov     es, ax               ; es = 1000h
-    mov     di, 0                ; 
-    mov     si, 1                ; 
+    mov     di, 0                ;
+    mov     si, 1                ;
     mov     cx, 128              ; read 128 sectors, 64kb
 _read_sect_loop:
     call    _read_sect
@@ -127,7 +127,7 @@ _start_pm:
     ; never return it should  be
     jmp     08h:100000h
 
-_hang: 
+_hang:
     jmp     _hang
 
 gdt:

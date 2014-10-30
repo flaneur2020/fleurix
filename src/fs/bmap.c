@@ -1,7 +1,7 @@
 #include <param.h>
 #include <x86.h>
 #include <proc.h>
-// 
+//
 #include <buf.h>
 #include <conf.h>
 //
@@ -15,14 +15,14 @@
  * Given an inode and a position within the corresponding file, locate the
  * block (not zone) number in which that position is to be found and return it.
  * returns 0 on error.
- * note: 
- * the first 7 entry of ip->zones[] are direct pointers, ip->zone[7] is an indirect 
+ * note:
+ * the first 7 entry of ip->zones[] are direct pointers, ip->zone[7] is an indirect
  * pointer to a zone map, while ip->zone[8] is an double indirect pointer to a zone map.
  * note2: file extends only here.
  *
  * ip->i_size is adjusted in writei();
  *
- * TODO: maybe we can remove all the updatei and bwrite stuff, but sync() is to be implemented 
+ * TODO: maybe we can remove all the updatei and bwrite stuff, but sync() is to be implemented
  * first.
  */
 int bmap(struct inode *ip, ushort nr, uchar creat) {
@@ -80,7 +80,7 @@ int bmap(struct inode *ip, ushort nr, uchar creat) {
         bzero(dev, ip->i_zone[8]);
         ip->i_flag |= I_DIRTY;
         iupdate(ip);
-    } 
+    }
     bp = bread(dev, ip->i_zone[8]);
     zmap = (short *)bp->b_data;
     if (zmap[nr/NINDBLK]==0) {
@@ -107,10 +107,10 @@ int bmap(struct inode *ip, ushort nr, uchar creat) {
 
 /*
  * Discard inode's content.
- * Called from routines like open(), iput(). 
+ * Called from routines like open(), iput().
  * */
 int itrunc(struct inode *ip){
-    int i,j; 
+    int i,j;
     ushort dev;
     struct buf *bp, *bp2;
     char *zmap, *zmap2;
@@ -119,7 +119,7 @@ int itrunc(struct inode *ip){
     if (!(ip->i_mode & S_IFREG) || (ip->i_mode & S_IFDIR)) {
         return -1;
     }
-    
+
     dev = ip->i_dev;
     for (i=0; i<7; i++){
         if (ip->i_zone[i]!=0){
