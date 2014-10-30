@@ -2,7 +2,7 @@ cinc   = '-Isrc/inc -Isrc/inc/usr'
 cflag  = %{
   -Wall
   -nostdinc -fno-builtin -fno-stack-protector
-  -finline-functions -finline-small-functions -findirect-inlining -finline-functions -finline-functions-called-once 
+  -finline-functions -finline-small-functions -findirect-inlining -finline-functions -finline-functions-called-once
 }.split(/\s/).join(' ')
 
 mkdir_p 'bin'
@@ -19,14 +19,14 @@ task :bochs => :build do
   sh "bochs -q -f .bochsrc"
 end
 
-task :nm => :build do 
+task :nm => :build do
   sh 'cat main.nmtab'
 end
 
 task :debug => :build do
   sh "bochs-dbg -q -f .bochsrc"
 end
-  
+
 task :build => ['bin/kernel.img', :rootfs, :ctags]
 
 task :clean do
@@ -40,7 +40,7 @@ task :werr do
 end
 
 ## helpers ##
-task :todo do 
+task :todo do
   sh "grep -r -n '\\(TODO\\|\\<bug\\>\\)' ./src --color"
 end
 
@@ -48,7 +48,7 @@ task :ctags do
   sh "(cd src; ctags -R .)"
 end
 
-task :fsck do 
+task :fsck do
   sh "fsck.minix -fl ./bin/rootfs.img"
 end
 
@@ -68,7 +68,7 @@ file 'bin/boot.o' => ['src/boot/boot.S'] do
   sh "nasm -f elf -o bin/boot.o src/boot/boot.S"
 end
 
-file 'bin/boot.bin' => ['bin/boot.o', 'tool/boot.ld'] do 
+file 'bin/boot.bin' => ['bin/boot.o', 'tool/boot.ld'] do
   sh "ld bin/boot.o -o bin/boot.bin -e c -T tool/boot.ld"
 end
 
@@ -109,7 +109,7 @@ file 'bin/main.elf' => ofiles + ['tool/main.ld'] do
 end
 
 # ----------------------------------------------------------------------
-# the rootfs part. 
+# the rootfs part.
 # => rootfs.img
 
 # the root file system aka the hard disk image, 1mb yet and ignored
@@ -118,7 +118,7 @@ end
 task :rootfs => ['bin/rootfs.img']
 
 # init and copy some thing into the hard disk image.
-file 'bin/rootfs.img' => [:usr] do 
+file 'bin/rootfs.img' => [:usr] do
   `rm -f bin/rootfs.img`
   sh "bximage bin/rootfs.img -hd -mode=flat -size=1 -q"
   sh "mkfs.minix bin/rootfs.img"
@@ -167,7 +167,7 @@ usr_cfiles.each do |fn_c|
   fn = File.basename(fn_c).ext('')
   fn_o = 'bin/usr/'+fn.ext('o')
   fn_e = 'bin/usr/'+fn
-  file fn_e => [fn_c, :libsys, 'tool/user.ld'] do 
+  file fn_e => [fn_c, :libsys, 'tool/user.ld'] do
     sh "gcc -c #{cinc} -nostdinc -fno-builtin -fno-stack-protector #{fn_c} -o #{fn_o}"
     sh "ld #{libsys_ofiles*' '} #{fn_o} -o #{fn_e} -e c -T tool/user.ld"
     sh "nm #{fn_e} > #{fn_o.ext('sym')}"

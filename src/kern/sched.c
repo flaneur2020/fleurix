@@ -6,7 +6,7 @@
 #include <conf.h>
 
 /* TODO: the algorithm on runrun seems break */
-uint runrun = 0; 
+uint runrun = 0;
 
 /*******************************************************************************/
 
@@ -29,7 +29,7 @@ void sleep(uint chan, int pri){
         cu->p_pri = pri;
         cu->p_stat = SWAIT; // interruptible
         sti();
-        if (issig()) 
+        if (issig())
             psig();
         swtch();
     }
@@ -39,13 +39,13 @@ void wakeup(uint chan){
     struct proc *p;
     int i;
     for(i=0; i<NPROC; i++){
-        if ((p = proc[i]) == NULL) 
+        if ((p = proc[i]) == NULL)
             continue;
         if (p->p_chan == chan) {
             setrun(p);
         }
     }
-} 
+}
 
 void setrun(struct proc *p){
     p->p_chan = 0;
@@ -68,7 +68,7 @@ void setpri(struct proc *p){
     p->p_pri = n;
 }
 
-/* called once per second, re-caculate all the procs' p_pri 
+/* called once per second, re-caculate all the procs' p_pri
  * TODO: stil didn't catch the idea of traditional Unix's scheduling.
  * choose linus's approach instead later.
  * */
@@ -85,7 +85,7 @@ void sched_cpu(){
     }
 }
 
-/* 
+/*
  * find the next proc and switch it.
  * re-caculate the current proc's p_pri on the end of time quatum.
  * */
@@ -119,7 +119,7 @@ void swtch(){
  * */
 void swtch_to(struct proc *to){
     struct proc *from;
-    tss.esp0 = (uint)to + PAGE; 
+    tss.esp0 = (uint)to + PAGE;
     from = cu;
     cu = to;
     lpgd(to->p_vm.vm_pgd);

@@ -14,7 +14,7 @@
  *
  * */
 
-static uint mode = 0; 
+static uint mode = 0;
 
 /* translate into flags which indicated the satus of shift, ctrl & alt. */
 char shift(char sc){
@@ -38,8 +38,8 @@ char shift(char sc){
 }
 
 /*
- * Each keyboard interrupt came along with a 8bit scan code (via inb(KB_DATA)), if bit 8 is 
- * set, it's releasing a key, else pressing. 
+ * Each keyboard interrupt came along with a 8bit scan code (via inb(KB_DATA)), if bit 8 is
+ * set, it's releasing a key, else pressing.
  * */
 int do_keybd_intr(struct trap *tf){
     uchar sc, ch, m;
@@ -52,18 +52,18 @@ int do_keybd_intr(struct trap *tf){
     sc = inb(KB_DATA);
 
     // ignore capslock yet.
-    if ((sc & 0x7f) == 0x3A) 
+    if ((sc & 0x7f) == 0x3A)
         return 0;
 
     // check E0ESC
-    if (sc == 0xE0) 
+    if (sc == 0xE0)
         mode |= E0ESC;
 
     // check shift, ctrl and alt
     if ((m = shift(sc))) {
-        if (sc & 0x80) 
+        if (sc & 0x80)
             mode &= ~m;
-        else 
+        else
             mode |= m;
         return 0;
     }
@@ -72,7 +72,7 @@ int do_keybd_intr(struct trap *tf){
 
     if (mode & CTRL) {
         switch(ch){
-        case 'c': ch = CINTR; 
+        case 'c': ch = CINTR;
         case 'd': ch = CEOF;
         case 'x': ch = CKILL;
         case 'q': ch = CSTART;
@@ -82,7 +82,7 @@ int do_keybd_intr(struct trap *tf){
         }
     }
 
-    // on pressed 
+    // on pressed
     if ((sc & 0x80)==0 && ch!='\0') {
         tty_input(&tty[0], ch);
     }

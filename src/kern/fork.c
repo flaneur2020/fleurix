@@ -6,12 +6,12 @@
 #include <page.h>
 #include <vm.h>
 
-#include <conf.h>                      
+#include <conf.h>
 
 /*
  * proc.c - 2010 fleurer
- * this file implies the initilization of proc[0] and the implementation 
- * of fork(), 
+ * this file implies the initilization of proc[0] and the implementation
+ * of fork(),
  *
  * */
 
@@ -20,7 +20,7 @@ struct proc proc0;
 struct proc *proc[NPROC] = {NULL, };
 struct proc *cu = NULL;
 
-struct tss_desc tss;              
+struct tss_desc tss;
 
 extern void _hwint_ret();
 
@@ -40,10 +40,10 @@ int find_pid(){
     return 0;
 }
 
-/* Spawn a kernel thread.    
+/* Spawn a kernel thread.
  * This is not quite cool, but we have to do some initialization in
- * kernel's address space, the approach in linux0.11 is not quite 
- * ease here for the fact that trap occured in the kernel space do 
+ * kernel's address space, the approach in linux0.11 is not quite
+ * ease here for the fact that trap occured in the kernel space do
  * not refering the esp in TSS.
  *
  * returns a pointer to the newly borned proc, one page size(with the kernel stack).
@@ -130,8 +130,8 @@ int do_fork(struct trap *tf){
 
 /* ----------------------------------------------------------- */
 
-/* 
- * init proc[0] 
+/*
+ * init proc[0]
  * set the LDT and th ONLY TSS into GDT
  * and make current as proc[0]
  */

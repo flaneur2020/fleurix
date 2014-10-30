@@ -2,14 +2,14 @@
 #define STAT_H
 
 struct stat {
-    ushort  st_dev; 
+    ushort  st_dev;
     ushort  st_ino;
     ushort  st_mode;
-    ushort  st_nlink;  
+    ushort  st_nlink;
     ushort  st_uid;
     ushort  st_gid;
     ushort  st_rdev;
-    uint    st_size;  
+    uint    st_size;
     ushort  st_atime;
     ushort  st_mtime;
     ushort  st_ctime;

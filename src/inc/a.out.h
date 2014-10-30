@@ -10,7 +10,7 @@ struct ahead {
   uint      a_entry;		/* start address */
   uint      a_trsize;		/* size of relocation info for text, in bytes */
   uint      a_drsize;		/* size of relocation info for data, in bytes */
-}; 
+};
 
 #define NMAGIC 0x6400CC
 

@@ -13,14 +13,14 @@ struct vma {
     uint            v_ioff; // keep block aligned
 };
 
-#define VMA_RDONLY  0x1  // read only 
+#define VMA_RDONLY  0x1  // read only
 #define VMA_STACK   0x2  // this vma indicates a stack, which grows downwards.
 #define VMA_ZERO    0x4  // demand-zero
 #define VMA_MMAP    0x8  // mapped from a file
-#define VMA_PRIVATE 0x10 // Copy On Write 
+#define VMA_PRIVATE 0x10 // Copy On Write
 
 /*
- * each proc got one struct vm, which indicated it's page directory 
+ * each proc got one struct vm, which indicated it's page directory
  * and misc on address space.
  * */
 struct vm {

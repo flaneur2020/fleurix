@@ -6,13 +6,13 @@
 struct buf;
 
 struct bdevsw {
-    int             (*d_open)(); 
+    int             (*d_open)();
     int             (*d_close)();
     int             (*d_request)(struct buf *bp);
     struct devtab    *d_tab;
 };
 
-extern struct bdevsw    bdevsw[NBLKDEV];   
+extern struct bdevsw    bdevsw[NBLKDEV];
 
 struct cdevsw {
     int             (*d_open)   (ushort dev);

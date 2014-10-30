@@ -58,12 +58,12 @@ void do_no_page(uint vaddr){
     panic("do_no_page()");
 }
 
-/* 
+/*
  * the handler of the read-only protection. here is the 'copy' action
  * of the implemtion of copy-on-write.
  * If this one is the last one who did the write, just mark the page as
  * write-able.
- * else allocate one page and associate inside the page table. 
+ * else allocate one page and associate inside the page table.
  * */
 void do_wp_page(uint vaddr){
     struct vma *vp;
@@ -117,7 +117,7 @@ int do_pgfault(struct trap *tf){
     if (tf->err_code & PFE_U) {
         sigsend(cu->p_pid, SIGSEGV, 1);
     }
-    
+
     return 0;
 }
 

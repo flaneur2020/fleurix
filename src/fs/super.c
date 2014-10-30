@@ -2,7 +2,7 @@
 #include <x86.h>
 #include <proto.h>
 #include <proc.h>
-// 
+//
 #include <buf.h>
 #include <conf.h>
 //
@@ -13,7 +13,7 @@
 struct super    mnt[NMOUNT] = { {0, }, };
 
 /* search the mount table.
- * note: super block is meaningless until the device is mounted 
+ * note: super block is meaningless until the device is mounted
  * */
 struct super* getsp(ushort dev){
     struct super *sp;
@@ -46,7 +46,7 @@ int spload(struct super *sp){
     bp = bread(sp->s_dev, 1);
     if ((bp->b_flag & B_ERROR)!=0){
         panic("disk read error");
-        return -1;   
+        return -1;
     }
     memcpy(sp, bp->b_data, sizeof(struct d_super));
     brelse(bp);
@@ -63,7 +63,7 @@ int spload(struct super *sp){
  * */
 void spupdate(struct super *sp){
     struct buf *bp;
-    
+
     bp = getblk(sp->s_dev, 1);
     memcpy(bp->b_data, (char*)sp, sizeof(struct d_super));
     bwrite(bp);
@@ -77,7 +77,7 @@ void update(){
 
 /* ---------------------------------------------- */
 
-/* 
+/*
  * unlock(release) a super
  * */
 void unlk_sp(struct super *sp){

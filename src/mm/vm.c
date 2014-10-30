@@ -48,9 +48,9 @@ int vm_clone(struct vm *to){
     return 0;
 }
 
-/* free all the pages used in this process, deallocate all the page tables, 
- * this routine is called on freeing one task in do_exit(), or overlapping 
- * a proc's address space on do_exec() is being called. 
+/* free all the pages used in this process, deallocate all the page tables,
+ * this routine is called on freeing one task in do_exit(), or overlapping
+ * a proc's address space on do_exec() is being called.
  * note: this routine will *NOT* free the pgd.
  * */
 int vm_clear(struct vm *vm){
@@ -81,7 +81,7 @@ int vm_renew(struct vm *vm, struct ahead *ah, struct inode *ip){
     text = ah->a_entry - sizeof(struct ahead);
     data = text + ah->a_tsize;
     bss  = data + ah->a_dsize;
-    heap = bss  + ah->a_bsize; 
+    heap = bss  + ah->a_bsize;
     //
     pgd_init(vm->vm_pgd);
     vm->vm_entry = ah->a_entry;
@@ -93,24 +93,24 @@ int vm_renew(struct vm *vm, struct ahead *ah, struct inode *ip){
     return 0;
 }
 
-/* Have a check of virtual memory area on getting a user space 
- * pointer, on writing a write protected page, x86 do not raise 
- * a page fault in ring0, so simulate a write only access as 
+/* Have a check of virtual memory area on getting a user space
+ * pointer, on writing a write protected page, x86 do not raise
+ * a page fault in ring0, so simulate a write only access as
  * what mmu does if nessary.
  *
- * note:  
+ * note:
  *   be aware that do NOT touch the memory in the second argument
  *   like `vm_verify(path, strlen(path) + 1)`, which is a bug
  *
- * note2: 
- *   use this routine only before reading and writing the 
+ * note2:
+ *   use this routine only before reading and writing the
  *   user memory.
  * */
 int vm_verify(void *vaddr, uint size){
     struct pte *pte;
     uint page;
     uint addr = (uint)vaddr;
-    
+
     if (addr<KMEM_END || size<0) {
         return -1;
     }

@@ -15,7 +15,7 @@ void set_seg(struct seg_desc *seg, uint base, uint limit, uint dpl, uint type){
     seg->type     = type;
     seg->s        = 1;
     seg->dpl      = dpl;
-    seg->present  = 1; 
+    seg->present  = 1;
     seg->limit_hi = (uint) (limit) >> 28;
     seg->avl      = 0;
     seg->r        = 0;
@@ -39,7 +39,7 @@ void set_tss(struct seg_desc *seg, uint base){
 
 /* ------------------------------------------------------ */
 
-/* 
+/*
  * refill the gdt(the ex-gdt initialized in boot/boot.S)
  * one tss is shared among all processes.
  */

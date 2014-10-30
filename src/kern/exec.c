@@ -16,14 +16,14 @@
 #include <super.h>
 #include <inode.h>
 #include <file.h>
-// 
+//
 #include <a.out.h>
 
 /*
  * exec.c
  *
  * this file indicated the implementation of exec(char* path, char **argv).
- * exec() create a NEW address space, which overlapped the old forked address 
+ * exec() create a NEW address space, which overlapped the old forked address
  * space, make it demand-reading.
  * */
 
@@ -32,7 +32,7 @@ static int free_argv(char **tmp);
 
 /* ---------------------------------------------- */
 
-/* initialize a new struct vm according to an a.out executable 
+/* initialize a new struct vm according to an a.out executable
  * image.
  * returns NULL on fail.
  * the user stack initialized like this:
@@ -174,7 +174,7 @@ static char** store_argv(char *path, char **argv){
     int argc, i;
 
     argc = 1;
-    if (argv!=NULL) 
+    if (argv!=NULL)
         for (; argv[argc-1]; argc++);
     // store the argv in temp
     tmp    = (char**)kmalloc(PAGE);

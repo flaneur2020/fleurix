@@ -4,10 +4,10 @@
 
 #include <tty.h>
 
-/* 
+/*
  * vga.c
  *
- * This file indicated how to display text on the terminal, no 
+ * This file indicated how to display text on the terminal, no
  * xxx_init() needed. And you can take printk() almost every
  * where among this kernel.
  * */
@@ -67,7 +67,7 @@ void putch(char c) {
             vgamem[py][px].vc_char = ' ';
         }
         else {
-            if (py>0) 
+            if (py>0)
                 py--;
             px = 79;
             vgamem[py][px].vc_char = ' ';
@@ -108,14 +108,14 @@ void printn(uint n, uint b){
     static char *ntab = "0123456789ABCDEF";
     uint a, m;
     if ((a = n / b)){
-        printn(a, b);  
+        printn(a, b);
     }
     m = n % b;
     putch( ntab[m] );
 }
 
 /* a simpler printk
- * refer to unix v6 
+ * refer to unix v6
  * */
 void printk(char *fmt, ...){
     char c;

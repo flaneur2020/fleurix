@@ -47,8 +47,8 @@ int issig(){
 
 /*
  * perform the action specified by the current signal.
- * the usual sequence is: 
- * if (issig()) 
+ * the usual sequence is:
+ * if (issig())
  *      psig();
  * */
 void psig(){
@@ -67,7 +67,7 @@ void psig(){
     cu->p_cursig = 0;
     if (sa->sa_handler != SIG_DFL) {
         tf = cu->p_trap;
-        // save registers and the old sa_mask 
+        // save registers and the old sa_mask
         usigsav(&jbuf, tf, cu->p_sigmask);
         // store the new sa_mask
         if ((sa->sa_flags & SA_NOMASK)==0) {
@@ -132,7 +132,7 @@ void usigsav(struct jmp_buf *buf, struct trap *tf, uint mask){
 /* send a signal to a process.*/
 int sigsend(int pid, int n, int priv){
     struct proc *p;
-    
+
     p = proc[pid];
     if (pid==0 || p==NULL || n<0 || n>=NSIG) {
         syserr(EINVAL);
@@ -142,7 +142,7 @@ int sigsend(int pid, int n, int priv){
         syserr(EPERM);
         return -1;
     }
-    if (p->p_sigact[n-1].sa_handler==SIG_IGN && n!=SIGKILL) 
+    if (p->p_sigact[n-1].sa_handler==SIG_IGN && n!=SIGKILL)
         return -1;
 
     p->p_sig |= (1<<(n-1));
@@ -179,15 +179,15 @@ int do_kill(int pid, int sig){
     struct proc *p;
     int nr, ret;
 
-    if (pid>0) 
+    if (pid>0)
         return sigsend(pid, sig, 0);
-    if (pid==0) 
+    if (pid==0)
         return sigsend_g(cu->p_pid, sig, 0);
-    if (pid < -1) 
+    if (pid < -1)
         return sigsend_g(-pid, sig, 0);
     if (pid==-1) {
         for (nr=1; nr<NPROC; nr++) {
-            if ((p=proc[nr])) 
+            if ((p=proc[nr]))
                 ret = sigsend(nr, sig, 0);
         }
         return ret;
@@ -201,7 +201,7 @@ int do_sigaction(int sig, struct sigaction *sa, struct sigaction *old_sa){
         syserr(EINVAL);
         return -1;
     }
-    // store the old struct sigaction 
+    // store the old struct sigaction
     if (old_sa!=NULL) {
         if (vm_verify(old_sa, sizeof(struct sigaction))<0) {
             syserr(EFAULT);

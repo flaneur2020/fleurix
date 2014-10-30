@@ -2,7 +2,7 @@
 #include <x86.h>
 #include <proto.h>
 #include <proc.h>
-// 
+//
 #include <buf.h>
 #include <tty.h>
 #include <conf.h>
@@ -65,7 +65,7 @@ int do_write(int fd, char *buf, int cnt){
     struct inode *ip;
     int r, off;
     uint dev;
-    
+
     fp = cu->p_ofile[fd];
     if ( fd<0 || fd>NOFILE || fp==NULL) {
         syserr(ENFILE);
@@ -87,7 +87,7 @@ int do_write(int fd, char *buf, int cnt){
     ip = fp->f_ino;
     switch(ip->i_mode & S_IFMT) {
     case S_IFBLK:
-        // TODO: 
+        // TODO:
         break;
     case S_IFCHR:
         dev = ip->i_zone[0];
@@ -109,7 +109,7 @@ int do_write(int fd, char *buf, int cnt){
 }
 
 /*
- * reposition the opened file asscociated with the file descriptor fd 
+ * reposition the opened file asscociated with the file descriptor fd
  * to the argument off, according to the directive whence below:
  *  SEEK_SET: set the offset as the argument off
  *  SEEK_CUR: set the offset to its current location plus off bytes.
@@ -129,12 +129,12 @@ int do_lseek(uint fd, int off, int whence){
     }
 
     if (whence==SEEK_SET) {
-        if (off < 0) 
+        if (off < 0)
             goto _einval;
         fp->f_offset = off;
     }
-    if (whence==SEEK_CUR) { 
-        if (fp->f_offset+off < fp->f_offset) 
+    if (whence==SEEK_CUR) {
+        if (fp->f_offset+off < fp->f_offset)
             goto _einval;
         fp->f_offset += off;
     }

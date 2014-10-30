@@ -1,6 +1,6 @@
 /* it's a minix 2 fs's super block.
  * note that each minor device's first logical block(1024b, 2 physical block)
- * is reserved for the boot record, the second logical block is reserved for the 
+ * is reserved for the boot record, the second logical block is reserved for the
  * super block, which is also 1024b.
  * */
 struct d_super {

@@ -1,7 +1,7 @@
 #include <param.h>
 #include <x86.h>
 #include <proc.h>
-// 
+//
 #include <buf.h>
 #include <conf.h>
 //
@@ -21,16 +21,16 @@ struct inode inode[NINODE];
  * iupdate -> write changes back to disk.
  * */
 
-/* get an (locked) inode via an number 
+/* get an (locked) inode via an number
  * if the inode is in cache, return it right now.
  * return NULL on error.
  * note1: you may compare this code with getblk, the idea here
  * is common used among everywhere on resource allocation.
- * it returns ONLY locked inode just as B_BUSY in getblk, just 
+ * it returns ONLY locked inode just as B_BUSY in getblk, just
  * to prevent other processes' accessing within one syscall.
  *
  * note2: though there is still some differences between getblk,
- * put an eye on *reference count*, lock won't stays long(within 
+ * put an eye on *reference count*, lock won't stays long(within
  * one syscall, like the open routine, which unlock the inode at
  * last), though *reference count* ramains set between syscalls
  * to prevent the kernel from reallocating active in-core inode.
@@ -79,12 +79,12 @@ _loop:
             return ip;
         }
     }
-    // if not found (no free slot) 
+    // if not found (no free slot)
     printk("inode table overflow.\n");
     return NULL;
 }
 
-/* 
+/*
  * release an inode.
  * decrease the reference count, write updates to disk if nessary.
  * also check the link count, if zero, trucate it.
@@ -122,7 +122,7 @@ void iput(struct inode *ip){
 
 /***************************************************/
 
-/* load a inode from disk 
+/* load a inode from disk
  * */
 int iload(struct inode *ip){
     struct super *sp;

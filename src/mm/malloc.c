@@ -18,7 +18,7 @@
  * */
 
 /*
- * the bucket table, each slot got a different 2-powered size. 
+ * the bucket table, each slot got a different 2-powered size.
  * 1 << 3 == 32,  1 << 12 == 0x1000
  * */
 struct bucket bktab[] = {
@@ -37,7 +37,7 @@ struct bucket bkfreelist = {0, };
 /* ---------------------------------------------------------- */
 
 inline int bkslot(int size){
-    int n,i; 
+    int n,i;
 
     if (size <= 0)
         return -1;
@@ -46,13 +46,13 @@ inline int bkslot(int size){
     while((n <<= 1)<=4096) {
         if (size <= n){
             return i;
-        } 
+        }
         i++;
     }
     return -1;
 }
 
-/* 
+/*
  * Allocate one bucket. All free buckets are cached in one free list,
  * if no free bucket, allocate one page and divide it into buckets.
  * */
@@ -112,7 +112,7 @@ int bkinit(struct bucket *bk, int size){
 
 /* -------------------------------------------------------- */
 
-/* 
+/*
  * kmalloc().
  * one page size is special considered, for no need to arrange
  * any bucket. which symmeties in kfree.
@@ -127,7 +127,7 @@ void* kmalloc(uint size){
     if (sn < 0) {
         panic("kmalloc(): bad size");
     }
-    
+
     bk = bh = &bktab[sn];
     size = bh->bk_size;
     // special case for one page size
@@ -155,7 +155,7 @@ _find:
 }
 
 /*
- * 
+ *
  * */
 int kfree(void* addr, uint size){
     int sn;

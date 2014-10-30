@@ -18,7 +18,7 @@ struct proc {
     int                 p_cpu;          /* - */
     int                 p_nice;         /* - */
     int                 p_time;         /* on swap */
-    uint                p_pid;          
+    uint                p_pid;
     uint                p_ppid;         /* parent's pid */
     uint                p_pgrp;         /* process group */
     uint                p_euid;         /* effective uid */
@@ -46,7 +46,7 @@ extern struct proc *proc[NPROC];
 extern struct proc *cu;
 
 /* flag for re-scheduling */
-extern uint runrun; 
+extern uint runrun;
 
 /* stat codes */
 #define SSLEEP      1           // sleeping on high priority (unitterruptible)

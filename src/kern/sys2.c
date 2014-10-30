@@ -12,11 +12,11 @@
 
 /* syscalls on fs */
 
-/* 
+/*
  * WARNING: DANGEROUS here! While passing data between kernel
- * and user, a verification is nesscary. Just make a simulation 
- * what the hardware does in user space, or it may cause corruption, 
- * even overlaps the kernel memory, be careful. 
+ * and user, a verification is nesscary. Just make a simulation
+ * what the hardware does in user space, or it may cause corruption,
+ * even overlaps the kernel memory, be careful.
  *
  * */
 
@@ -74,7 +74,7 @@ int sys_close(struct trap *tf){
 int sys_read(struct trap *tf){
     int fd = tf->ebx;
     int cnt = tf->edx;
-    char *buf = (char*)tf->ecx; 
+    char *buf = (char*)tf->ecx;
 
     if(vm_verify(buf, cnt) < 0){
         syserr(EFAULT);
@@ -116,7 +116,7 @@ int sys_link(struct trap *tf){
 
 int sys_unlink(struct trap *tf){
     char *path = (char *) tf->ebx;
-    
+
     return do_unlink(path);
 }
 
@@ -150,7 +150,7 @@ int sys_fstat(struct trap *tf){
     int fd = (int)tf->ebx;
     struct stat *sbuf = (struct stat*)tf->ecx;
     struct file *fp;
-   
+
     if (fd<0 || fd>=NOFILE || cu->p_ofile[fd]==NULL) {
         syserr(EBADF);
         return -1;
@@ -161,7 +161,7 @@ int sys_fstat(struct trap *tf){
 
 /* int stat(char *path, struct stat *buf); */
 int sys_stat(struct trap *tf){
-    char *path = (char*)tf->ebx; 
+    char *path = (char*)tf->ebx;
     struct stat *sbuf = (struct stat*)tf->ecx;
     struct inode *ip;
 
@@ -176,7 +176,7 @@ int sys_stat(struct trap *tf){
     }
     return do_stat(ip, sbuf);
 }
- 
+
 /* int fcntl(int fd, int cmd, int arg); */
 int sys_fcntl(struct trap *tf){
     int fd = (int)tf->ebx;

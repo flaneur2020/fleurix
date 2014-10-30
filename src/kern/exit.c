@@ -6,7 +6,7 @@
 #include <page.h>
 #include <vm.h>
 
-#include <conf.h>                      
+#include <conf.h>
 
 /* exit.c - 2011 fleurer
  * */
@@ -40,7 +40,7 @@ int do_exit(int ret){
     // free the address space
     vm_clear(&cu->p_vm);
     kfree(cu->p_vm.vm_pgd, PAGE);
-    // make this process Zombie, give all the children to proc[1] 
+    // make this process Zombie, give all the children to proc[1]
     // and tell its parent
     cu->p_chan = 0;
     cu->p_stat = SZOMB;

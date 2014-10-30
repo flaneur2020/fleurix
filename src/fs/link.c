@@ -2,7 +2,7 @@
 #include <x86.h>
 #include <proto.h>
 #include <proc.h>
-// 
+//
 #include <buf.h>
 #include <conf.h>
 //
@@ -13,8 +13,8 @@
 #include <stat.h>
 
 /*
- * link path1 to path2. 
- * path1 is existing yet, create a new directory entry for path2, 
+ * link path1 to path2.
+ * path1 is existing yet, create a new directory entry for path2,
  * and increase the reference count of path1's inode.
  * */
 int do_link(char *path1, char *path2){
@@ -62,7 +62,7 @@ int do_link(char *path1, char *path2){
     return 0;
 
 _bad_name:
-    // undo something 
+    // undo something
     lock_ino(tip);
     tip->i_nlink--;
     iupdate(tip);
@@ -74,7 +74,7 @@ _bad_name:
 /*
  * remove a link to a file.
  * this file should not be a directory.
- * returns 0 on success. 
+ * returns 0 on success.
  * */
 int do_unlink(char *path){
     struct inode *ip, *dip;
@@ -82,7 +82,7 @@ int do_unlink(char *path){
     char *name;
 
     dip = namei_parent(path, &name);
-    // on path=='/' 
+    // on path=='/'
     if (strlen(name)==0 || strlen(name) >= NAMELEN)
         goto _bad_name;
     if (strcmp(name, ".")==0 || strcmp(name, "..")==0)
@@ -90,7 +90,7 @@ int do_unlink(char *path){
 
     ino = unlink_entry(dip, name, strlen(name));
     // entry not found
-    if (ino<=0) 
+    if (ino<=0)
         goto _bad_name;
     ip = iget(dip->i_dev, ino);
     // can't unlink a directory, undo something.

@@ -2,7 +2,7 @@
 #include <x86.h>
 #include <proto.h>
 #include <proc.h>
-// 
+//
 #include <buf.h>
 #include <conf.h>
 //
@@ -10,9 +10,9 @@
 #include <inode.h>
 #include <stat.h>
 
-/* alloc one disk block in order to extend one file. returns 
+/* alloc one disk block in order to extend one file. returns
  * its LBA.
- * note: only called in bmap(, , 1). 
+ * note: only called in bmap(, , 1).
  * note2: here assumes each zone equals one block.
  * */
 int balloc(ushort dev){
@@ -40,13 +40,13 @@ int balloc(ushort dev){
     return -1;
 }
 
-/* free a block. 
+/* free a block.
  * */
 int bfree(ushort dev, uint nr){
     struct buf *bp;
     struct super *sp;
     uint bn;
-    
+
     sp = getsp(dev);
     if ((nr < sp->s_data_zone0) || (nr >= sp->s_max_zone)) {
         panic("freeing a block not in data zone");
@@ -89,7 +89,7 @@ int ialloc(ushort dev){
     sp = getsp(dev);
     for (nr=0; nr < sp->s_max_inode; nr++){
         bp = bread(dev, IMAPBLK(sp, nr));
-        r = find_bit(bp->b_data, BLK);   
+        r = find_bit(bp->b_data, BLK);
         if (r < 0) {
             continue;
         }
@@ -108,7 +108,7 @@ int ialloc(ushort dev){
 void ifree(ushort dev, uint ino){
     struct buf *bp;
     struct super *sp;
-    
+
     sp = getsp(dev);
     if ((ino <= 0) || (ino >= sp->s_max_inode)) {
         panic("freeing an non-existing inode");
