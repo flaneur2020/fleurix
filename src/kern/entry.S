@@ -103,7 +103,7 @@ _hwint_ret:
 
 %macro hwint 1
     _hwint%1:
-        %if %1 != 17 && (%1 < 8 || %1 > 14)
+        %if %1 != 17 && %1 != 30 && (%1 < 8 || %1 > 14)
             push dword 0
         %endif
         push dword %1
