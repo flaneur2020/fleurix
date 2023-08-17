@@ -11,8 +11,8 @@ It contains 37 system calls, 7000 lines of C, over 200 lines of assembly, develo
 It has:
 -------
 
-- Support a.out executable format with fork(), exec(), exit(), signal handlings, and so on.
-- A pure paging memory management system with copy-on-write and demand paging. Support 4GB of address space for each process, sharing 128MB of kernel address space.
+- Support a.out executable format with `fork()`, `exec()`, `exit()`, `wait()`, signal handlings, and so on.
+- A pure paging memory management with copy-on-write and demand paging. Support 4GB of address space for each process, sharing 128MB of kernel address space.
 - A simple minixv1 fs implementation. It's simple, and it can takes advantage of tools under Linux such as mkfs.minix, fsck.minix, etc.
 - A simple `kmalloc()`.
 - A simple terminal.
