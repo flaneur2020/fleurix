@@ -1,26 +1,24 @@
 Fleurix
 =======
 
-About
------
+## About
 
-一个雏形的Unix-like内核。
+A prototype Unix-like kernel.
 
-37个系统调用，七千行C，二百多行汇编，在bochs之上。诚然还脱不去“玩具”的标签，不过也算完成了它的设计目标，那就是*跑起来* :)
+It contains 37 system calls, 7000 lines of C, over 200 lines of assembly, developed in a bochs environment. Admittedly, it can't yet shed the label of being a "toy", but it has accomplished its design goal, which is to *get it running* :)
 
-It has：
--------
-* minix v1的文件系统。原理简单，而且可以利用linux下的mkfs.minix，fsck.minix等工具。
-* `fork()/exec()/exit()`等等。a.out的可执行格式，实现了写时复制与请求调页。
-* 信号。
-* 一个纯分页的内存管理系统，每个进程4gb的地址空间，共享128mb的内核地址空间。至少比Linux0.11中的段页式内存管理方式更加灵活。
-* 一个简单的k`malloc()`(可惜没大用上)。
-* 一个简单的终端。
+## It has:
+
+- The filesystem of Minix v1. The principles are simple, and it can make use of tools under Linux such as mkfs.minix, fsck.minix, etc.
+- fork()/exec()/exit(), and so on. The a.out executable format, implementing copy-on-write and demand paging.
+- Signals.
+- A pure paging memory management system, with 4GB of address space for each process, sharing 128MB of kernel address space.
+- A simple k malloc(). Unfortunately, it wasn't used much.
+- A simple terminal.
 
 ### Syscalls
 
 ```c
-/* in src/inc/unistd.h */
 static inline _SYS0(int, debug);
 static inline _SYS2(int, access, char*, int);
 static inline _SYS3(int, open, char*, int, int);
@@ -39,11 +37,9 @@ static inline _SYS2(int, link, char*, char*);
 static inline _SYS1(int, unlink, char*);
 static inline _SYS2(int, stat, char*, struct stat*);
 static inline _SYS2(int, fstat, int, struct stat*);
-//
 static inline _SYS0(int, fork);
 static inline _SYS2(int, exec, char*, char**);
 static inline _SYS1(int, _exit, int);
-//
 static inline _SYS1(int, nice, int);
 static inline _SYS0(int, getpid);
 static inline _SYS0(int, getppid);
@@ -55,7 +51,6 @@ static inline _SYS0(int, getpgrp);
 static inline _SYS0(int, setpgrp);
 static inline _SYS2(int, setreuid, int, int);
 static inline _SYS2(int, setregid, int, int);
-//
 static inline _SYS2(int, kill, int, int);
 static inline _SYS2(int, signal, int, uint);
 static inline _SYS3(int, sigaction, int, struct sigaction*, struct sigaction*);
@@ -67,33 +62,32 @@ static inline _SYS0(int, pause);
 
 Delayed yet :(
 --------------
-* 没有管道
-* 没有swap
-* 还不是基于POSIX
-* 不支持硬盘分区
-* 只支持128mb的物理内存
 
-所以在真机上可能不靠谱 :(
+- not have pipes.
+- not support swap.
+- not POSIX yet.
+- not support hard disk partitioning.
+- only supports up to 128MB of physical memory.
 
 Compiling & Testing
 -------------------
 
-编译环境: ubuntu
+tools: rake, binutils(gcc, ld, as), nasm, bochs, mkfs.minix
 
-工具: rake, binutils(gcc, ld, as), nasm, bochs, mkfs.minix
-
-    git clone git@github.com:Fleurer/fleurix.git
-    cd fleurix
-    rake
-
+```
+git clone git@github.com:Fleurer/fleurix.git
+cd fleurix
+rake
+```
 
 Write your own programs under Fleurix
 -------------------------------------
 
-在`usr/`目录下新建一个.c文件。
+Create a new .c file in the usr/ directory, then execute:
 
-    rake
-
+```
+rake
+```
 
 Contributing
 ------------
@@ -102,5 +96,5 @@ Contributing
 2. Create a branch (`git checkout -b my_markup`)
 3. Commit your changes (`git commit -am "Added Snarkdown"`)
 4. Push to the branch (`git push origin my_markup`)
-5. Create an [Issue][1] with a link to your branch
+5. Create an Issue with a link to your branch
 6. Enjoy a refreshing Diet Coke and wait
