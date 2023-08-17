@@ -9,11 +9,11 @@ It contains 37 system calls, 7000 lines of C, over 200 lines of assembly, develo
 
 ## It has:
 
-- The filesystem of Minix v1. The principles are simple, and it can make use of tools under Linux such as mkfs.minix, fsck.minix, etc.
+- Minix v1 fs. It's simple, and it can take advantage of tools under Linux such as mkfs.minix, fsck.minix, etc.
 - fork()/exec()/exit(), and so on. The a.out executable format, implementing copy-on-write and demand paging.
 - Signals.
 - A pure paging memory management system, with 4GB of address space for each process, sharing 128MB of kernel address space.
-- A simple k malloc(). Unfortunately, it wasn't used much.
+- A simple `kmalloc()`. Unfortunately, it wasn't used much yet.
 - A simple terminal.
 
 ### Syscalls
